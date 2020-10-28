@@ -17,10 +17,10 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from file_utils import cached_path
+from src.vilio.file_utils import cached_path
 
 from torch.nn.functional import relu
-from transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 
 ### BOTTOM-UP APPROACH ###
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 ### B) ACTIVATION FUNCS ###
 
-from transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -98,7 +98,7 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-from transformers.modeling_bert import (
+from src.vilio.transformers.modeling_bert import (
     BertLayer,
     BertPooler,
     BertOutput,
@@ -111,7 +111,7 @@ from transformers.modeling_bert import (
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
 
-from transformers.modeling_albert import AlbertEmbeddings
+from src.vilio.transformers.modeling_albert import AlbertEmbeddings
 
 class BertVisioLinguisticEmbeddings(AlbertEmbeddings):
     def __init__(self, config, *args, **kwargs):
@@ -246,10 +246,10 @@ class BertVisioLinguisticEmbeddings(AlbertEmbeddings):
 
 ### H) Final VB Model ###
 
-from transformers.modeling_bert import BertPreTrainedModel
-from transformers.configuration_albert import AlbertConfig
+from src.vilio.transformers.modeling_bert import BertPreTrainedModel
+from src.vilio.transformers.configuration_albert import AlbertConfig
 from param import args
-from transformers.modeling_albert import AlbertTransformer
+from src.vilio.transformers.modeling_albert import AlbertTransformer
 
 class AlbertV(BertPreTrainedModel):
     """
@@ -396,7 +396,7 @@ class AlbertV(BertPreTrainedModel):
 
 ### I) Only for pre-training- This can be safely deleted if no pretraining is planned ###
 
-from transformers.modeling_bert import BertForPreTraining
+from src.vilio.transformers.modeling_bert import BertForPreTraining
 
 class BertPredictionHeadTransform(nn.Module):
     def __init__(self, config):
@@ -439,7 +439,7 @@ class BertVisualObjHead(nn.Module):
             output[key] = self.decoder_dict[key](hidden_states)
         return output
 
-from transformers.modeling_albert import AlbertMLMHead
+from src.vilio.transformers.modeling_albert import AlbertMLMHead
 
 class AlbertVPretraining(nn.Module):
     """

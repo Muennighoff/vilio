@@ -15,7 +15,7 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from file_utils import cached_path
+from src.vilio.file_utils import cached_path
 
 ### BOTTOM-UP APPROACH ###
 # We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
@@ -35,7 +35,7 @@ from file_utils import cached_path
 
 logger = logging.getLogger(__name__)
 
-from transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -92,7 +92,7 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-from transformers.configuration_albert import AlbertConfig 
+from src.vilio.transformers.configuration_albert import AlbertConfig 
 
 ### C) EMBEDDING ENCODERS ### 
 
@@ -100,7 +100,7 @@ from transformers.configuration_albert import AlbertConfig
 BertLayerNorm = torch.nn.LayerNorm
 
 
-from transformers.modeling_albert import AlbertEmbeddings
+from src.vilio.transformers.modeling_albert import AlbertEmbeddings
 
 class VisualFeatEncoder(nn.Module):
     """Constructs the embeddings from features of detected objects & positions"""
@@ -329,7 +329,7 @@ class LXRTXLayer(nn.Module):
 
 # Note: Currently we are just loading in the whole AlbertModel (with e.g. 12 Layers)
 # If we only want to load in llayers specified; We need to modify AlbertLayerGroup itself (+ make sure we only use one group, which is standard anyways)
-from transformers.modeling_albert import AlbertLayerGroup
+from src.vilio.transformers.modeling_albert import AlbertLayerGroup
 
 class LXRTEncoder(nn.Module):
     """Defines the layers to use
@@ -430,7 +430,7 @@ class BertPooler(nn.Module):
 ### G) Pre-Model Class LXMERT inherits from ###
 
 # Note: BertPreTrainedModel as used in original LXMERT is outdated
-from transformers.modeling_bert import BertPreTrainedModel
+from src.vilio.transformers.modeling_bert import BertPreTrainedModel
 
 ### H) Final LXRT Model & Extension for Classification ###
 

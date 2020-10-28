@@ -87,6 +87,7 @@ Follow SCORE_REPROD.md
 
 ## To-do's
 
+- [ ] Clean-up import statements, python paths & find a better way to integrate transformers (Right now all import statements only work if in main folder)
 - [ ] Enable loading and running models just via import statements (and not having to clone the repo)
 - [ ] Find a way to include ERNIE-VIL in this repo (PaddlePaddle to Torch?)
 - [ ] Move tokenization in entry files to model-specific tokenization similar to transformers
