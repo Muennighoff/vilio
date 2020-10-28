@@ -9,8 +9,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # Data Splits
-    parser.add_argument("--train", default='train')
-    parser.add_argument("--valid", default='dev') # Dev, as dev.jsonl for Hatefulmemes
+    parser.add_argument("--train", default='traincleanex')
+    parser.add_argument("--valid", default='devseen')
     parser.add_argument("--test", default=None)
 
     # Training Hyper-parameters

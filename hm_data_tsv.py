@@ -19,17 +19,14 @@ class MMFDataset(Dataset):
         self.splits = splits.split(",")
 
 class MMFTorchDataset(Dataset):
-    def __init__(self, splits, rs=True):
+    def __init__(self, splits):
         super().__init__()
         self.name = splits
         self.splits = splits.split(",")
 
-        self.rs = rs
-
         # Loading datasets to data
         self.raw_data = []
         for split in self.splits:
-            #path = os.path.join(os.pardir, "data/hateful_memes/data", f"{split}.jsonl")
             path = os.path.join("data/", f"{split}.jsonl")
             self.raw_data.extend(
                     [json.loads(jline) for jline in open(path, "r").read().split('\n')]
@@ -38,9 +35,6 @@ class MMFTorchDataset(Dataset):
 
         # List to dict (for evaluation and others)
         self.id2datum = {datum["id"]: datum for datum in self.raw_data}
-
-        ### ABOVE could be moved to "Dataset" ###
-
 
         # Loading detection features to img_data
         img_data = []
