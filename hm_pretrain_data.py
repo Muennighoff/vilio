@@ -147,27 +147,7 @@ class LXMERTTorchDataset(Dataset):
                     other_datum = self.data[random.randint(0, len(self.data)-1)]
 
                 sent = other_datum['text']
-
-        if args.textb:
-            cls_prob = img["cls_prob"]
-
-            text_b = "[SEP]"
-
-            counts = Counter()
-    
-            for f in range(cls_prob.shape[0]):
-                idx = np.argmax(cls_prob[f, :])
-                for word in vg_dict["categories"]:
-                    if idx - 1 == word["id"]: # -1 as 0 is here None, while it is an actual value in the dict; hence all is shifted by 1
-                        if cls_prob[f, idx] > 0.2:
-                            counts[word["name"]] += 1
-            
-            for key in counts.keys():
-                text_b += " " + key
-
-            # Add it to our normal text
-            sent += text_b
-
+                
         # If label
         if "label" in datum:
             if int(datum["label"]) == 1:

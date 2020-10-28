@@ -24,10 +24,13 @@ from entryV import ModelV
 from entryD import ModelD
 from entryO import ModelO
 
-# SWA:
+# Two different SWA Methods - https://pytorch.org/blog/pytorch-1.6-now-includes-stochastic-weight-averaging/
 if args.swa:
     from torch.optim.swa_utils import AveragedModel, SWALR
     from torch.optim.lr_scheduler import CosineAnnealingLR
+
+if args.contrib:
+    from torchcontrib.optim import SWA
 
 
 # Largely sticking to the standards set in LXMERT here
@@ -134,12 +137,7 @@ class MMF:
         self.output = args.output
         os.makedirs(self.output, exist_ok=True)
 
-        self.output = args.output
-        os.makedirs(self.output, exist_ok=True)
-
-        # Implementing SWA as in https://pytorch.org/blog/pytorch-1.6-now-includes-stochastic-weight-averaging/
         if args.contrib:
-            from torchcontrib.optim import SWA
             self.optim = SWA(self.optim, swa_start=self.t_total * 0.75, swa_freq=5, swa_lr=args.lr)
 
         if args.swa: 
