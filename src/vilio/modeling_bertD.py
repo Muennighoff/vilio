@@ -284,7 +284,7 @@ class BertImageEmbeddings(nn.Module):
 
         self.image_embeddings = nn.Linear(config.v_feature_size, config.v_hidden_size)
         # Had to change the following from 5 to 4
-        self.image_location_embeddings = nn.Linear(4, config.v_hidden_size)
+        self.image_location_embeddings = nn.Linear(5, config.v_hidden_size)
         self.LayerNorm = BertLayerNorm(config.v_hidden_size, eps=1e-12)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
 
