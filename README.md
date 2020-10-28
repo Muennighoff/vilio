@@ -1,6 +1,6 @@
 <p align="center">
     <br>
-    <img src="https://raw.githubusercontent.com/Muennighoff/vilio/master/docs/vilio_cold.png" width="400"/> <h1 VILIO >
+    <h1 align="center"> 🥶VILIO🥶 </h1> 
     <br>
 <p>
 <p align="center">
@@ -71,14 +71,19 @@ Follow SCORE_REPROD.md
 1. **[D - DeVLBERT](https://arxiv.org/abs/2008.06884)** [DeVLBert: Learning Deconfounded Visio-Linguistic Representations](https://arxiv.org/abs/2008.06884)
 1. **[O - OSCAR](https://arxiv.org/abs/2004.06165)** [Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks](https://arxiv.org/abs/2004.06165)
 1. **[U - UNITER](https://arxiv.org/abs/1909.11740)** [UNITER: UNiversal Image-TExt Representation Learning](https://arxiv.org/abs/1909.11740)
+    - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
+    - [RoBERTa: Robustly Optimized BERT Pretraining Approach](https://arxiv.org/abs/1907.11692)
 1. **[V - VisualBERT](https://arxiv.org/abs/1908.03557)** [VisualBERT: A Simple and Performant Baseline for Vision and Language](https://arxiv.org/abs/1908.03557)
+    - [ALBERT: A Lite BERT](https://arxiv.org/abs/1909.11942)
+    - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
+    - [RoBERTa: Robustly Optimized BERT Pretraining Approach](https://arxiv.org/abs/1907.11692)
 1. **[X - LXMERT](https://arxiv.org/abs/1908.07490)** [LXMERT: Learning Cross-Modality Encoder Representations from Transformers](https://arxiv.org/abs/1908.07490)
-    - ALBERT
-    - BERT
-    - RoBERTa 
+    - [ALBERT: A Lite BERT](https://arxiv.org/abs/1909.11942)
+    - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
+    - [RoBERTa: Robustly Optimized BERT Pretraining Approach](https://arxiv.org/abs/1907.11692)
 
 
-## TO-DOs
+## To-do's
 
 - [ ] Enable loading and running models just via import statements (and not having to clone the repo)
 - [ ] Find a way to include ERNIE-VIL in this repo (PaddlePaddle to Torch?)
@@ -88,6 +93,6 @@ Follow SCORE_REPROD.md
 ## Attributions
 
 The code heavily borrows from the following repositories:
-https://github.com/huggingface/transformers
-https://github.com/facebookresearch/mmf
-https://github.com/airsplay/lxmert
+- https://github.com/huggingface/transformers
+- https://github.com/facebookresearch/mmf
+- https://github.com/airsplay/lxmert
