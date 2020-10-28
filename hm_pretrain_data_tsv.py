@@ -15,9 +15,7 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-from vg_dict import vg_dict
-
-from mmf_data_tsv import load_obj_tsv
+from hm_data_tsv import load_obj_tsv
 
 class InputExample(object):
     """A single training/test example for the language model."""

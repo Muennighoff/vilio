@@ -17,8 +17,6 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-from vg_dict import vg_dict
-
 # Load part of the dataset for fast checking.
 # Notice that here is the number of images instead of the number of data,
 # which means all related data to the images would be used.

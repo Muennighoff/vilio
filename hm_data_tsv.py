@@ -12,9 +12,6 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-from vg_dict import vg_dict
-
-
 class MMFDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
