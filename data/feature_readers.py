@@ -236,7 +236,7 @@ class PaddedFeatureRCNNWithBBoxesFeatureReader:
 if __name__ == "__main__":
 
     path = "features"
-    max_feats = 100 #36
+    max_feats = 100
 
     feat_reader = FeatureReader(max_features=max_feats, depth_first=True, base_path="path")
     hello = feat_reader.read(path)

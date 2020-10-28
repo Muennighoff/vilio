@@ -51,7 +51,7 @@ class MMFTorchDataset(Dataset):
         self.id2datum = {datum["id"]: datum for datum in self.data}
 
         path = "data/features/"
-        path2 = "data/detectron.lmdb"
+        path2 = "data/detectron.lmdb" #########################
 
         self.db = FeaturesDatabase(
                 path=path2,
