@@ -94,8 +94,10 @@ class MMF:
 
         if args.train is not None:
             batch_per_epoch = len(self.train_tuple.loader)
-            self.t_total = int(batch_per_epoch * args.epochs // args.acc)
-            print("Total Iters: %d" % self.t_total)
+        else:
+            batch_per_epoch = len(self.valid_tuple.loader)
+        self.t_total = int(batch_per_epoch * args.epochs // args.acc)
+        print("Total Iters: %d" % self.t_total)
 
         def is_backbone(n):
             if "encoder" in n:
