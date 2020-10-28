@@ -17,11 +17,21 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from src.vilio.file_utils import cached_path
-
 from torch.nn.functional import relu
 from src.vilio.transformers.activations import gelu, gelu_new, swish
 
+from src.vilio.file_utils import cached_path
+from src.vilio.transformers.configuration_albert import AlbertConfig
+from src.vilio.transformers.modeling_albert import AlbertEmbeddings, AlbertTransformer, AlbertMLMHead
+from src.vilio.transformers.modeling_bert import (
+    BertLayer,
+    BertPooler,
+    BertOutput,
+    BertIntermediate,
+    BertSelfOutput,
+    BertPreTrainedModel,
+    BertForPreTraining
+)
 
 ### BOTTOM-UP APPROACH ###
 # We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
@@ -37,13 +47,9 @@ from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 # I) LXMERT MODEL & DEPENDENCIES FOR PRETRAINING
 
-### A) D Links & Bert Weight loading ###
+### A) ACTIVATION FUNCS ###
 
 logger = logging.getLogger(__name__)
-
-### B) ACTIVATION FUNCS ###
-
-from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -98,20 +104,12 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-from src.vilio.transformers.modeling_bert import (
-    BertLayer,
-    BertPooler,
-    BertOutput,
-    BertIntermediate,
-    BertSelfOutput
-)
-
 ### C) EMBEDDINGS ENCODERS ### 
+# a) Imported AlbertEmb.
+# b) VisioL.
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-from src.vilio.transformers.modeling_albert import AlbertEmbeddings
 
 class BertVisioLinguisticEmbeddings(AlbertEmbeddings):
     def __init__(self, config, *args, **kwargs):
@@ -244,12 +242,8 @@ class BertVisioLinguisticEmbeddings(AlbertEmbeddings):
         embeddings = self.dropout(embeddings)
         return embeddings
 
-### H) Final VB Model ###
+### D) Final VB Model ###
 
-from src.vilio.transformers.modeling_bert import BertPreTrainedModel
-from src.vilio.transformers.configuration_albert import AlbertConfig
-from param import args
-from src.vilio.transformers.modeling_albert import AlbertTransformer
 
 class AlbertV(BertPreTrainedModel):
     """
@@ -277,6 +271,7 @@ class AlbertV(BertPreTrainedModel):
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
         config.output_hidden_states = True
+        self.layeravg = True
 
         self.config = config
     
@@ -298,7 +293,7 @@ class AlbertV(BertPreTrainedModel):
         self.fixed_head_masks = self.get_head_mask(None, self.config.num_hidden_layers)
 
         # Taking hidden states from all hidden layers
-        if args.reg:
+        if self.layeravg:
             self.dropout = nn.Dropout(p=0.2)
             n_weights = config.num_hidden_layers + 1
             weights_init = torch.zeros(n_weights).float()
@@ -381,7 +376,7 @@ class AlbertV(BertPreTrainedModel):
             sequence_output = encoded_layers[0]
             pooled_output = self.pooler(sequence_output)
 
-            if args.reg:
+            if self.layeravg:
                 hidden_layers = encoded_layers[1]
 
                 cls_outputs = torch.stack(
@@ -392,11 +387,7 @@ class AlbertV(BertPreTrainedModel):
             return sequence_output, pooled_output
 
 
-#### ONLY FOR PRETRAINING ####
-
-### I) Only for pre-training- This can be safely deleted if no pretraining is planned ###
-
-from src.vilio.transformers.modeling_bert import BertForPreTraining
+### E) Only for pre-training- This can be safely deleted if no pretraining is planned ###
 
 class BertPredictionHeadTransform(nn.Module):
     def __init__(self, config):
@@ -439,7 +430,6 @@ class BertVisualObjHead(nn.Module):
             output[key] = self.decoder_dict[key](hidden_states)
         return output
 
-from src.vilio.transformers.modeling_albert import AlbertMLMHead
 
 class AlbertVPretraining(nn.Module):
     """

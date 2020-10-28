@@ -24,22 +24,26 @@ from torch.nn import CrossEntropyLoss, SmoothL1Loss
 from file_utils import cached_path
 
 from torch.nn.functional import relu
-from transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.activations import gelu, gelu_new, swish
 
+from src.vilio.transformers.configuration_roberta import RobertaConfig
+from src.vilio.transformers.modeling_roberta import RobertaEmbeddings
 
-from transformers.modeling_bert import (
+from src.vilio.transformers.modeling_bert import (
     BertLayer,
     BertPooler,
     BertOutput,
     BertIntermediate,
-    BertSelfOutput
+    BertSelfOutput,
+    BertEncoder,
+    BertPreTrainedModel,
+    BertForPreTraining
 )
+
 
 logger = logging.getLogger(__name__)
 
-### ACTIVATION FUNCS ###
-
-from transformers.activations import gelu, gelu_new, swish
+### A) ACTIVATION FUNCS ###
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -58,7 +62,7 @@ class GeLU(nn.Module):
     def forward(self, x):
         return gelu(x)
 
-### CONFIGS ###
+### B) CONFIGS ###
 
 CONFIG_NAME = 'bert_config.json'
 WEIGHTS_NAME = 'pytorch_model.bin'
@@ -94,12 +98,12 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-### EMBEDDINGS ### 
+### C) EMBEDDINGS ###
+# a) Imported RobertaEmbeddings
+# b) Adpated VisioLing. Emb.
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-from transformers.modeling_roberta import RobertaEmbeddings
 
 def create_position_ids_from_input_ids(input_ids, padding_idx):
     """Replace non-padding symbols with their position numbers. Position numbers begin at
@@ -162,8 +166,6 @@ class BertVisioLinguisticEmbeddings(RobertaEmbeddings):
             seq_length, dtype=torch.long, device=input_ids.device
         )
         
-        #position_ids = position_ids.unsqueeze(0).expand_as(input_ids)
-
         # Roberta Position IDS
         if input_ids is not None:
             # Create the position ids from the input token ids. Any padded tokens remain padded.
@@ -174,19 +176,6 @@ class BertVisioLinguisticEmbeddings(RobertaEmbeddings):
         position_embeddings = self.position_embeddings(position_ids)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
         embeddings = words_embeddings + position_embeddings + token_type_embeddings
-
-        # Adjust Roberta Embeddings for final </s>
-        #embeddings = embeddings[:, :-1, :]
-
-        ### Roberta special </s> to add back to the end
-        #s_iid = torch.tensor([2], dtype=torch.long).expand(input_ids.size(0)).unsqueeze(1).cuda()
-        #s_pos = torch.tensor([0], dtype=torch.long).expand_as(s_iid).cuda()
-        #s_tok = torch.tensor([0], dtype=torch.long).expand_as(s_iid).cuda()
-        #s_word_emb = self.word_embeddings(s_iid)
-        #s_pos_emb = self.position_embeddings(s_pos)
-        #s_tok_emb = self.token_type_embeddings(s_tok)
-
-        #s_emb = s_word_emb + s_pos_emb + s_tok_emb
 
         if visual_embeddings is not None:
 
@@ -270,12 +259,7 @@ class BertVisioLinguisticEmbeddings(RobertaEmbeddings):
         embeddings = self.dropout(embeddings)
         return embeddings
 
-### Final VB Model ###
-
-from param import args
-from transformers.modeling_bert import BertEncoder
-from transformers.modeling_bert import BertPreTrainedModel
-from transformers.configuration_roberta import RobertaConfig
+### D) Final VB Model ###
 
 class RobertaV(BertPreTrainedModel):
     """
@@ -303,6 +287,7 @@ class RobertaV(BertPreTrainedModel):
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
         config.output_hidden_states = True
+        self.layeravg = True
 
         self.config = config
     
@@ -320,7 +305,7 @@ class RobertaV(BertPreTrainedModel):
         self.fixed_head_masks = [None for _ in range(len(self.encoder.layer))]
 
         # Taking hidden states from all hidden layers
-        if args.reg:
+        if self.layeravg:
             self.dropout = nn.Dropout(p=0.2)
             n_weights = config.num_hidden_layers + 1
             weights_init = torch.zeros(n_weights).float()
@@ -403,7 +388,7 @@ class RobertaV(BertPreTrainedModel):
 
             pooled_output = self.pooler(sequence_output)
 
-            if args.reg:
+            if self.layeravg:
                 hidden_layers = encoded_layers[1]
 
                 cls_outputs = torch.stack(
@@ -414,9 +399,7 @@ class RobertaV(BertPreTrainedModel):
             
             return sequence_output, pooled_output
 
-### ONLY FOR PRETRAINING ###
-
-from transformers.modeling_bert import BertForPreTraining
+### E) ONLY FOR PRETRAINING ###
 
 class BertPredictionHeadTransform(nn.Module):
     def __init__(self, config):

@@ -1,4 +1,4 @@
-# BERTBASEUNCASED LMXERT
+# Code adapted from MMF, LXMERT, VisualBERT
 
 from copy import deepcopy
 
@@ -17,27 +17,27 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from file_utils import cached_path
-
 from torch.nn.functional import relu
-from transformers.activations import gelu, gelu_new, swish
 
-from transformers.modeling_bert import BertConfig
-
-from transformers.modeling_bert import (
+from src.vilio.file_utils import cached_path
+from src.vilio.transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.modeling_bert import (
+    BertConfig,
+    BertEmbeddings,
     BertLayer,
     BertPooler,
     BertOutput,
     BertIntermediate,
-    BertSelfOutput
+    BertSelfOutput,
+    BertEncoder,
+    BertPreTrainedModel,
+    BertForPreTraining
 )
 
 
+### A) ACTIVATION FUNCS ###
+
 logger = logging.getLogger(__name__)
-
-### ACTIVATION FUNCS ###
-
-from transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -56,7 +56,7 @@ class GeLU(nn.Module):
     def forward(self, x):
         return gelu(x)
 
-### VISUALCONFIG (only used in pretraining) ###
+### B) VISUALCONFIG (only used in pretraining) ###
 
 CONFIG_NAME = 'bert_config.json'
 WEIGHTS_NAME = 'pytorch_model.bin'
@@ -91,12 +91,12 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-### EMBEDDINGS ### 
+### C) EMBEDDINGS ### 
+# a) BertEmbeddings as imported
+# c) VisioLing. embeddings
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-from transformers.modeling_bert import BertEmbeddings
 
 class BertVisioLinguisticEmbeddings(BertEmbeddings):
     def __init__(self, config, *args, **kwargs):
@@ -149,17 +149,6 @@ class BertVisioLinguisticEmbeddings(BertEmbeddings):
         position_embeddings = self.position_embeddings(position_ids)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
         embeddings = words_embeddings + position_embeddings + token_type_embeddings
-
-        #embeddings = embeddings[:, :-1, :]
-        #s_iid = torch.tensor([102], dtype=torch.long).expand(input_ids.size(0)).unsqueeze(1).cuda()
-        #s_pos = torch.tensor([0], dtype=torch.long).expand_as(s_iid).cuda()
-        #s_tok = torch.tensor([0], dtype=torch.long).expand_as(s_iid).cuda()
-        #s_word_emb = self.word_embeddings(s_iid)
-        #s_pos_emb = self.position_embeddings(s_pos)
-        #s_tok_emb = self.token_type_embeddings(s_tok)
-
-        #s_emb = s_word_emb + s_pos_emb + s_tok_emb
-
 
         if visual_embeddings is not None:
             visual_embeddings = self.projection(visual_embeddings)
@@ -225,7 +214,6 @@ class BertVisioLinguisticEmbeddings(BertEmbeddings):
                 position_embeddings_visual = self.position_embeddings_visual(
                     position_ids_visual
                 )
-
             
             v_embeddings = (
                 visual_embeddings
@@ -242,11 +230,7 @@ class BertVisioLinguisticEmbeddings(BertEmbeddings):
         embeddings = self.dropout(embeddings)
         return embeddings
 
-### Final VB Model ###
-
-from param import args
-from transformers.modeling_bert import BertEncoder
-from transformers.modeling_bert import BertPreTrainedModel
+### D) Final VB Model ###
 
 class BertV(BertPreTrainedModel):
     """
@@ -272,6 +256,7 @@ class BertV(BertPreTrainedModel):
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
         config.output_hidden_states = True
+        self.layeravg = True
 
         self.config = config
     
@@ -292,7 +277,7 @@ class BertV(BertPreTrainedModel):
         self.fixed_head_masks = [None for _ in range(len(self.encoder.layer))]
 
         # Taking hidden states from all hidden layers
-        if args.reg:
+        if self.layeravg:
             self.dropout = nn.Dropout(p=0.2)
             n_weights = config.num_hidden_layers + 1
             weights_init = torch.zeros(n_weights).float()
@@ -315,10 +300,7 @@ class BertV(BertPreTrainedModel):
 
         # Manually create visual_embeddings_type
         if visual_embeddings_type is None:
-            if args.textb:
-                visual_embeddings_type = torch.full((visual_embeddings.shape[0], visual_embeddings.shape[1]), fill_value=1, dtype=torch.long).cuda()
-            else:
-                visual_embeddings_type = torch.ones((visual_embeddings.shape[0], visual_embeddings.shape[1]), dtype=torch.long).cuda()
+            visual_embeddings_type = torch.ones((visual_embeddings.shape[0], visual_embeddings.shape[1]), dtype=torch.long).cuda()
 
         # Note: We add 100 here, as it is the amount of features for HM
         #attention_mask = torch.ones((input_ids.shape[0], input_ids.shape[1] + num_features)).cuda()
@@ -344,7 +326,6 @@ class BertV(BertPreTrainedModel):
             visual_embeddings_type=visual_embeddings_type,
             image_text_alignment=image_text_alignment,
         )
-
 
         if self.bypass_transformer and visual_embeddings is not None:
             assert (
@@ -381,7 +362,7 @@ class BertV(BertPreTrainedModel):
             pooled_output = self.pooler(sequence_output)
 
 
-            if args.reg:
+            if self.layeravg:
                 hidden_layers = encoded_layers[1]
 
                 cls_outputs = torch.stack(
@@ -392,9 +373,7 @@ class BertV(BertPreTrainedModel):
 
             return sequence_output, pooled_output
 
-### PRETRAINING ###
-
-from transformers.modeling_bert import BertForPreTraining
+### E) PRETRAINING ###
 
 class BertPredictionHeadTransform(nn.Module):
     def __init__(self, config):
@@ -539,14 +518,12 @@ class BertVPretraining(nn.Module):
             total_visn_loss = 0.
 
             # Take visn output
-            #visn_output = sequence_output[:, 128:, :].clone()
             visn_output = sequence_output.clone()
             visn_prediction_scores_dict = self.obj_predict_head(visn_output)
             for key in VISUAL_CONFIG.visual_losses:
                 label, mask_conf = obj_labels[key]
 
-                #print("LB:", label.shape, label[0, 0, :])
-                # Add 0's to label at beginning for lang output - EXP
+                # Add 0's to label at beginning for lang output
                 lang_label = torch.zeros((label.size(0), 128, label.size(2)), dtype=torch.long).cuda()
                 label = torch.cat((lang_label, label), dim=1)
 
