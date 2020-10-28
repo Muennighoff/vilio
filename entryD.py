@@ -141,7 +141,7 @@ class ModelD(nn.Module):
                 print("SAVING {} as {}.".format(key, key[11:]))
                 new_state_dict[key[11:]] = value
 
-            if key.startswith("bert.v_embeddings.image_location_embeddings.weight"):
+            if key.startswith("bert.v_embeddings.image_location_embeddings.weight") and args.num_pos == 4:
                 value = value[:, :4].clone()
                 print("MODIFYING:", key)
                 new_state_dict[key] = value
