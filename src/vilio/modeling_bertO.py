@@ -1,11 +1,5 @@
 # Adapted from OSCAR Repo
 
-from transformers.modeling_bert import (BertEmbeddings, 
-        BertSelfAttention, BertAttention, BertEncoder, BertLayer, 
-        BertSelfOutput, BertIntermediate, BertOutput,
-        BertPooler, BertLayerNorm, BertPreTrainedModel,
-		BertPredictionHeadTransform)
-
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -13,6 +7,11 @@ from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
 import logging
 import math
+
+from src.vilio.transformers.modeling_bert import (BertEmbeddings, 
+        BertSelfAttention, BertAttention, BertEncoder, BertLayer, 
+        BertSelfOutput, BertIntermediate, BertOutput,
+        BertPooler, BertLayerNorm, BertPreTrainedModel)
 
 from src.vilio.transformers.activations import gelu, gelu_new, swish
 

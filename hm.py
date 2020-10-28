@@ -55,9 +55,7 @@ class MMF:
         )
 
         if args.valid != "":
-            #valid_bsize = 2048 if args.multiGPU else 512
-            #valid_bsize = 500 # We only have 500
-            valid_bsize = 5 # Problems with CudaMemory when outputting hidden states for 500
+            valid_bsize = 2048 if args.multiGPU else 50
             self.valid_tuple = get_tuple(
                 args.valid, bs=valid_bsize,
                 shuffle=False, drop_last=False, rs=False
@@ -82,9 +80,6 @@ class MMF:
         # Load pre-trained weights from paths
         if args.load_lxmert is not None:
             self.model.load(args.load_lxmert)
-        # Load second LXMERT parts e.g. only Bert or only Vision
-        if args.load_lxmert0 is not None:
-            self.model.lxrt_encoder.load(args.load_lxmert0)
 
         # GPU options
         if args.multiGPU:
@@ -93,9 +88,6 @@ class MMF:
         self.model = self.model.cuda()
 
         # Losses and optimizer
-        self.mce_loss = nn.CrossEntropyLoss()
-        self.bce_loss = nn.BCEWithLogitsLoss()
-
         self.logsoftmax = nn.LogSoftmax(dim=1)
         self.nllloss = nn.NLLLoss()
 
@@ -113,16 +105,8 @@ class MMF:
             print("F: ", n)
             return False
 
-        def is_trained(n):
-            if "x_layers" or "r_layers" in n:
-                return False
-            elif "layers" in n:
-                return True
-            False
-
         no_decay = ['bias', 'LayerNorm.weight']
 
-        # As of right now, different lrs do not seem to work well for X models.
         params = list(self.model.named_parameters())
         if args.reg:
             optimizer_grouped_parameters = [
@@ -157,8 +141,6 @@ class MMF:
 
         if args.swa: 
             self.swa_model = AveragedModel(self.model)
-            # Cos For SWA - Worsened for VBAREG
-            #self.scheduler = get_cosine_schedule_with_warmup(self.optim, self.t_total * 0.75 * 0.1, self.t_total * 0.75)
             self.swa_start = self.t_total * 0.75
             self.swa_scheduler = SWALR(self.optim, swa_lr=args.lr)
 
@@ -174,7 +156,7 @@ class MMF:
             _epoch_true: `Tensor`.  Targets (labels) from last epoch.
             epoch_pred : `Tensor`.  Predicions from last epoch.
         """
-        #convert labels to boolean
+        # Convert labels to boolean
         y_true = (_y_true>=0.50)
         epoch_true = (_epoch_true>=0.50)
 
@@ -310,38 +292,18 @@ class MMF:
 
             for i, (ques_id, feats, boxes, num_b, sent, label, target) in iter_wrapper(enumerate(loader)):
 
-                # This is needed if we do extraction
-                torch.cuda.empty_cache()
-
                 if ups == args.midsave:
                     self.save("MID")
-                
-                if args.extract:
-                    # ques_id = ids, feats = paths
-                    # Due to cuda memory problems:
-                    feats0, boxes0 = self.detector.dump_features(feats[:int(len(feats)/2)], ques_id[:int(len(feats)/2)])
-                    feats1, boxes1 = self.detector.dump_features(feats[int(len(feats)/2):], ques_id[int(len(feats)/2):])
-                    
-                    feats = torch.cat((feats0, feats1), dim=0)
-                    boxes =  torch.cat((boxes0, boxes1), dim=0)
 
                 self.model.train()
 
                 if args.swa:
                     self.swa_model.train()
                 
-                if args.model != "US":
-                    feats, boxes, target = feats.cuda(), boxes.cuda(), target.long().cuda()
-                else:
-                    target = target.long().cuda()
+                target = target.long().cuda()
 
                 # Model expects visual feats as tuple of feats & boxes
-                if args.pad:
-                    logit = self.model(sent, (feats, boxes, num_b))
-                elif args.model == "US":
-                    logit = self.model(sent[0], (feats[0], boxes[0]), sent[1], (feats[1], boxes[1]))
-                else:
-                    logit = self.model(sent, (feats, boxes))
+                logit = self.model(sent, (feats, boxes))
 
                 # Taking raw estimates (Shifted to val-only) (Removed Softmax as same as logsoftmax)
                 #score1 = logit[:, 1]
@@ -451,14 +413,8 @@ class MMF:
         quesid2prob1 = {}
 
         for i, datum_tuple in enumerate(loader):
-            # This is needed if we do extraction
-            torch.cuda.empty_cache()
 
             ques_id, feats, boxes, num_b, sent = datum_tuple[:5]
-
-            if args.extract:
-                # ques_id = ids, feats = paths
-                feats, boxes = self.detector.dump_features(feats, ques_id, transform=False)
 
             self.model.eval()
 
@@ -467,16 +423,8 @@ class MMF:
 
             with torch.no_grad():
                 
-                if args.model != "US":
-                    feats, boxes = feats.cuda(), boxes.cuda()
-
-                    
-                if args.pad:
-                    logit = self.model(sent, (feats, boxes, num_b)) 
-                elif args.model == "US":
-                    logit = self.model(sent[0], (feats[0], boxes[0]), sent[1], (feats[1], boxes[1]))
-                else:
-                    logit = self.model(sent, (feats, boxes))
+                feats, boxes = feats.cuda(), boxes.cuda()
+                logit = self.model(sent, (feats, boxes))
 
                 # Taking several raw estimates
                 score0 = logit[:, 1]
@@ -490,10 +438,6 @@ class MMF:
                     logit_swa = self.swa_model(sent, (feats, boxes))
                     logit_swa = self.logsoftmax(logit_swa)
                     score1 = logit_swa[:, 1]
-
-                # For one output
-                #score2 = score0
-                #score3 = score1
 
                 _, predict = logit.max(1)
 
@@ -509,7 +453,6 @@ class MMF:
                 
                 for qid, l in zip(ques_id, score1.cpu().numpy()):
                     quesid2prob1[qid] = l
-
 
 
         if dump is not None:

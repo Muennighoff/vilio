@@ -5,28 +5,6 @@ import numpy as np
 import torch
 
 
-def get_optimizer(optim):
-    # Bind the optimizer
-    if optim == 'rms':
-        print("Optimizer: Using RMSProp")
-        optimizer = torch.optim.RMSprop
-    elif optim == 'adam':
-        print("Optimizer: Using Adam")
-        optimizer = torch.optim.Adam
-    elif optim == 'adamax':
-        print("Optimizer: Using Adamax")
-        optimizer = torch.optim.Adamax
-    elif optim == 'sgd':
-        print("Optimizer: sgd")
-        optimizer = torch.optim.SGD
-    elif 'bert' in optim:
-        optimizer = 'bert'      # The bert optimizer will be bind later.
-    else:
-        assert False, "Please add your optimizer %s in the list." % optim
-
-    return optimizer
-
-
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -36,10 +14,10 @@ def parse_args():
     parser.add_argument("--test", default=None)
 
     # Training Hyper-parameters
-    parser.add_argument('--batchSize', dest='batch_size', type=int, default=32)
+    parser.add_argument('--batchSize', dest='batch_size', type=int, default=8)
     parser.add_argument('--optim', default='bert')
     parser.add_argument('--lr', type=float, default=1e-05)
-    parser.add_argument('--epochs', type=int, default=38)
+    parser.add_argument('--epochs', type=int, default=5)
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--seed', type=int, default=42, help='random seed')
 
@@ -53,7 +31,7 @@ def parse_args():
     parser.add_argument("--reg", action='store_const', default=False, const=True) # Applies Multi-sample dropout, SWA, Other regularization 
     parser.add_argument("--rcac", action='store_const', default=False, const=True) # Uses rcac loss instead of CE
     parser.add_argument("--acc", type=int, default=1, help='Amount of acc steps for bigger batch size - make sure to adjust LR')
-    parser.add_argument("--tr", type=str, default="bert-base-uncased", help="Transformer Model")
+    parser.add_argument("--tr", type=str, default="bert-base-uncased", help="Name of language transformer to be used")
     parser.add_argument("--swa", action='store_const', default=False, const=True)
     parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
     parser.add_argument("--midsave", type=int, default=-1, help='Save a MID model after x steps')
@@ -69,22 +47,15 @@ def parse_args():
     parser.add_argument("--case", action='store_const', default=False, const=True)
     parser.add_argument("--contrib", action='store_const', default=False, const=True)
     
-
-    # Variable feature amounts not yet supported
-
     # Ensemble-related
     parser.add_argument("--enspath", type=str, default="/kaggle/working", help="Path to folder with all csvs")
 
     # Model Loading - Note: PATHS must be put in here! 
-    parser.add_argument('--model', type=str, default='X', help='Type of Model: X = LXMERT, U = UNITER, V = VisualBERT')
+    parser.add_argument('--model', type=str, default='X', help='Type of Model, X V O U D')
     parser.add_argument('--load', type=str, default=None,
                         help='Load the model (usually the fine-tuned model).')               
     parser.add_argument('--loadLXMERT', dest='load_lxmert', type=str, default=None,
                         help='Load the pre-trained LXMERT model.')
-    parser.add_argument('--loadLXMERT0', dest='load_lxmert0', type=str, default=None,
-                        help='Loads a second lxmert model ontop (e.g. to swap some weights).')
-    parser.add_argument('--loadLXMERTQA', dest='load_lxmert_qa', type=str, default=None,
-                        help='Load the pre-trained LXMERT model with QA answer head.')
     parser.add_argument("--fromScratch", dest='from_scratch', action='store_const', default=False, const=True,
                         help='If none of the --load, --loadLXMERT, --loadLXMERTQA is set, '
                              'the model would be trained from scratch. If --fromScratch is'
@@ -117,9 +88,6 @@ def parse_args():
 
     # Parse the arguments.
     args = parser.parse_args()
-
-    # Bind optimizer class.
-    args.optimizer = get_optimizer(args.optim)
 
     # Set seeds
     torch.manual_seed(args.seed)
