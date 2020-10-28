@@ -117,48 +117,6 @@ class LXMERTTorchDataset(Dataset):
 
         sent = datum['text']
 
-
-        # Select Objects & Attributes to append to text
-        if args.textb:
-
-            obj_id = img_info["objects_id"]
-            obj_conf = img_info["objects_conf"]
-            attr_id = img_info["attrs_id"]
-            attr_conf = img_info["attrs_conf"]
-
-            assert len(obj_id) == len(obj_conf) == len(attr_id) == len(attr_conf)
-
-            textb = " [SEP]"
-
-            counts = Counter()
-
-            for oid, oconf, aid, aconf in zip(obj_id, obj_conf, attr_id, attr_conf):
-                attr_obj = ""
-                if aconf > 0.2:
-                    for entry in vg_dict["attCategories"]:
-                        if entry["id"] == aid:
-                            attr_obj += " " + entry["name"]
-            
-                if oconf > 0.3:
-                    for entry in vg_dict["categories"]:
-                        if entry["id"] == oid:
-                            attr_obj += " " + entry["name"]
-
-                #(TAB THIS FORWARD)  
-                # We only add if we have also found an obj for the attr
-                counts[attr_obj] += 1
-                
-                # Only take unique attr_obj combos
-                if counts[attr_obj] < 2:
-                    textb += attr_obj
-
-                ### Cut short at e.g. 10:
-                #if len(counts) > 9:
-                #    break
-
-            # Add it to our normal text
-            sent += textb
-
         # Normalize the boxes (to 0 ~ 1)
         img_h, img_w = img_info['img_h'], img_info['img_w']
         boxes = boxes.copy()
@@ -178,18 +136,6 @@ class LXMERTTorchDataset(Dataset):
                 while other_datum['id'] == img_id:
                     other_datum = self.data[random.randint(0, len(self.data)-1)]
                 sent = other_datum['text']
-
-        # If label
-        #if "label" in datum:
-        #    if int(datum["label"]) == 1:
-        #        label = [0, 1]
-        #    else:
-        #        label = [1, 0]
-        #    target = torch.tensor(datum["label"], dtype=torch.float) 
-        #    label = torch.tensor(label, dtype=torch.float)
-        #else:
-            # Set the target to the ignore_index of later used Cross Entropy Loss
-        #    target = torch.tensor([-1], dtype=torch.float)
 
         label = None
 

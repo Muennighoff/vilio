@@ -21,7 +21,6 @@ TINY_IMG_NUM = 10
 FAST_IMG_NUM = 5000
 
 
-
 class MMFDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
@@ -49,7 +48,7 @@ class MMFTorchDataset(Dataset):
         self.id2datum = {datum["id"]: datum for datum in self.data}
 
         path = "data/features/"
-        path2 = "data/detectron.lmdb" #########################
+        path2 = "data/detectron.lmdb"
 
         self.db = FeaturesDatabase(
                 path=path2,
@@ -95,28 +94,6 @@ class MMFTorchDataset(Dataset):
         pred_objs = img["pred_objs"]
         pred_conf = img["pred_conf"]
         assert len(boxes) == len(feats)
-
-        ### Select Objects to append to text
-
-        if args.textb:
-            cls_prob = img["cls_prob"]
-
-            text_b = "[SEP]"
-
-            counts = Counter()
-    
-            for f in range(cls_prob.shape[0]):
-                idx = np.argmax(cls_prob[f, :])
-                for word in vg_dict["categories"]:
-                    if idx - 1 == word["id"]: # -1 as 0 is here None, while it is an actual value in the dict; hence all is shifted by 1
-                        if cls_prob[f, idx] > 0.2:
-                            counts[word["name"]] += 1
-            
-            for key in counts.keys():
-                text_b += " " + key
-
-            # Add it to our normal text
-            text += text_b
 
         # Normalize the boxes (to 0 ~ 1)
         #boxes = boxes.clone()
@@ -182,6 +159,3 @@ class MMFEvaluator:
         label = [self.dataset.id2datum[int(key)]["label"] for key in id2ans.keys()]
         score = roc_auc_score(label, ans)
         return score
-
-
-        

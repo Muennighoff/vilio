@@ -31,7 +31,6 @@ class MMFTorchDataset(Dataset):
         for split in self.splits:
             #path = os.path.join(os.pardir, "data/hateful_memes/data", f"{split}.jsonl")
             path = os.path.join("data/", f"{split}.jsonl")
-            print(path)
             self.raw_data.extend(
                     [json.loads(jline) for jline in open(path, "r").read().split('\n')]
             )
@@ -55,19 +54,6 @@ class MMFTorchDataset(Dataset):
             # Adding int here to convert 0625 to 625
             self.imgid2img[int(img_datum['img_id'])] = img_datum
 
-        # AUG EXP
-        #if self.rs and args.model != "U":
-        #    path_gt = "data/HM_gt_img.tsv"
-        #    img_data_gt = []#
-
-        #    img_data_gt.extend(load_obj_tsv(path_gt, self.id2datum.keys()))
-            # Convert img list to dict
-        #    self.imgid2img_gt = {}
-        #    for img_datum in img_data_gt:
-               # Adding int here to convert 0625 to 625
-        #        self.imgid2img_gt[int(img_datum['img_id'])] = img_datum
-
-
 
         # Only keep the data with loaded image features
         self.data = []
@@ -90,10 +76,6 @@ class MMFTorchDataset(Dataset):
         img_id = datum['id']
         text = datum['text']
 
-        # Exp. Random Swap augmentation
-        #if self.rs == True:
-        #    text = random_swap(text, 2)
-        #    text = random_insertion(text, int(len(text) * random.uniform(0, 0.1))) #int(len(text) * random.uniform(0, 0.2)))
 
         # Get image info
         img_info = self.imgid2img[img_id]
@@ -102,69 +84,22 @@ class MMFTorchDataset(Dataset):
         boxes = img_info['boxes'].copy()
         assert obj_num == len(boxes) == len(feats)
 
-        # Select Objects & Attributes to append to text
-        if args.textb:
-
-            obj_id = img_info["objects_id"]
-            obj_conf = img_info["objects_conf"]
-            attr_id = img_info["attrs_id"]
-            attr_conf = img_info["attrs_conf"]
-
-            assert len(obj_id) == len(obj_conf) == len(attr_id) == len(attr_conf)
-
-            textb = "[SEP]"
-
-            counts = Counter()
-
-            for oid, oconf, aid, aconf in zip(obj_id, obj_conf, attr_id, attr_conf):
-                attr_obj = ""
-                if aconf > 999:
-                    for entry in vg_dict["attCategories"]:
-                        if entry["id"] == aid:
-                            attr_obj += " " + entry["name"]
-            
-                if oconf > 0.3:
-                    for entry in vg_dict["categories"]:
-                        if entry["id"] == oid:
-                            attr_obj += " " + entry["name"]
-
-                #(TAB THIS FORWARD)  
-                # We only add if we have also found an obj for the attr
-                counts[attr_obj] += 1
-                
-                # Only take unique attr_obj combos
-                if counts[attr_obj] < 2:
-                    textb += attr_obj
-
-                ### Cut short at e.g. 10:
-                if len(counts) > 10:
-                    break
-
-            # Add it to our normal text
-            text += textb
 
         # Normalize the boxes (to 0 ~ 1)
-
-        # Exp. Random Swap augmentation
-        #if self.rs == True and args.model != "U":
-        #    boxes, feats = random_swap_feats(boxes, feats, 2)
-        #    img_info_gt = self.imgid2img_gt[img_id]
-        #    feats_gt = img_info_gt['features'].copy()
-        #    boxes_gt = img_info_gt['boxes'].copy()
-        #    boxes, feats = random_swap_feats_gt(boxes, feats, boxes_gt, feats_gt, 5)
-
-
         img_h, img_w = img_info['img_h'], img_info['img_w']
+
+        if args.num_pos == 5: 
+            # For DeVLBert taken from VilBERT
+            image_location = np.zeros((boxes.shape[0], 5), dtype=np.float32)
+            image_location[:,:4] = boxes
+            image_location[:,4] = (image_location[:,3] - image_location[:,1]) * (image_location[:,2] - image_location[:,0]) / (float(img_w) * float(img_h))
+            boxes = image_location
+
         boxes = boxes.copy()
         boxes[:, (0, 2)] /= img_w
         boxes[:, (1, 3)] /= img_h
         np.testing.assert_array_less(boxes, 1+1e-5)
         np.testing.assert_array_less(-boxes, 0+1e-5)
-
-        #if self.rs == True: --- Does not add value
-        #    boxes, feats = transform_feats(boxes, feats, img_info["objects_id"])
-        #    boxes = np.array(boxes, dtype=np.float32)
-        #    feats = np.array(feats)
 
 
         if args.num_pos == 6:
@@ -178,31 +113,8 @@ class MMFTorchDataset(Dataset):
             if args.model == "U":
                 boxes = np.concatenate([boxes, boxes[:, 4:5]*boxes[:, 5:]], axis=-1)
 
-
         # Pad Boxes
-        if args.pad:
-            if feats.shape[0] > args.num_features:
-
-                feats = feats[:args.num_features, :]
-                boxes = boxes[:args.num_features, :]
-
-                
-                num_b = boxes.shape[0]
-
-            else:
-                # Save num_b for attention mask lateron
-                num_b = boxes.shape[0]
-
-                boxes_pad = np.zeros((args.num_features, boxes.shape[1]), dtype=boxes.dtype)
-                boxes_pad[:boxes.shape[0], :boxes.shape[1]] = boxes
-
-                feats_pad = np.zeros((args.num_features, feats.shape[1]), dtype=feats.dtype)
-                feats_pad[:feats.shape[0], :feats.shape[1]] = feats
-
-                boxes = boxes_pad
-                feats = feats_pad
-        else:
-            num_b = -1
+        num_b = -1
 
         # Provide label (target) - From mmf_data
         if 'label' in datum:
@@ -216,151 +128,6 @@ class MMFTorchDataset(Dataset):
             return img_id, feats, boxes, num_b, text, label, target
         else:
             return img_id, feats, boxes, num_b, text
-
-import random
-
-#https://maelfabien.github.io/machinelearning/NLP_8/#random-insertion-ri
-
-
-import albumentations as A
-
-def transform_feats(boxes, feats, obj_ids):
-
-    transform = A.Compose([
-        #A.Cutout(num_holes=1, max_h_size=1, max_w_size=2048, fill_value=0, p=0.5)
-        A.Blur(blur_limit=3, p=0.5),
-    ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['vg_dict']))
-
-    transformed = transform(image=feats, bboxes=boxes, vg_dict=obj_ids)
-    transformed_image = transformed['image']
-    transformed_bboxes = transformed['bboxes']
-
-    return transformed_bboxes, transformed_image
-
-def swap_feats_gt(boxes, feats, boxes_gt, feats_gt):
-    
-    random_idx_1 = random.randint(0, len(boxes)-1)
-    random_idx_2 = random.randint(0, len(boxes_gt)-1)
-    counter = 0
-    
-    while random_idx_2 == random_idx_1:
-        random_idx_2 = random.randint(0, len(boxes_gt)-1)
-        counter += 1
-        
-        if counter > 3:
-            return boxes, feats
-    
-    boxes[random_idx_1] = boxes_gt[random_idx_2]
-    feats[random_idx_1] = feats_gt[random_idx_2]
-    return boxes, feats
-
-def random_swap_feats_gt(boxes, feats, boxes_gt, feats_gt, n):
-    
-
-    for _ in range(n):
-        boxes, feats = swap_feats_gt(boxes, feats, boxes_gt, feats_gt)
-    
-    return boxes, feats
-
-def swap_feats(boxes, feats):
-    
-    random_idx_1 = random.randint(0, len(boxes)-1)
-    random_idx_2 = random_idx_1
-    counter = 0
-    
-    while random_idx_2 == random_idx_1:
-        random_idx_2 = random.randint(0, len(boxes)-1)
-        counter += 1
-        
-        if counter > 3:
-            return boxes, feats
-    
-    boxes[random_idx_1], boxes[random_idx_2] = boxes[random_idx_2], boxes[random_idx_1] 
-    feats[random_idx_1], feats[random_idx_2] = feats[random_idx_2], feats[random_idx_1] 
-    return boxes, feats
-
-def random_swap_feats(boxes, feats, n):
-    
-
-    for _ in range(n):
-        boxes, feats = swap_feats(boxes, feats)
-    
-    return boxes, feats
-
-def swap_word(new_words):
-    
-    random_idx_1 = random.randint(0, len(new_words)-1)
-    random_idx_2 = random_idx_1
-    counter = 0
-    
-    while random_idx_2 == random_idx_1:
-        random_idx_2 = random.randint(0, len(new_words)-1)
-        counter += 1
-        
-        if counter > 3:
-            return new_words
-    
-    new_words[random_idx_1], new_words[random_idx_2] = new_words[random_idx_2], new_words[random_idx_1] 
-    return new_words
-
-def random_swap(words, n):
-    
-    words = words.split()
-    new_words = words.copy()
-    
-    for _ in range(n):
-        new_words = swap_word(new_words)
-        
-    sentence = ' '.join(new_words)
-    
-    return sentence
-
-from nltk.corpus import wordnet 
-
-def get_synonyms(word):
-    """
-    Get synonyms of a word
-    """
-    synonyms = set()
-    
-    for syn in wordnet.synsets(word): 
-        for l in syn.lemmas(): 
-            synonym = l.name().replace("_", " ").replace("-", " ").lower()
-            synonym = "".join([char for char in synonym if char in ' qwertyuiopasdfghjklzxcvbnm'])
-            synonyms.add(synonym) 
-    
-    if word in synonyms:
-        synonyms.remove(word)
-    
-    return list(synonyms)
-
-def random_insertion(words, n):
-    
-    words = words.split()
-    new_words = words.copy()
-    
-    for _ in range(n):
-        add_word(new_words)
-        
-    sentence = ' '.join(new_words)
-    return sentence
-
-def add_word(new_words):
-    
-    synonyms = []
-    counter = 0
-    
-    while len(synonyms) < 1:
-        random_word = new_words[random.randint(0, len(new_words)-1)]
-        synonyms = get_synonyms(random_word)
-        counter += 1
-        if counter >= 10:
-            return
-        
-    random_synonym = synonyms[0]
-    random_idx = random.randint(0, len(new_words)-1)
-    new_words.insert(random_idx, random_synonym)
-
 
 class MMFEvaluator:
     def __init__(self, dataset):
@@ -417,13 +184,10 @@ import csv
 import base64
 import time
 
-
-
 csv.field_size_limit(sys.maxsize)
 
 FIELDNAMES = ["img_id", "img_h", "img_w", "objects_id", "objects_conf",
               "attrs_id", "attrs_conf", "num_boxes", "boxes", "features"]
-
 
 def load_obj_tsv(fname, ids, topk=args.topk):
     """Load object features from tsv file.

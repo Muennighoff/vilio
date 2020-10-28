@@ -15,9 +15,7 @@
 # limitations under the License.
 """ RoBERTa configuration """
 
-
 import logging
-
 from .configuration_bert import BertConfig
 
 
