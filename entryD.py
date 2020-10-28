@@ -7,7 +7,7 @@ from param import args
 
 from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
 
-from src.vilio.modeling_bertD import BertD, DeVLBertForVLTasks, BertConfig
+from src.vilio.modeling_bertD import BertD, BertConfig
 
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
