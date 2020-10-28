@@ -31,6 +31,7 @@ class MMFTorchDataset(Dataset):
         for split in self.splits:
             #path = os.path.join(os.pardir, "data/hateful_memes/data", f"{split}.jsonl")
             path = os.path.join("data/", f"{split}.jsonl")
+            print(path)
             self.raw_data.extend(
                     [json.loads(jline) for jline in open(path, "r").read().split('\n')]
             )
