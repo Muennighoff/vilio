@@ -50,12 +50,12 @@ def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
 class MMF:
     def __init__(self):
         
-        if args.train != "":
+        if args.train is not None:
             self.train_tuple = get_tuple(
                 args.train, bs=args.batch_size, shuffle=True, drop_last=False
             )
 
-        if args.valid != "":
+        if args.valid is not None:
             valid_bsize = 2048 if args.multiGPU else 50
             self.valid_tuple = get_tuple(
                 args.valid, bs=valid_bsize,
