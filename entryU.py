@@ -5,14 +5,13 @@ import torch.nn as nn
 
 from param import args
 
-from modeling_bertX import BertLayerNorm, GeLU, BertLayer
-from modeling_robertaX import RobertaClassificationHead
-from modeling_albertX import GeLU_new
+from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
+from src.vilio.modeling_albertX import GeLU_new
 
-from modeling_bertU import BertU, UniterConfig
-from modeling_robertaU import RobertaU
+from src.vilio.modeling_bertU import BertU, UniterConfig
+from src.vilio.modeling_robertaU import RobertaU
 
-from transformers.tokenization_auto import AutoTokenizer
+from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
 from torch.nn.utils.rnn import pad_sequence
 

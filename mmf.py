@@ -11,16 +11,12 @@ import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 from torch.nn.modules.loss import _Loss
 
-if args.model == "US":
-    from mmf_data_tsv_META import MMFTorchDataset, MMFEvaluator, MMFDataset
-elif args.tsv:
-    from mmf_data_tsv import MMFTorchDataset, MMFEvaluator, MMFDataset
-elif args.extract:
-    from mmf_data_tsv0 import MMFTorchDataset, MMFEvaluator, MMFDataset
+if args.tsv:
+    from data.mmf_data_tsv import MMFTorchDataset, MMFEvaluator, MMFDataset
 else:
-    from mmf_data import MMFTorchDataset, MMFEvaluator, MMFDataset
+    from data.mmf_data import MMFTorchDataset, MMFEvaluator, MMFDataset
 
-from transformers.optimization import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup, get_cosine_with_hard_restarts_schedule_with_warmup
+from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from entryU import ModelU
 from entryX import ModelX
@@ -28,15 +24,11 @@ from entryV import ModelV
 from entryD import ModelD
 from entryO import ModelO
 
-from entryUS import ModelUS
-
 # SWA:
 if args.swa:
     from torch.optim.swa_utils import AveragedModel, SWALR
     from torch.optim.lr_scheduler import CosineAnnealingLR
 
-if args.extract:
-    from feat_detection import Detector
 
 # Largely sticking to the standards set in LXMERT here
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
@@ -84,8 +76,6 @@ class MMF:
             self.model = ModelD(args)
         elif args.model == 'O':
             self.model = ModelO(args)
-        elif args.model == 'US':
-            self.model = ModelUS(args)
         else:
             print(args.model, " is not implemented.")
 
@@ -171,10 +161,6 @@ class MMF:
             #self.scheduler = get_cosine_schedule_with_warmup(self.optim, self.t_total * 0.75 * 0.1, self.t_total * 0.75)
             self.swa_start = self.t_total * 0.75
             self.swa_scheduler = SWALR(self.optim, swa_lr=args.lr)
-
-        if args.extract:
-            self.detector = Detector()
-
 
     def roc_star_loss(self, _y_true, y_pred, gamma, _epoch_true, epoch_pred):
         """

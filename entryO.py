@@ -13,10 +13,10 @@ import torch.nn as nn
 
 from param import args
 
-from modeling_bertX import BertLayerNorm, GeLU, BertLayer
+from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
 
-from modeling_bertO import BertO
-from transformers.tokenization_auto import AutoTokenizer
+from src.vilio.modeling_bertO import BertO
+from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
 class InputFeatures(object):
     """A single set of features of data."""

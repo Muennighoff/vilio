@@ -5,15 +5,14 @@ import torch.nn as nn
 
 from param import args
 
-from modeling_bertX import BertLayerNorm, GeLU, BertLayer
-from modeling_robertaX import RobertaClassificationHead
-from modeling_albertX import GeLU_new
+from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
+from src.vilio.modeling_albertX import GeLU_new
 
-from modeling_bertV import BertV
-from modeling_robertaV import RobertaV
-from modeling_albertV import AlbertV
+from src.vilio.modeling_bertV import BertV
+from src.vilio.modeling_robertaV import RobertaV
+from src.vilio.modeling_albertV import AlbertV
 
-from transformers.tokenization_auto import AutoTokenizer
+from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
 class InputFeatures(object):
     """A single set of features of data."""
@@ -159,9 +158,6 @@ class ModelV(nn.Module):
                 nn.Linear(self.dim * 2, 2)
             )
         self.classifier.apply(self.init_weights)
-           # if self.tr_name.startswith("roberta"): # Does not help for after masked pretr.
-           #     self.model.pooler.apply(self.init_weights)
-
 
         if args.from_scratch:
             print("initializing all the weights")

@@ -9,11 +9,11 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from param import args
-from pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
+from data.pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
 
-from transformers import AutoTokenizer
-from transformers.optimization import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
-from modeling_bertV import BertVPretraining
+from src.vilio.transformers import AutoTokenizer
+from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
+from src.vilio.modeling_bertV import BertVPretraining
 
 
 DataTuple = collections.namedtuple("DataTuple", 'dataset torchdset loader evaluator')

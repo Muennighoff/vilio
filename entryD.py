@@ -5,11 +5,11 @@ import torch.nn as nn
 
 from param import args
 
-from modeling_bertX import BertLayerNorm, GeLU, BertLayer
+from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
 
-from modeling_bertD import DeVLBertForVLTasks, BertConfig
+from src.vilio.modeling_bertD import DeVLBertForVLTasks, BertConfig
 
-from transformers.tokenization_auto import AutoTokenizer
+from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
 ### TODO
 # Reenable loading info
