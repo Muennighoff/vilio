@@ -7,15 +7,10 @@ from param import args
 
 from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
 
-from src.vilio.modeling_bertD import DeVLBertForVLTasks, BertConfig
+from src.vilio.modeling_bertD import BertD, DeVLBertForVLTasks, BertConfig
 
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
 
-### TODO
-# Reenable loading info
-# Remove .json dependency
-# Rename models
-# Check details about image_position .. 5 > 4
 
 class InputFeatures(object):
     """A single set of features of data."""
@@ -73,20 +68,15 @@ class ModelD(nn.Module):
         self.tokenizer = AutoTokenizer.from_pretrained(tr_name)
 
         ### SETUP CONFIG ###
-        config = BertConfig.from_json_file("devlbert_config.json")
+        config = BertConfig.from_json_file("src/vilio/config_bertD.json")
 
         ### BUILD MODEL ###
         if tr_name.startswith("bert"):
-            self.model = DeVLBertForVLTasks.from_pretrained(tr_name, config, num_labels=2) #, visual_embedding_dim=2048
+            self.model = BertD.from_pretrained(tr_name, config, num_labels=2)
         else:
             raise NotImplementedError
 
-        #print("UNEXPECTED: ", loading_info["unexpected_keys"])
-        #print("MISSING: ", loading_info["missing_keys"])
-        #print("ERRORS: ", loading_info["error_msgs"])
-
         ### CLASSIFICATION HEAD ###
-
         if args.reg:
             self.high_dropout = nn.Dropout(p=0.5)
             self.classifier = nn.Linear(self.model.config.hidden_size, 2)
@@ -109,9 +99,7 @@ class ModelD(nn.Module):
 
     def forward(self, sents, visual_feats, visual_attention_mask=None):
 
-        if self.tr_name.startswith("roberta"):
-            train_features = preprocess_roberta(sents, self.max_seq_len, self.tokenizer)
-        elif self.tr_name.startswith("bert") or self.tr_name.startswith("albert"):
+        if self.tr_name.startswith("bert") or self.tr_name.startswith("albert"):
             train_features = preprocess_bert(sents, self.max_seq_len, self.tokenizer)
 
         input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long).cuda()
@@ -120,7 +108,6 @@ class ModelD(nn.Module):
 
         img_feat, img_pos_feat = visual_feats
         
-        # Returns: vil_prediction, vil_logit, vil_binary_prediction, vision_prediction, vision_logit, linguisic_prediction, linguisic_logit
         output = self.model(input_ids, input_imgs=img_feat, image_loc=img_pos_feat, attention_mask=input_mask)
 
         if args.reg:
@@ -133,7 +120,8 @@ class ModelD(nn.Module):
                 dim=0,
             )
         else:
-            output = output[0]
+            # The classifier is already applied in the model itself
+            output = output
 
         return output
 

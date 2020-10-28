@@ -36,7 +36,27 @@ from src.vilio.transformers.file_utils import cached_path
 import pdb
 import numpy as np
 
+
+### A) ACTIVATION FUNCS ###
+
 logger = logging.getLogger(__name__)
+
+def gelu(x):
+    """Implementation of the gelu activation function.
+        For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
+        0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
+        Also see https://arxiv.org/abs/1606.08415
+    """
+    return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+
+
+def swish(x):
+    return x * torch.sigmoid(x)
+
+
+ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish}
+
+### B) CONFIG ###
 
 PRETRAINED_MODEL_ARCHIVE_MAP = {
     "bert-base-uncased": "https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased.tar.gz",
@@ -109,22 +129,6 @@ def load_tf_weights_in_bert(model, tf_checkpoint_path):
         print("Initialize PyTorch weight {}".format(name))
         pointer.data = torch.from_numpy(array)
     return model
-
-def gelu(x):
-    """Implementation of the gelu activation function.
-        For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
-        0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
-        Also see https://arxiv.org/abs/1606.08415
-    """
-    return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
-
-
-def swish(x):
-    return x * torch.sigmoid(x)
-
-
-ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish}
-
 
 class BertConfig(object):
     """Configuration class to store the configuration of a `BertModel`.
@@ -270,12 +274,30 @@ class BertConfig(object):
         """Serializes this instance to a JSON string."""
         return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"
 
-# try:
-#     from apex.normalization.fused_layer_norm import FusedLayerNorm as BertLayerNorm
-# except ImportError:
-#     logger.info(
-#         "Better speed can be achieved with apex installed from https://www.github.com/nvidia/apex ."
-#     )
+### C) EMBEDDINGS ###
+
+class BertImageEmbeddings(nn.Module):
+    """Construct the embeddings from image, spatial location (omit now) and token_type embeddings.
+    """
+    def __init__(self, config):
+        super(BertImageEmbeddings, self).__init__()
+
+        self.image_embeddings = nn.Linear(config.v_feature_size, config.v_hidden_size)
+        # Had to change the following from 5 to 4
+        self.image_location_embeddings = nn.Linear(4, config.v_hidden_size)
+        self.LayerNorm = BertLayerNorm(config.v_hidden_size, eps=1e-12)
+        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+
+    def forward(self, input_ids, input_loc):
+
+        img_embeddings = self.image_embeddings(input_ids)
+        loc_embeddings = self.image_location_embeddings(input_loc)
+        embeddings = self.LayerNorm(img_embeddings+loc_embeddings)
+        embeddings = self.dropout(embeddings)
+
+        return embeddings
+
+### D) BERT HELPER FUNCS ###
 
 class BertLayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-12):
@@ -753,6 +775,8 @@ class BertConnectionLayer(nn.Module):
         layer_output2 = self.t_output(intermediate_output2, attention_output2)
 
         return layer_output1, layer_output2, co_attention_probs
+
+### E) ENCODER ###
 
 class BertEncoder(nn.Module):
     def __init__(self, config):
@@ -1439,28 +1463,78 @@ class BertModel(BertPreTrainedModel):
 
         return encoded_layers_t, encoded_layers_v, pooled_output_t, pooled_output_v, all_attention_mask
 
+### F) Final Model ###
 
-class BertImageEmbeddings(nn.Module):
-    """Construct the embeddings from image, spatial location (omit now) and token_type embeddings.
-    """
-    def __init__(self, config):
-        super(BertImageEmbeddings, self).__init__()
+class SimpleClassifier(nn.Module):
+    def __init__(self, in_dim, hid_dim, out_dim, dropout):
+        super(SimpleClassifier, self).__init__()
+        layers = [
+            weight_norm(nn.Linear(in_dim, hid_dim), dim=None),
+            nn.ReLU(),
+            nn.Dropout(dropout, inplace=True),
+            weight_norm(nn.Linear(hid_dim, out_dim), dim=None)
+        ]
+        self.main = nn.Sequential(*layers)
 
-        self.image_embeddings = nn.Linear(config.v_feature_size, config.v_hidden_size)
-        # Had to change the following from 5 to 4
-        self.image_location_embeddings = nn.Linear(4, config.v_hidden_size)
-        self.LayerNorm = BertLayerNorm(config.v_hidden_size, eps=1e-12)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+    def forward(self, x):
+        logits = self.main(x)
+        return logits
 
-    def forward(self, input_ids, input_loc):
+class BertD(BertPreTrainedModel):
+    def __init__(self, config, num_labels=2, dropout_prob=0.1, default_gpu=True):
+        super(BertD, self).__init__(config)
+        self.num_labels = num_labels
+        self.bert = BertModel(config)
+        self.dropout = nn.Dropout(dropout_prob)
 
-        img_embeddings = self.image_embeddings(input_ids)
-        loc_embeddings = self.image_location_embeddings(input_loc)
-        embeddings = self.LayerNorm(img_embeddings+loc_embeddings)
-        embeddings = self.dropout(embeddings)
+        self.vil_prediction = SimpleClassifier(config.bi_hidden_size, config.bi_hidden_size*2, num_labels, 0.5)
 
-        return embeddings
+        self.fusion_method = config.fusion_method
+        self.apply(self.init_bert_weights)
 
+    def forward(
+        self,
+        input_txt,
+        input_imgs,
+        image_loc,
+        token_type_ids=None,
+        attention_mask=None,
+        image_attention_mask=None,
+        co_attention_mask=None,
+        output_all_encoded_layers=False,
+    ):
+
+        # Copy & pasted from BertModel
+        if attention_mask is None:
+            attention_mask = torch.ones_like(input_txt)
+        if token_type_ids is None:
+            token_type_ids = torch.zeros_like(input_txt)
+        if image_attention_mask is None:
+            image_attention_mask = torch.ones(
+                input_imgs.size(0), input_imgs.size(1)
+            ).type_as(input_txt)
+
+        sequence_output_t, sequence_output_v, pooled_output_t, pooled_output_v, _ = self.bert(
+            input_txt,
+            input_imgs,
+            image_loc,
+            token_type_ids,
+            attention_mask,
+            image_attention_mask,
+            co_attention_mask,
+            output_all_encoded_layers=False,
+        )
+
+        if self.fusion_method == 'sum':
+            pooled_output = self.dropout(pooled_output_t + pooled_output_v)
+        elif self.fusion_method == 'mul':
+            pooled_output = self.dropout(pooled_output_t * pooled_output_v)
+        else:
+            assert False
+
+        vil_prediction = self.vil_prediction(pooled_output)
+
+        return vil_prediction
 
 ### PRETRAINING RELATED ###
 
@@ -1752,7 +1826,6 @@ class DeVLBertForVLTasks(BertPreTrainedModel):
 
         return vil_prediction, vil_logit, vil_binary_prediction, vision_prediction, vision_logit, linguisic_prediction, linguisic_logit
 
-class SimpleClassifier(nn.Module):
     def __init__(self, in_dim, hid_dim, out_dim, dropout):
         super(SimpleClassifier, self).__init__()
         layers = [

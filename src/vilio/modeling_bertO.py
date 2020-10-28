@@ -1,3 +1,4 @@
+# Adapted from OSCAR Repo
 
 from transformers.modeling_bert import (BertEmbeddings, 
         BertSelfAttention, BertAttention, BertEncoder, BertLayer, 
@@ -8,15 +9,35 @@ from transformers.modeling_bert import (BertEmbeddings,
 import torch
 from torch import nn
 import torch.nn.functional as F
+from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
 import logging
 import math
 
+from src.vilio.transformers.activations import gelu, gelu_new, swish
+
+### A) ACTIVATION FUNCS ###
 
 logger = logging.getLogger(__name__)
 
+def mish(x):
+    return x * torch.tanh(nn.functional.softplus(x))
 
-### BERT HELPERS ###
+ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish, "gelu_new": gelu_new, "mish": mish}
+
+class GeLU(nn.Module):
+    """Implementation of the gelu activation function.
+        For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
+        0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
+        Also see https://arxiv.org/abs/1606.08415
+    """
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return gelu(x)
+
+### B) BERT HELPERS ###
 
 class CaptionBertSelfAttention(BertSelfAttention):
     """
@@ -85,9 +106,7 @@ class CaptionBertAttention(BertAttention):
         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
         return outputs
 
-
-
-### LAYER ###
+### C) LAYER ###
 
 class CaptionBertLayer(BertLayer):
     """
@@ -110,7 +129,7 @@ class CaptionBertLayer(BertLayer):
         return outputs
 
 
-### ENCODER ###
+### D) ENCODER ###
 
 class CaptionBertEncoder(BertEncoder):
     """
@@ -150,9 +169,7 @@ class CaptionBertEncoder(BertEncoder):
             outputs = outputs + (all_attentions,)
         return outputs  # outputs, (hidden states), (attentions)
 
-### FINAL OSCAR MODEL ###
-
-from param import args
+### E) OSCAR MODEL ###
 
 class BertO(BertPreTrainedModel):
     """ Expand from BertModel to handle image region features as input
@@ -163,19 +180,10 @@ class BertO(BertPreTrainedModel):
         # Features + Positions (2048 + 4)
         config.img_feature_dim = img_feature_dim
         config.img_feature_type = "faster_r-cnn"
-        config.code_voc = 512 # 256?
+        config.code_voc = 512
 
         # Original Repo uses 0.3 dropout
         config.hidden_dropout_prob = 0.3
-
-        if args.reg:
-            config.output_hidden_states = True
-
-        #config.loss_type = args.loss_type
-        #config.use_layernorm = args.use_layernorm
-        #config.classifier = args.classifier
-        #config.cls_hidden_scale = args.cls_hidden_scale
-        #config.num_choice = args.num_choice
 
         super(BertO, self).__init__(config)
         self.embeddings = BertEmbeddings(config)
@@ -205,14 +213,6 @@ class BertO(BertPreTrainedModel):
             self.dropout = nn.Dropout(config.hidden_dropout_prob)
             if self.use_img_layernorm:
                 self.LayerNorm = BertLayerNorm(config.hidden_size, eps=config.img_layer_norm_eps)
-
-        # Taking hidden states from all hidden layers
-        if args.reg:
-            self.high_dropout = nn.Dropout(p=0.2)
-            n_weights = config.num_hidden_layers + 1
-            weights_init = torch.zeros(n_weights).float()
-            weights_init.data[:-1] = -3
-            self.layer_weights = torch.nn.Parameter(weights_init)
 
         self.init_weights()
 
@@ -310,43 +310,12 @@ class BertO(BertPreTrainedModel):
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
 
-        if args.reg:
-            hidden_layers = encoder_outputs[1]
-
-            cls_outputs = torch.stack(
-                [self.high_dropout(layer[:, 0, :]) for layer in hidden_layers], dim=2
-            )
-
-            sequence_output = (torch.softmax(self.layer_weights, dim=0) * cls_outputs).sum(-1)
-
         # add hidden_states and attentions if they are here
         outputs = (sequence_output, pooled_output,) # + encoder_outputs[1:]
         return outputs
 
 
-### PRETRAINING ###
-
-### ACTIVATION FUNCS ###
-
-from transformers.activations import gelu, gelu_new, swish
-
-def mish(x):
-    return x * torch.tanh(nn.functional.softplus(x))
-
-ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish, "gelu_new": gelu_new, "mish": mish}
-
-class GeLU(nn.Module):
-    """Implementation of the gelu activation function.
-        For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
-        0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
-        Also see https://arxiv.org/abs/1606.08415
-    """
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, x):
-        return gelu(x)
-
+### F) PRETRAINING ###
 
 class VisualConfig(object):
     VISUAL_LOSSES = ['obj', 'attr', 'feat']
@@ -436,7 +405,6 @@ class BertVisualObjHead(nn.Module):
             output[key] = self.decoder_dict[key](hidden_states)
         return output
 
-
 class BertPreTrainingHeads(nn.Module):
     def __init__(self, config, bert_model_embedding_weights):
         super(BertPreTrainingHeads, self).__init__()
@@ -447,11 +415,6 @@ class BertPreTrainingHeads(nn.Module):
         prediction_scores = self.predictions(sequence_output)
         seq_relationship_score = self.seq_relationship(pooled_output)
         return prediction_scores, seq_relationship_score
-
-
-import torch
-from torch import nn
-from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
 class BertOPretraining(BertPreTrainedModel):
     def __init__(self,
