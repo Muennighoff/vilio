@@ -33,11 +33,11 @@ if args.swa:
 # Largely sticking to the standards set in LXMERT here
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 
-def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False, rs=True) -> DataTuple:
+def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
 
     dset =  MMFDataset(splits)
 
-    tset = MMFTorchDataset(splits, rs=rs)
+    tset = MMFTorchDataset(splits)
     evaluator = MMFEvaluator(tset)
     data_loader = DataLoader(
         tset, batch_size=bs,
@@ -59,7 +59,7 @@ class MMF:
             valid_bsize = 2048 if args.multiGPU else 50
             self.valid_tuple = get_tuple(
                 args.valid, bs=valid_bsize,
-                shuffle=False, drop_last=False, rs=False
+                shuffle=False, drop_last=False
             )
         else:
             self.valid_tuple = None

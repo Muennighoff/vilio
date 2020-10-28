@@ -29,7 +29,7 @@ class MMFDataset(Dataset):
 
 
 class MMFTorchDataset(Dataset):
-    def __init__(self, splits, rs=None):
+    def __init__(self, splits):
         super().__init__()
         self.name = splits
         self.splits = splits.split(",")
