@@ -16,11 +16,15 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
 from src.vilio.file_utils import cached_path
+from src.vilio.transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.configuration_albert import AlbertConfig 
+from src.vilio.transformers.modeling_albert import AlbertEmbeddings, AlbertLayerGroup
+from src.vilio.transformers.modeling_bert import BertPreTrainedModel
 
 ### BOTTOM-UP APPROACH ###
-# We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
+# We start with the lowest level & then go up step by step
 
-# A) ACTIVATION FUNCS & LOGGER
+# A) ACTIVATION FUNCS
 # B) CONFIGS / HYPERPARAMS FOR VISION & LANG
 # C) EMBEDDING ENCODERS FOR VISION & LANG
 # D) BERT/ATTENTION HELPER FUNCS
@@ -28,21 +32,17 @@ from src.vilio.file_utils import cached_path
 # F) STACKING LAYERS & OUTPUT
 # G) PARENT CLASS OF LXMERT
 # H) Final LXMERT MODEL
+# I) PRETRAINING
 
-# I) LXMERT MODEL & DEPENDENCIES FOR PRETRAINING
-
-### A) ACTIVATION FUNCS & LOGGER ###
+### A) ACTIVATION FUNCS ###
 
 logger = logging.getLogger(__name__)
-
-from src.vilio.transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
 
 
 ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish, "gelu_new": gelu_new, "mish": mish}
-
 
 class GeLU_new(nn.Module):
     """Implementation of the gelu activation function.
@@ -92,15 +92,13 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-from src.vilio.transformers.configuration_albert import AlbertConfig 
 
 ### C) EMBEDDING ENCODERS ### 
+# a) AlbertEmbeddings as imported
+# b) VisualFeatEncoder
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-
-from src.vilio.transformers.modeling_albert import AlbertEmbeddings
 
 class VisualFeatEncoder(nn.Module):
     """Constructs the embeddings from features of detected objects & positions"""
@@ -256,7 +254,8 @@ class BertOutput(nn.Module):
         return hidden_states
 
 ### E) LAYERS ### 
-### TWO TYPES: BertLayer - Used for Unimodal Text & Unimodal Image encoders; Cross LXRTX Layer
+# a) BertLayer - Used for Unimodal Text & Unimodal Image encoders
+# b) Cross LXRTX Layer
 
 class BertLayer(nn.Module):
     def __init__(self, config):
@@ -326,10 +325,12 @@ class LXRTXLayer(nn.Module):
 
 
 ### F) Model Outputs - LXRTEncoder for visual & textual output; BertPooler for Cross output ###
+# a) AlbertLayerGroup as imported
+# b) LXRTEndoer
 
 # Note: Currently we are just loading in the whole AlbertModel (with e.g. 12 Layers)
 # If we only want to load in llayers specified; We need to modify AlbertLayerGroup itself (+ make sure we only use one group, which is standard anyways)
-from src.vilio.transformers.modeling_albert import AlbertLayerGroup
+
 
 class LXRTEncoder(nn.Module):
     """Defines the layers to use
@@ -428,9 +429,8 @@ class BertPooler(nn.Module):
 
 
 ### G) Pre-Model Class LXMERT inherits from ###
+# > Imported as BertPreTrainedModel
 
-# Note: BertPreTrainedModel as used in original LXMERT is outdated
-from src.vilio.transformers.modeling_bert import BertPreTrainedModel
 
 ### H) Final LXRT Model & Extension for Classification ###
 
@@ -505,7 +505,6 @@ class AlbertX(BertPreTrainedModel):
         elif 'l' in self.mode or 'r' in self.mode:
             return (lang_feats, visn_feats)
 
-
     def _init_weights(self, module):
         """ 
         Initialize the weights 
@@ -527,40 +526,7 @@ def set_visual_config(llayers, xlayers, rlayers):
     VISUAL_CONFIG.l_layers = llayers
     VISUAL_CONFIG.x_layers = xlayers
     VISUAL_CONFIG.r_layers = rlayers
-
-
-class AlbertXOutdated(BertPreTrainedModel):
-    """
-    AlbertX Model
-    """
-    base_model_prefix = "albert"
-
-    def __init__(self, config, mode='lxr', llayers=9, xlayers=5, rlayers=5):
-        """
-        :param config:
-        :param mode:  Number of visual layers
-        """
-        super().__init__(config)
-        set_visual_config(llayers, xlayers, rlayers)
-        self.albert = LXRTModel(config)
-        self.mode = mode
-
-        # Note: self.apply(self.init_bert_weights) as used in the LXMERT library is outdated
-        self.init_weights()
-
-    def forward(self, input_ids, token_type_ids=None, attention_mask=None, visual_feats=None,
-                visual_attention_mask=None):
-        feat_seq, pooled_output = self.albert(input_ids, token_type_ids, attention_mask,
-                                            visual_feats=visual_feats,
-                                            visual_attention_mask=visual_attention_mask)
-
-        if 'x' == self.mode:
-            return pooled_output
-        elif 'x' in self.mode and ('l' in self.mode or 'r' in self.mode):
-            return feat_seq, pooled_output
-        elif 'l' in self.mode or 'r' in self.mode:
-            return feat_seq
-            
+        
 class AlbertClassificationHead(nn.Module):
     """Head for sentence-level classification tasks."""
 
@@ -576,8 +542,6 @@ class AlbertClassificationHead(nn.Module):
         x = self.dropout(x)
         x = self.classifier(x)
         return x
-
-### PRETRAINING ONLY ###
 
 
 ### I) Only for pre-training- This can be safely deleted if no pretraining is planned ###

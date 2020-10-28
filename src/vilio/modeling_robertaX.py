@@ -15,12 +15,15 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from file_utils import cached_path
+from src.vilio.file_utils import cached_path
+from src.vilio.transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.configuration_roberta import RobertaConfig, RobertaEmbeddings
+from src.vilio.transformers.modeling_bert import BertPreTrainedModel
 
 ### BOTTOM-UP APPROACH ###
-# We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
+# We start with the lowest level & then go up step by step
 
-# A) D LINKS & BERT WEIGHTS 
+# A) ACTIVATION FUNCS
 # B) CONFIGS / HYPERPARAMS FOR VISION & LANG
 # C) EMBEDDING ENCODERS FOR VISION & LANG
 # D) BERT/ATTENTION HELPER FUNCS
@@ -28,18 +31,13 @@ from file_utils import cached_path
 # F) STACKING LAYERS & OUTPUT
 # G) PARENT CLASS OF LXMERT
 # H) Final LXMERT MODEL
+# I) PRETRAINING
 
-# I) LXMERT MODEL & DEPENDENCIES FOR PRETRAINING
 
-### A) D Links & Bert Weight loading ###
+
+### A) ACTIVATION FUNCS ###
 
 logger = logging.getLogger(__name__)
-
-
-### B) ACTIVATION FUNCS ###
-
-
-from transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -62,6 +60,8 @@ class GeLU(nn.Module):
 
 
 ### B) CONFIGS ###
+# a) RobertaConfig as imported
+# b) VisualConfig
 
 CONFIG_NAME = 'bert_config.json'
 WEIGHTS_NAME = 'pytorch_model.bin'
@@ -96,14 +96,13 @@ class VisualConfig(object):
 
 VISUAL_CONFIG = VisualConfig()
 
-from transformers.configuration_roberta import RobertaConfig 
 
 ### C) EMBEDDING ENCODERS ### 
+# a) Imported RobertaEmbeddings
+# b) VisualFeatEnc.
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-from transformers.modeling_roberta import RobertaEmbeddings
 
 class VisualFeatEncoder(nn.Module):
     """Constructs the embeddings from features of detected objects & positions"""
@@ -259,7 +258,8 @@ class BertOutput(nn.Module):
         return hidden_states
 
 ### E) LAYERS ### 
-### TWO TYPES: BertLayer - Used for Unimodal Text & Unimodal Image encoders; Cross LXRTX Layer
+# a) BertLayer - Used for Unimodal Text & Unimodal Image encoders
+# b) Cross LXRTX Layer
 
 class BertLayer(nn.Module):
     def __init__(self, config):
@@ -328,7 +328,9 @@ class LXRTXLayer(nn.Module):
         return lang_output, visn_output
 
 
-### F) Model Outputs - LXRTEncoder for visual & textual output; BertPooler for Cross output ###
+### F) Model Outputs ###
+# a) LXRTEncoder for visual & textual output
+# b) BertPooler for Cross output
 
 class LXRTEncoder(nn.Module):
     """Defines the layers to use
@@ -363,7 +365,7 @@ class LXRTEncoder(nn.Module):
     def forward(self, lang_feats, lang_attention_mask,
             visn_feats, visn_attention_mask=None, output_hidden_states=False):
 
-        all_hidden_states = () if args.reg else None
+        all_hidden_states = () if output_hidden_states else None
 
         # Run visual embedding layer
         # Note: Word embedding layer was executed outside this module.
@@ -385,8 +387,8 @@ class LXRTEncoder(nn.Module):
         # Run N(X) cross-modality layers - Starting with the Vision & Language feats, and then continuously feeding in its own output
         for layer_module in self.x_layers:
 
-            #if output_hidden_states:
-            #    all_hidden_states = all_hidden_states + (visn_feats,) + (lang_feats,)
+            if output_hidden_states:
+                all_hidden_states = all_hidden_states + (visn_feats,) + (lang_feats,)
 
             lang_feats, visn_feats = layer_module(lang_feats, lang_attention_mask,
                                                     visn_feats, visn_attention_mask)
@@ -414,13 +416,10 @@ class BertPooler(nn.Module):
 
 
 ### G) Pre-Model Class LXMERT inherits from ###
+# > Imported as BertPretrainedModel
 
-# Note: BertPreTrainedModel as used in original LXMERT is outdated
-from transformers.modeling_bert import BertPreTrainedModel
 
 ### H) Final LXRT Model & Extension for Classification ###
-
-from param import args
 
 class RobertaX(BertPreTrainedModel):
     """LXRT Model."""
@@ -503,7 +502,6 @@ class RobertaX(BertPreTrainedModel):
                 
             pooled_output = (torch.softmax(self.layer_weights, dim=0) * cls_outputs).sum(-1)
 
-
         else:
             pooled_output = self.pooler(lang_feats)
 
@@ -537,41 +535,6 @@ def set_visual_config(llayers, xlayers, rlayers):
     VISUAL_CONFIG.x_layers = xlayers
     VISUAL_CONFIG.r_layers = rlayers
 
-
-class RobertaXOutdated(BertPreTrainedModel):
-    """
-    RobertaX Model
-    """
-    base_model_prefix = "roberta"
-    config_class = RobertaConfig
-
-    def __init__(self, config, mode='lxr', llayers=9, xlayers=5, rlayers=5):
-        """
-        :param config:
-        :param mode:  Number of visual layers
-        """
-        super().__init__(config)
-        set_visual_config(llayers, xlayers, rlayers)
-        self.roberta = LXRTModel(config)
-        self.mode = mode
-
-        # Note: self.apply(self.init_bert_weights) as used in the LXMERT library is outdated
-        self.init_weights()
-
-    def forward(self, input_ids, token_type_ids=None, attention_mask=None, visual_feats=None,
-                visual_attention_mask=None):
-        feat_seq, pooled_output = self.roberta(input_ids, token_type_ids, attention_mask,
-                                            visual_feats=visual_feats,
-                                            visual_attention_mask=visual_attention_mask)
-
-        if 'x' == self.mode:
-            return pooled_output
-        elif 'x' in self.mode and ('l' in self.mode or 'r' in self.mode):
-            return feat_seq, pooled_output
-        elif 'l' in self.mode or 'r' in self.mode:
-            return feat_seq
-            
-
 class RobertaClassificationHead(nn.Module):
     """Head for sentence-level classification tasks."""
 
@@ -589,7 +552,6 @@ class RobertaClassificationHead(nn.Module):
         x = self.dropout(x)
         x = self.out_proj(x)
         return x
-
 
 
 #### ONLY FOR PRETRAINING ####

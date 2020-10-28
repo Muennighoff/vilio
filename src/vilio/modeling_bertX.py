@@ -15,16 +15,16 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from src.vilio.file_utils import cached_path
-
 from torch.nn.functional import relu
-from transformers.activations import gelu, gelu_new, swish
+from src.vilio.transformers.activations import gelu, gelu_new, swish
 
+from src.vilio.file_utils import cached_path
+from src.vilio.transformers.modeling_bert import BertConfig, BertEmbeddings, BertPreTrainedModel
 
 ### BOTTOM-UP APPROACH ###
-# We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
+# We start with the lowest level & then go up step by step
 
-# A) D LINKS & BERT WEIGHTS 
+# A) ACTIVATION FUNCS
 # B) CONFIGS / HYPERPARAMS FOR VISION & LANG
 # C) EMBEDDING ENCODERS FOR VISION & LANG
 # D) BERT/ATTENTION HELPER FUNCS
@@ -32,16 +32,11 @@ from transformers.activations import gelu, gelu_new, swish
 # F) STACKING LAYERS & OUTPUT
 # G) PARENT CLASS OF LXMERT
 # H) Final LXMERT MODEL
+# I) PRETRAINING
 
-# I) LXMERT MODEL & DEPENDENCIES FOR PRETRAINING
-
-### A) D Links & Bert Weight loading ###
+### A) ACTIVATION FUNCS ###
 
 logger = logging.getLogger(__name__)
-
-### B) ACTIVATION FUNCS ###
-
-from transformers.activations import gelu, gelu_new, swish
 
 def mish(x):
     return x * torch.tanh(nn.functional.softplus(x))
@@ -61,13 +56,16 @@ class GeLU(nn.Module):
         return gelu(x)
 
 ### B) CONFIGS ###
+# a) VisualConfig
+# b) Imported BertConfig
 
 CONFIG_NAME = 'bert_config.json'
 WEIGHTS_NAME = 'pytorch_model.bin'
 TF_WEIGHTS_NAME = 'model.ckpt'
 
 class VisualConfig(object):
-    VISUAL_LOSSES = ['obj', 'feat'] # Removed: 'attr',
+    # Removed 'attr' pretraining
+    VISUAL_LOSSES = ['obj', 'feat']
     
     def __init__(self,
                  l_layers=12,
@@ -86,7 +84,6 @@ class VisualConfig(object):
         self.visual_losses = self.VISUAL_LOSSES
         self.visual_loss_config = {
             'obj': (self.obj_id_num, 'ce', (-1,), 1/0.15),
-            #'attr': (self.attr_id_num, 'ce', (-1,), 1/0.15),
             'feat': (2048, 'l2', (-1, 2048), 1/0.15)
         }
 
@@ -94,18 +91,14 @@ class VisualConfig(object):
         self.visual_feat_dim = feat_dim
         self.visual_pos_dim = pos_dim
 
-
 VISUAL_CONFIG = VisualConfig()
 
-from transformers.modeling_bert import BertConfig
-
-
 ### C) EMBEDDING ENCODERS ### 
+# a) BertEmbeddings
+# b) VisualFeatEncoder
 
 # Same as batch norm, but statistics for the whole layer, not just batch
 BertLayerNorm = torch.nn.LayerNorm
-
-from transformers.modeling_bert import BertEmbeddings
 
 class VisualFeatEncoder(nn.Module):
     """Constructs the embeddings from features of detected objects & positions"""
@@ -149,7 +142,6 @@ class BertAttention(nn.Module):
         self.attention_head_size = int(config.hidden_size / config.num_attention_heads)
         self.all_head_size = self.num_attention_heads * self.attention_head_size
 
-        # visual_dim = 2048
         if ctx_dim is None:
             ctx_dim =config.hidden_size
         self.query = nn.Linear(config.hidden_size, self.all_head_size)
@@ -262,7 +254,8 @@ class BertOutput(nn.Module):
 
 
 ### E) LAYERS ### 
-### TWO TYPES: BertLayer - Used for Unimodal Text & Unimodal Image encoders; Cross LXRTX Layer
+# a) BertLayer - Used for Unimodal Text & Unimodal Image
+# b) Cross LXRTX Layer
 
 class BertLayer(nn.Module):
     def __init__(self, config):
@@ -276,8 +269,6 @@ class BertLayer(nn.Module):
         intermediate_output = self.intermediate(attention_output)
         layer_output = self.output(intermediate_output, attention_output)
         return layer_output
-
-# from transformers.modeling_bert import BertLayer
 
 class LXRTXLayer(nn.Module):
     def __init__(self, config):
@@ -402,11 +393,8 @@ class BertPooler(nn.Module):
         return pooled_output
 
 
-
 ### G) Pre-Model Class LXMERT inherits from ###
-
-# Note: BertPreTrainedModel as used in original LXMERT is outdated
-from transformers.modeling_bert import BertPreTrainedModel
+# > Moved to imports; BertPreTrainedModel as used in original LXMERT is outdated
 
 ### H) Final LXRT Model & Extension for Classification ###
 
@@ -495,11 +483,7 @@ class BertX(BertPreTrainedModel):
         """
         :param config:
         :param mode:  Number of visual layers
-        """
-        # Adjust dropout rates - Default: Both 0.1
-        #config.hidden_dropout_prob = 0.2
-        #config.attention_probs_dropout_prob = 0.2
-        
+        """       
         super().__init__(config)
         set_visual_config(llayers, xlayers, rlayers)
         self.bert = LXRTModel(config)
@@ -645,10 +629,10 @@ class BertXPretraining(BertPreTrainedModel):
 
         # Weight initialization
         self.init_weights()
-        #self.apply(self.init_bert_weights)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, masked_lm_labels=None,
                 visual_feats=None, pos=None, obj_labels=None, matched_label=None, ans=None):
+
         (lang_output, visn_output), pooled_output = self.bert(
             input_ids, token_type_ids, attention_mask,
             visual_feats=(visual_feats, pos),
