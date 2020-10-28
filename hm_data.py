@@ -6,15 +6,13 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from features_database import FeaturesDatabase
+from data.features_database import FeaturesDatabase
 import os
 from collections import Counter
 
 from param import args
 
 from sklearn.metrics import roc_auc_score
-
-from vg_dict import vg_dict
 
 # Load part of the dataset for fast checking.
 # Notice that here is the number of images instead of the number of data,

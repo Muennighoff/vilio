@@ -12,9 +12,9 @@ from torch.utils.data.dataloader import DataLoader
 from torch.nn.modules.loss import _Loss
 
 if args.tsv:
-    from data.mmf_data_tsv import MMFTorchDataset, MMFEvaluator, MMFDataset
+    from hm_data_tsv import MMFTorchDataset, MMFEvaluator, MMFDataset
 else:
-    from data.mmf_data import MMFTorchDataset, MMFEvaluator, MMFDataset
+    from hm_data import MMFTorchDataset, MMFEvaluator, MMFDataset
 
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 

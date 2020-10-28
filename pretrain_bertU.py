@@ -11,9 +11,9 @@ from torch.utils.data import DataLoader
 from param import args
 
 if args.tsv:
-    from data.pretrain_data_tsv import InputExample, LXMERTDataset, LXMERTTorchDataset
+    from hm_pretrain_data_tsv import InputExample, LXMERTDataset, LXMERTTorchDataset
 else:
-    from data.pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
+    from hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
 
 from src.vilio.transformers import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup

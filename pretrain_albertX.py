@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from param import args
-from src.vilio.pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
+from hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
 
 from src.vilio.transformers import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup

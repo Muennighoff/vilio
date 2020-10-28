@@ -69,7 +69,9 @@ Follow SCORE_REPROD.md
 🥶 Vilio currently provides the following architectures with the outlined language transformers:
 
 1. **[D - DeVLBERT](https://arxiv.org/abs/2008.06884)** [DeVLBert: Learning Deconfounded Visio-Linguistic Representations](https://arxiv.org/abs/2008.06884)
+    - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
 1. **[O - OSCAR](https://arxiv.org/abs/2004.06165)** [Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks](https://arxiv.org/abs/2004.06165)
+    - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
 1. **[U - UNITER](https://arxiv.org/abs/1909.11740)** [UNITER: UNiversal Image-TExt Representation Learning](https://arxiv.org/abs/1909.11740)
     - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
     - [RoBERTa: Robustly Optimized BERT Pretraining Approach](https://arxiv.org/abs/1907.11692)
