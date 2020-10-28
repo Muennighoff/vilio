@@ -15,7 +15,7 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
-from file_utils import cached_path
+from src.vilio.file_utils import cached_path
 
 from torch.nn.functional import relu
 from transformers.activations import gelu, gelu_new, swish
