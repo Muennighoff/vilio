@@ -17,7 +17,8 @@ from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
 from src.vilio.file_utils import cached_path
 from src.vilio.transformers.activations import gelu, gelu_new, swish
-from src.vilio.transformers.configuration_roberta import RobertaConfig, RobertaEmbeddings
+from src.vilio.transformers.configuration_roberta import RobertaConfig
+from src.vilio.transformers.modeling_roberta import RobertaEmbeddings
 from src.vilio.transformers.modeling_bert import BertPreTrainedModel
 
 ### BOTTOM-UP APPROACH ###
