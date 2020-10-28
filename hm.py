@@ -94,10 +94,8 @@ class MMF:
 
         if args.train is not None:
             batch_per_epoch = len(self.train_tuple.loader)
-        else:
-            batch_per_epoch = len(self.valid_tuple.loader)
-        self.t_total = int(batch_per_epoch * args.epochs // args.acc)
-        print("Total Iters: %d" % self.t_total)
+            self.t_total = int(batch_per_epoch * args.epochs // args.acc)
+            print("Total Iters: %d" % self.t_total)
 
         def is_backbone(n):
             if "encoder" in n:
@@ -130,7 +128,8 @@ class MMF:
 
             self.optim = AdamW(optimizer_grouped_parameters, lr=args.lr)
 
-        self.scheduler = get_linear_schedule_with_warmup(self.optim, self.t_total * 0.1, self.t_total)
+        if args.train is not None:
+            self.scheduler = get_linear_schedule_with_warmup(self.optim, self.t_total * 0.1, self.t_total)
         
         self.output = args.output
         os.makedirs(self.output, exist_ok=True)
