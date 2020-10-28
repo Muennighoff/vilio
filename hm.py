@@ -92,7 +92,7 @@ class MMF:
         self.logsoftmax = nn.LogSoftmax(dim=1)
         self.nllloss = nn.NLLLoss()
 
-        if args.train != "":
+        if args.train is not None:
             batch_per_epoch = len(self.train_tuple.loader)
             self.t_total = int(batch_per_epoch * args.epochs // args.acc)
             print("Total Iters: %d" % self.t_total)
