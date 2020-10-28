@@ -9,8 +9,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     # Data Splits
-    parser.add_argument("--train", default='traincleanex')
-    parser.add_argument("--valid", default='devseen')
+    parser.add_argument("--train", default=None)
+    parser.add_argument("--valid", default=None)
     parser.add_argument("--test", default=None)
 
     # Training Hyper-parameters

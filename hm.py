@@ -50,9 +50,10 @@ def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False, rs=True) -> D
 class MMF:
     def __init__(self):
         
-        self.train_tuple = get_tuple(
-            args.train, bs=args.batch_size, shuffle=True, drop_last=False
-        )
+        if args.train != "":
+            self.train_tuple = get_tuple(
+                args.train, bs=args.batch_size, shuffle=True, drop_last=False
+            )
 
         if args.valid != "":
             valid_bsize = 2048 if args.multiGPU else 50
@@ -91,9 +92,10 @@ class MMF:
         self.logsoftmax = nn.LogSoftmax(dim=1)
         self.nllloss = nn.NLLLoss()
 
-        batch_per_epoch = len(self.train_tuple.loader)
-        self.t_total = int(batch_per_epoch * args.epochs // args.acc)
-        print("Total Iters: %d" % self.t_total)
+        if args.train != "":
+            batch_per_epoch = len(self.train_tuple.loader)
+            self.t_total = int(batch_per_epoch * args.epochs // args.acc)
+            print("Total Iters: %d" % self.t_total)
 
         def is_backbone(n):
             if "encoder" in n:
