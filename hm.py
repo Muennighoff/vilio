@@ -217,7 +217,7 @@ class HM:
 
         return res2
 
-    def epoch_update_gamma(self, y_true, y_pred, epoch=-1, delta=1.0):
+    def epoch_update_gamma(self, y_true, y_pred, epoch=-1, delta=2.0):
         """
         Calculate gamma from last epoch's targets and predictions.
         Gamma is updated at the end of each epoch.
@@ -306,10 +306,6 @@ class HM:
                 # Model expects visual feats as tuple of feats & boxes
                 logit = self.model(sent, (feats, boxes))
 
-                # Taking raw estimates (Shifted to val-only) (Removed Softmax as same as logsoftmax)
-                #score1 = logit[:, 1]
-                #score2 = 100 - logit[:, 0] # Inverting; 100 needed as - & + values
-
                 # Note: LogSoftmax does not change order, hence there should be nothing wrong with taking it as our prediction 
                 # In fact ROC AUC stays the exact same for logsoftmax / normal softmax, but logsoftmax is better for loss calculation
                 # due to stronger penalization & decomplexifying properties (log(a/b) = log(a) - log(b))
@@ -319,9 +315,6 @@ class HM:
                 if i < 1:
                     print(logit[0, :].detach())
                
-                #target = target.unsqueeze(dim=1).long()#.float()#.cuda()
-                #score1 = score1.unsqueeze(dim=1)#.long()#.cuda()
-                #score1 = torch.tensor(score1, requires_grad=True, dtype=torch.long)#(requires_grad=True)
 
                 if (epoch > 0) and (args.rcac):
                     loss = self.roc_star_loss(target, score, epoch_gamma, last_epoch_y_t, last_epoch_y_pred)
