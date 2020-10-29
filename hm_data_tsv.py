@@ -1,4 +1,4 @@
-# Mix of mmf_data & LXMERTs task data files
+# Mix of hm_data & LXMERTs task data files
 
 import json
 import numpy as np
@@ -12,13 +12,13 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-class MMFDataset(Dataset):
+class HMDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
         self.name = splits
         self.splits = splits.split(",")
 
-class MMFTorchDataset(Dataset):
+class HMTorchDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
         self.name = splits
@@ -110,7 +110,7 @@ class MMFTorchDataset(Dataset):
         # Pad Boxes
         num_b = -1
 
-        # Provide label (target) - From mmf_data
+        # Provide label (target) - From hm_data
         if 'label' in datum:
             if int(datum["label"]) == 1:
                 label = [0, 1]
@@ -123,7 +123,7 @@ class MMFTorchDataset(Dataset):
         else:
             return img_id, feats, boxes, num_b, text
 
-class MMFEvaluator:
+class HMEvaluator:
     def __init__(self, dataset):
         self.dataset = dataset
 

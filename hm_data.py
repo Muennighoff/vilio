@@ -21,14 +21,14 @@ TINY_IMG_NUM = 10
 FAST_IMG_NUM = 5000
 
 
-class MMFDataset(Dataset):
+class HMDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
         self.name = splits
         self.splits = splits.split(",")
 
 
-class MMFTorchDataset(Dataset):
+class HMTorchDataset(Dataset):
     def __init__(self, splits):
         super().__init__()
         self.name = splits
@@ -118,7 +118,7 @@ class MMFTorchDataset(Dataset):
             return iid, feats, boxes, num_b, text
 
 
-class MMFEvaluator:
+class HMEvaluator:
     def __init__(self, dataset):
         self.dataset = dataset
 

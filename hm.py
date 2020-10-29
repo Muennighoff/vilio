@@ -12,9 +12,9 @@ from torch.utils.data.dataloader import DataLoader
 from torch.nn.modules.loss import _Loss
 
 if args.tsv:
-    from hm_data_tsv import MMFTorchDataset, MMFEvaluator, MMFDataset
+    from hm_data_tsv import HMTorchDataset, HMEvaluator, HMDataset
 else:
-    from hm_data import MMFTorchDataset, MMFEvaluator, MMFDataset
+    from hm_data import HMTorchDataset, HMEvaluator, HMDataset
 
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
@@ -38,10 +38,10 @@ DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 
 def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
 
-    dset =  MMFDataset(splits)
+    dset =  HMDataset(splits)
 
-    tset = MMFTorchDataset(splits)
-    evaluator = MMFEvaluator(tset)
+    tset = HMTorchDataset(splits)
+    evaluator = HMEvaluator(tset)
     data_loader = DataLoader(
         tset, batch_size=bs,
         shuffle=shuffle, num_workers=args.num_workers,
@@ -50,7 +50,7 @@ def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
 
     return DataTuple(dataset=dset, loader=data_loader, evaluator=evaluator)
 
-class MMF:
+class HM:
     def __init__(self):
         
         if args.train is not None:
@@ -82,8 +82,8 @@ class MMF:
             print(args.model, " is not implemented.")
 
         # Load pre-trained weights from paths
-        if args.load_lxmert is not None:
-            self.model.load(args.load_lxmert)
+        if args.loadpre is not None:
+            self.model.load(args.loadpre)
 
         # GPU options
         if args.multiGPU:
@@ -504,11 +504,11 @@ class MMF:
 if __name__ == "__main__":
 
     # Build Class
-    mmf = MMF()
+    hm = HM()
 
     # Load Model
-    if args.load is not None:
-        mmf.load(args.load)
+    if args.loadfin is not None:
+        hm.load(args.loadfin)
 
     # Test or Train
     if args.test is not None:
@@ -516,13 +516,13 @@ if __name__ == "__main__":
         # To avoid having to reload the tsv everytime:
         for split in args.test.split(","):
             if 'test' in split:
-                mmf.predict(
+                hm.predict(
                     get_tuple(split, bs=args.batch_size,
                             shuffle=False, drop_last=False),
                     dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
                 )
             elif 'dev' in split or 'valid' in split or 'train' in split:
-                result = mmf.evaluate(
+                result = hm.evaluate(
                     get_tuple(split, bs=args.batch_size,
                             shuffle=False, drop_last=False),
                     dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
@@ -531,10 +531,10 @@ if __name__ == "__main__":
             else:
                 assert False, "No such test option for %s" % args.test
     else:
-        print('Splits in Train data:', mmf.train_tuple.dataset.splits)
-        if mmf.valid_tuple is not None:
-            print('Splits in Valid data:', mmf.valid_tuple.dataset.splits)
+        print('Splits in Train data:', hm.train_tuple.dataset.splits)
+        if hm.valid_tuple is not None:
+            print('Splits in Valid data:', hm.valid_tuple.dataset.splits)
         else:
             print("DO NOT USE VALIDATION")
-        mmf.train(mmf.train_tuple, mmf.valid_tuple)
+        hm.train(hm.train_tuple, hm.valid_tuple)
 

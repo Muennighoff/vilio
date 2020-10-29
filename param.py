@@ -52,10 +52,10 @@ def parse_args():
 
     # Model Loading - Note: PATHS must be put in here! 
     parser.add_argument('--model', type=str, default='X', help='Type of Model, X V O U D')
-    parser.add_argument('--load', type=str, default=None,
+    parser.add_argument('--loadfin', type=str, default=None,
                         help='Load the model (usually the fine-tuned model).')               
-    parser.add_argument('--loadLXMERT', dest='load_lxmert', type=str, default=None,
-                        help='Load the pre-trained LXMERT model.')
+    parser.add_argument('--loadpre', type=str, default=None,
+                        help='Load the pre-trained model.')
     parser.add_argument("--fromScratch", dest='from_scratch', action='store_const', default=False, const=True,
                         help='If none of the --load, --loadLXMERT, --loadLXMERTQA is set, '
                              'the model would be trained from scratch. If --fromScratch is'

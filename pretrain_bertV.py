@@ -245,11 +245,10 @@ class LXMERT:
         if args.from_scratch:
             print("Train from Scratch: re-initialize all BERT weights.")
             self.model.apply(self.model.init_bert_weights)
-        if args.load is not None:
-            self.load(args.load)
-        if args.load_lxmert is not None:
-            # Load lxmert would not load the answer head.
-            self.load_lxmert(args.load_lxmert)
+        if args.loadfin is not None:
+            self.load(args.loadfin)
+        if args.loadpre is not None:
+            self.loadpre(args.loadpre)
 
         # GPU Options
         self.model = self.model.cuda()
@@ -384,8 +383,8 @@ class LXMERT:
         state_dict = torch.load("%s" % path)
         self.model.load_state_dict(state_dict)
 
-    def load_lxmert(self, path):
-        print("Load LXMERT model from %s" % path)
+    def loadpre(self, path):
+        print("Load model from %s" % path)
         state_dict = torch.load("%s" % path)
 
         # Do not load any answer head
