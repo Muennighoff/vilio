@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from features_database import FeaturesDatabase
+from data.features_database import FeaturesDatabase
 import os
 from collections import Counter
 
