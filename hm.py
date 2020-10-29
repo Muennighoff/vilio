@@ -9,7 +9,6 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
-from torch.nn.modules.loss import _Loss
 
 if args.tsv:
     from hm_data_tsv import HMTorchDataset, HMEvaluator, HMDataset
@@ -94,8 +93,6 @@ class HM:
         # Losses and optimizer
         self.logsoftmax = nn.LogSoftmax(dim=1)
         self.nllloss = nn.NLLLoss()
-
-        self.roc_star_loss = RocStarLoss()
 
         if args.train is not None:
             batch_per_epoch = len(self.train_tuple.loader)
