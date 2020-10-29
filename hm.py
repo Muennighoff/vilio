@@ -164,10 +164,10 @@ class HM:
                 if args.model != "X":
                     print(self.model.model.layer_weights)
 
-            quesid2ans = {}
-            quesid2prob = {}
+            id2ans = {}
+            id2prob = {}
 
-            for i, (ques_id, feats, boxes, sent, label, target) in iter_wrapper(enumerate(loader)):
+            for i, (ids, feats, boxes, sent, label, target) in iter_wrapper(enumerate(loader)):
 
                 if ups == args.midsave:
                     self.save("MID")
@@ -204,11 +204,11 @@ class HM:
                 # Acts as argmax - extracting the higher score & the corresponding index (0 or 1)
                 _, predict = logit.detach().max(1)
                 # Getting labels for accuracy
-                for qid, l in zip(ques_id, predict.cpu().numpy()):
-                    quesid2ans[qid] = l
+                for qid, l in zip(ids, predict.cpu().numpy()):
+                    id2ans[qid] = l
                 # Getting probabilities for Roc auc
-                for qid, l in zip(ques_id, score.detach().cpu().numpy()):
-                    quesid2prob[qid] = l
+                for qid, l in zip(ids, score.detach().cpu().numpy()):
+                    id2prob[qid] = l
 
                 if (i+1) % args.acc == 0:
 
@@ -228,23 +228,23 @@ class HM:
                     # Do Validation in between
                     if ups % 250 == 0: 
                         
-                        log_str = "\nEpoch(U) %d(%d): Train AC %0.2f RA %0.4f LOSS %0.4f\n" % (epoch, ups, evaluator.evaluate(quesid2ans)*100, 
-                        evaluator.roc_auc(quesid2prob)*100, total_loss)
+                        log_str = "\nEpoch(U) %d(%d): Train AC %0.2f RA %0.4f LOSS %0.4f\n" % (epoch, ups, evaluator.evaluate(id2ans)*100, 
+                        evaluator.roc_auc(id2prob)*100, total_loss)
 
                         # Set loss back to 0 after printing it
                         total_loss = 0.
 
                         if self.valid_tuple is not None:  # Do Validation
-                            acc, roc_auc, roc_auc0, roc_auc1 = self.evaluate(eval_tuple)
+                            acc, roc_auc = self.evaluate(eval_tuple)
                             if roc_auc > best_roc:
                                 best_roc = roc_auc
                                 best_acc = acc
-                                # Not saving Best for now as we only use LAST
-                                # self.save("BEST")
+                                # Only save BEST when no midsave is specified to save space
+                                #if args.midsave < 0:
+                                #    self.save("BEST")
 
-                            log_str += "\nEpoch(U) %d(%d): DEV AC %0.2f RA %0.4f RA0 %0.4f RA1 %0.4f\n" % (epoch, ups, acc*100.,roc_auc*100, roc_auc0*100, 
-                            roc_auc1*100)
-                            log_str += "Epoch(U) %d(%d): Best (RA) ACC %0.2f RA %0.4f \n" % (epoch, ups, best_acc*100., best_roc*100.)
+                            log_str += "\nEpoch(U) %d(%d): DEV AC %0.2f RA %0.4f \n" % (epoch, ups, acc*100.,roc_auc*100)
+                            log_str += "Epoch(U) %d(%d): BEST AC %0.2f RA %0.4f \n" % (epoch, ups, best_acc*100., best_roc*100.)
     
                         print(log_str, end='')
 
@@ -261,15 +261,12 @@ class HM:
     def predict(self, eval_tuple: DataTuple, dump=None, out_csv=True):
 
         dset, loader, evaluator = eval_tuple
-        quesid2ans = {}
-
-        quesid2prob = {}
-        quesid2prob0 = {}
-        quesid2prob1 = {}
+        id2ans = {}
+        id2prob = {}
 
         for i, datum_tuple in enumerate(loader):
 
-            ques_id, feats, boxes, sent = datum_tuple[:4]
+            ids, feats, boxes, sent = datum_tuple[:4]
 
             self.model.eval()
 
@@ -281,53 +278,39 @@ class HM:
                 feats, boxes = feats.cuda(), boxes.cuda()
                 logit = self.model(sent, (feats, boxes))
 
-                # Taking several raw estimates
-                score0 = logit[:, 1]
-                score1 = 100 - logit[:, 0] # Inverting; 100 needed as - & + values
-
                 # Note: LogSoftmax does not change order, hence there should be nothing wrong with taking it as our prediction
                 logit = self.logsoftmax(logit)
                 score = logit[:, 1]
 
                 if args.swa:
-                    logit_swa = self.swa_model(sent, (feats, boxes))
-                    logit_swa = self.logsoftmax(logit_swa)
-                    score1 = logit_swa[:, 1]
+                    logit = self.swa_model(sent, (feats, boxes))
+                    logit = self.logsoftmax(logit)
 
                 _, predict = logit.max(1)
 
-                for qid, l in zip(ques_id, predict.cpu().numpy()):
-                    quesid2ans[qid] = l
+                for qid, l in zip(ids, predict.cpu().numpy()):
+                    id2ans[qid] = l
 
                 # Getting probas for Roc Auc
-                for qid, l in zip(ques_id, score.cpu().numpy()):
-                    quesid2prob[qid] = l
-
-                for qid, l in zip(ques_id, score0.cpu().numpy()):
-                    quesid2prob0[qid] = l
-                
-                for qid, l in zip(ques_id, score1.cpu().numpy()):
-                    quesid2prob1[qid] = l
-
+                for qid, l in zip(ids, score.cpu().numpy()):
+                    id2prob[qid] = l
 
         if dump is not None:
             if out_csv == True:
-                evaluator.dump_csv(quesid2ans, quesid2prob, dump)
+                evaluator.dump_csv(id2ans, id2prob, dump)
             else:
-                evaluator.dump_result(quesid2ans, dump)
+                evaluator.dump_result(id2ans, dump)
 
-        return quesid2ans, quesid2prob, quesid2prob0, quesid2prob1
+        return id2ans, id2prob
 
     def evaluate(self, eval_tuple: DataTuple, dump=None):
         """Evaluate all data in data_tuple."""
-        quesid2ans, quesid2prob, quesid2prob0, quesid2prob1 = self.predict(eval_tuple, dump=dump)
-        acc = eval_tuple.evaluator.evaluate(quesid2ans)
+        id2ans, id2prob = self.predict(eval_tuple, dump=dump)
 
-        roc_auc = eval_tuple.evaluator.roc_auc(quesid2prob)
-        roc_auc0 = eval_tuple.evaluator.roc_auc(quesid2prob0)
-        roc_auc1 = eval_tuple.evaluator.roc_auc(quesid2prob1)
+        acc = eval_tuple.evaluator.evaluate(id2ans)
+        roc_auc = eval_tuple.evaluator.roc_auc(id2prob)
 
-        return acc, roc_auc, roc_auc0, roc_auc1
+        return acc, roc_auc
 
     def save(self, name):
         if args.swa:
