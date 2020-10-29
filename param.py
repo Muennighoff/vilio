@@ -29,7 +29,6 @@ def parse_args():
 
     # After competition make this standard / remove
     parser.add_argument("--reg", action='store_const', default=False, const=True) # Applies Multi-sample dropout, SWA, Other regularization 
-    parser.add_argument("--rcac", action='store_const', default=False, const=True) # Uses rcac loss instead of CE
     parser.add_argument("--acc", type=int, default=1, help='Amount of acc steps for bigger batch size - make sure to adjust LR')
     parser.add_argument("--tr", type=str, default="bert-base-uncased", help="Name of language transformer to be used")
     parser.add_argument("--swa", action='store_const', default=False, const=True)
