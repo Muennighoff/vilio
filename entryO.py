@@ -224,7 +224,7 @@ class ModelO(nn.Module):
 
     def load(self, path):
         # Load state_dict from snapshot file
-        print("Load LXMERT pre-trained model from %s" % path)
+        print("Load pre-trained model from %s" % path)
         state_dict = torch.load("%s" % path)
         new_state_dict = {}
         for key, value in state_dict.items():

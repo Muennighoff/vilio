@@ -150,31 +150,6 @@ class ModelX(nn.Module):
 
         self.classifier.apply(self.init_weights)
 
-
-        # Original classifiers from huggingface
-        #self.classifier = RobertaClassificationHead(self.model.config)
-        #self.classifier = AlbertClassificationHead(self.model.config)
-
-        # Note: We're copy pasting the same _init_weights function here as used in the LXRTEncoder / the TR Library
-        # but we're only applying it to our final classifier as it has already been applied to the rest (& pretrained weights already initialized!)
-        # We're using it as init and not _init here, as we do not need the tieing / pruning additionaly present in _init
-        #self.classifier.apply(self.init_weights)
-
-        # The init weights works as follows:
-        # It goes all the way back to PreTrainedModel > Which then calls _init_weights on all modules passed
-        # They then initialize the weights of all layers as outlined in the function
-        # apply() passes in all modules of a torch.nn.Module
-
-        # As all weights have been initialized to the specified pretrained version, here we get the chance to reinit a couple final layers
-        # See: https://arxiv.org/abs/2006.05987
-        #self.lxrt_encoder.model.apply(self.reinit_weights)
-
-        # Reinit Albert Pooler
-        #、if self.tr_name.startswith("albert"):
-        #    self.model.albert.pooler.apply(self.init_weights)
-        #self.model.roberta.pooler.apply(self.init_weights)
-        #self.model.bert.pooler.apply(self.init_weights)
-
         if args.from_scratch:
             print("initializing all the weights")
             self.model.apply(self.model.init_weights)
@@ -209,30 +184,18 @@ class ModelX(nn.Module):
 
     def load(self, path):
         # Load state_dict from snapshot file
-        print("Load LXMERT pre-trained model from %s" % path)
+        print("Load pre-trained model from %s" % path)
         state_dict = torch.load("%s" % path) # removed _LXRT.pth
         new_state_dict = {}
         for key, value in state_dict.items():
             
-            ### SKIP X LAYERS ###
-            #if key.startswith("module.bert.encoder.x_layers."):
-            #    print("SKIPPING:", key)
-            #    continue
-            ### SKIP L LAYERS ###
-            #if key.startswith("module.bert.encoder.layer."):
-            #    print("SKIPPING:", key)
-            #    continue
-
             if key.startswith("module."):
                 new_state_dict[key[len("module."):]] = value
             elif key.startswith("model."):
-                #print("SAVING {} as {}.".format(key, key[6:])) # XRL
                 new_state_dict[key[6:]] = value
             elif key.startswith("roberta."):    
-                #print("SAVING {} as {}".format(key, key[8:]))
                 new_state_dict[key[8:]] = value
             elif key.startswith("albert."):
-                #print("SAVING {} as {}.".format(key, key[7:]))
                 new_state_dict[key[7:]] = value
             else:
                 new_state_dict[key] = value
@@ -276,4 +239,3 @@ class ModelX(nn.Module):
                 print("Reiniting :", module[-1])
                 # Reinit that layer: 
                 module[-2:].apply(self.init_weights)
-        # Alternatively -- for child in module.children() -- can be used

@@ -152,11 +152,8 @@ class ModelU(nn.Module):
         for (i, sent) in enumerate(sents):
 
             sent = " ".join(str(sent).split())
-
-            #sent = sent.replace("'", "")
-            #sent = sent.replace('"', '')
             
-            # Case first letter for bert-base-cased Uniter
+            # Case first letter for bert-base-cased Uniter performs better
             if args.case:
                 sent = sent[0].upper() + sent[1:]
 
@@ -228,7 +225,7 @@ class ModelU(nn.Module):
 
     def load(self, path):
         # Load state_dict from snapshot file
-        print("Load LXMERT pre-trained model from %s" % path)
+        print("Load pre-trained model from %s" % path)
         state_dict = torch.load("%s" % path)
         new_state_dict = {}
         for key, value in state_dict.items():
@@ -242,9 +239,8 @@ class ModelU(nn.Module):
             #    print("SKIPPING:", key)
             #    continue
 
-            # Experiments: Best-off taking only the first 4 (Tested with 2 seeds, after multiple eps only though)
             if key.startswith("img_embeddings.pos_linear.weight"):
-                if args.num_pos == 6: # 7 in fact for UNITER
+                if args.num_pos == 6: # Loading all 7 (not 6) for UNITER
                     new_state_dict[key] = value
                 else:
                     new_state_dict[key] = value[:, :4]
@@ -288,6 +284,3 @@ class ModelU(nn.Module):
             module.weight.data.fill_(1.0)
         if isinstance(module, nn.Linear) and module.bias is not None:
             module.bias.data.zero_()
-
-    def freeze_weights(self, module):
-        pass
