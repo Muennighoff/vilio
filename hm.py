@@ -50,6 +50,91 @@ def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
 
     return DataTuple(dataset=dset, loader=data_loader, evaluator=evaluator)
 
+class RocStarLoss(_Loss):
+    """Smooth approximation for ROC AUC
+    """
+    def __init__(self, delta = 1.0, sample_size = 10, sample_size_gamma = 10, update_gamma_each=10):
+        r"""
+        Args:
+            delta: Param from article
+            sample_size (int): Number of examples to take for ROC AUC approximation
+            sample_size_gamma (int): Number of examples to take for Gamma parameter approximation
+            update_gamma_each (int): Number of steps after which to recompute gamma value.
+        """
+        super().__init__()
+        self.delta = delta
+        self.sample_size = sample_size
+        self.sample_size_gamma = sample_size_gamma
+        self.update_gamma_each = update_gamma_each
+        self.steps = 0
+        size = max(sample_size, sample_size_gamma)
+
+        # Randomly init labels
+        self.y_pred_history = torch.rand((size, 1))
+        self.y_true_history = torch.randint(2, (size, 1))
+        
+
+    def forward(self, y_pred, y_true):
+        """
+        Args:
+            y_pred: Tensor of model predictions in [0, 1] range. Shape (B x 1)
+            y_true: Tensor of true labels in {0, 1}. Shape (B x 1)
+        """
+        #y_pred = _y_pred.clone().detach()
+        #y_true = _y_true.clone().detach()
+        if self.steps % self.update_gamma_each == 0:
+            self.update_gamma()
+        self.steps += 1
+        
+        positive = y_pred[y_true > 0]
+        negative = y_pred[y_true < 1]
+        
+        # Take last `sample_size` elements from history
+        y_pred_history = self.y_pred_history[- self.sample_size:]
+        y_true_history = self.y_true_history[- self.sample_size:]
+        
+        positive_history = y_pred_history[y_true_history > 0]
+        negative_history = y_pred_history[y_true_history < 1]
+        
+        if positive.size(0) > 0:
+            diff = negative_history.view(1, -1) + self.gamma - positive.view(-1, 1)
+            loss_positive = torch.nn.functional.relu(diff ** 2).mean()
+        else:
+            loss_positive = 0
+ 
+        if negative.size(0) > 0:
+            diff = negative.view(1, -1) + self.gamma - positive_history.view(-1, 1)
+            loss_negative = torch.nn.functional.relu(diff ** 2).mean()
+        else:
+            loss_negative = 0
+            
+        loss = loss_negative + loss_positive
+        
+        # Update FIFO queue
+        batch_size = y_pred.size(0)
+        self.y_pred_history = torch.cat((self.y_pred_history[batch_size:], y_pred.clone().detach()))
+        self.y_true_history = torch.cat((self.y_true_history[batch_size:], y_true.clone().detach()))
+        return loss
+
+    def update_gamma(self):
+        # Take last `sample_size_gamma` elements from history
+        y_pred = self.y_pred_history[- self.sample_size_gamma:]
+        y_true = self.y_true_history[- self.sample_size_gamma:]
+        
+        positive = y_pred[y_true > 0]
+        negative = y_pred[y_true < 1]
+        
+        # Create matrix of size sample_size_gamma x sample_size_gamma
+        diff = positive.view(-1, 1) - negative.view(1, -1)
+        AUC = (diff > 0).type(torch.float).mean()
+        num_wrong_ordered = (1 - AUC) * diff.flatten().size(0)
+        
+        # Adjuct gamma, so that among correct ordered samples `delta * num_wrong_ordered` were considered
+        # ordered incorrectly with gamma added
+        correct_ordered = diff[diff > 0].flatten().sort().values
+        idx = min(int(num_wrong_ordered * self.delta), len(correct_ordered)-1)
+        self.gamma = correct_ordered[idx]
+
 class HM:
     def __init__(self):
         
@@ -94,6 +179,8 @@ class HM:
         # Losses and optimizer
         self.logsoftmax = nn.LogSoftmax(dim=1)
         self.nllloss = nn.NLLLoss()
+
+        self.roc_star_loss = RocStarLoss()
 
         if args.train is not None:
             batch_per_epoch = len(self.train_tuple.loader)
@@ -145,124 +232,6 @@ class HM:
             self.swa_start = self.t_total * 0.75
             self.swa_scheduler = SWALR(self.optim, swa_lr=args.lr)
 
-    def roc_star_loss(self, _y_true, y_pred, gamma, _epoch_true, epoch_pred):
-        """
-        Nearly direct loss function for AUC.
-        See article,
-        C. Reiss, "Roc-star : An objective function for ROC-AUC that actually works."
-        https://github.com/iridiumblue/articles/blob/master/roc_star.md
-            _y_true: `Tensor`. Targets (labels).  Float either 0.0 or 1.0 .
-            y_pred: `Tensor` . Predictions.
-            gamma  : `Float` Gamma, as derived from last epoch.
-            _epoch_true: `Tensor`.  Targets (labels) from last epoch.
-            epoch_pred : `Tensor`.  Predicions from last epoch.
-        """
-        # Convert labels to boolean
-        y_true = (_y_true>=0.50)
-        epoch_true = (_epoch_true>=0.50)
-
-        # if batch is either all true or false return small random stub value.
-        if torch.sum(y_true)==0 or torch.sum(y_true) == y_true.shape[0]: return torch.sum(y_pred)*1e-8
-
-        pos = y_pred[y_true]
-        neg = y_pred[~y_true]
-
-        epoch_pos = epoch_pred[epoch_true]
-        epoch_neg = epoch_pred[~epoch_true]
-
-        # Take random subsamples of the training set, both positive and negative.
-        max_pos = 1000 # Max number of positive training samples
-        max_neg = 1000 # Max number of positive training samples
-        cap_pos = epoch_pos.shape[0]
-        cap_neg = epoch_neg.shape[0]
-        epoch_pos = epoch_pos[torch.rand_like(epoch_pos) < max_pos/cap_pos]
-        epoch_neg = epoch_neg[torch.rand_like(epoch_neg) < max_neg/cap_pos]
-
-        ln_pos = pos.shape[0]
-        ln_neg = neg.shape[0]
-
-        # sum positive batch elements agaionst (subsampled) negative elements
-        if ln_pos>0 :
-            pos_expand = pos.view(-1,1).expand(-1,epoch_neg.shape[0]).reshape(-1)
-            neg_expand = epoch_neg.repeat(ln_pos)
-
-            diff2 = neg_expand - pos_expand + gamma
-            l2 = diff2[diff2>0]
-            m2 = l2 * l2
-            len2 = l2.shape[0]
-        else:
-            m2 = torch.tensor([0], dtype=torch.float).cuda()
-            len2 = 0
-
-        # Similarly, compare negative batch elements against (subsampled) positive elements
-        if ln_neg>0 :
-            pos_expand = epoch_pos.view(-1,1).expand(-1, ln_neg).reshape(-1)
-            neg_expand = neg.repeat(epoch_pos.shape[0])
-
-            diff3 = neg_expand - pos_expand + gamma
-            l3 = diff3[diff3>0]
-            m3 = l3*l3
-            len3 = l3.shape[0]
-        else:
-            m3 = torch.tensor([0], dtype=torch.float).cuda()
-            len3=0
-
-        if (torch.sum(m2)+torch.sum(m3))!=0 :
-            res2 = torch.sum(m2)/max_pos+torch.sum(m3)/max_neg
-        #code.interact(local=dict(globals(), **locals()))
-        else:
-            res2 = torch.sum(m2)+torch.sum(m3)
-
-        res2 = torch.where(torch.isnan(res2), torch.zeros_like(res2), res2)
-
-        return res2
-
-    def epoch_update_gamma(self, y_true, y_pred, epoch=-1, delta=2.0):
-        """
-        Calculate gamma from last epoch's targets and predictions.
-        Gamma is updated at the end of each epoch.
-        y_true: `Tensor`. Targets (labels).  Float either 0.0 or 1.0 .
-        y_pred: `Tensor` . Predictions.
-        """
-        DELTA = delta
-        SUB_SAMPLE_SIZE = 2000.0
-
-        pos = y_pred[y_true==1] 
-        neg = y_pred[y_true==0]
-        # subsample the training set for performance
-
-        cap_pos = pos.shape[0]
-        cap_neg = neg.shape[0]
-        pos = pos[torch.rand_like(pos) < SUB_SAMPLE_SIZE/cap_pos]
-        neg = neg[torch.rand_like(neg) < SUB_SAMPLE_SIZE/cap_neg]
-        ln_pos = pos.shape[0]
-        ln_neg = neg.shape[0]
-        pos_expand = pos.view(-1,1).expand(-1,ln_neg).reshape(-1)
-        neg_expand = neg.repeat(ln_pos)
-        diff = neg_expand - pos_expand
-        ln_All = diff.shape[0]
-        Lp = diff[diff>0] # because we're taking positive diffs, we got pos and neg flipped.
-        ln_Lp = Lp.shape[0]-1
-        diff_neg = -1.0 * diff[diff<0]
-        diff_neg = diff_neg.sort()[0]
-        ln_neg = diff_neg.shape[0]-1
-        ln_neg = max([ln_neg, 0])
-        left_wing = int(ln_Lp*DELTA)
-        left_wing = max([0,left_wing])
-        left_wing = min([ln_neg,left_wing])
-        default_gamma=torch.tensor(0.2, dtype=torch.float).cuda()
-        if diff_neg.shape[0] > 0 :
-            gamma = diff_neg[left_wing]
-        else:
-            gamma = default_gamma # default=torch.tensor(0.2, dtype=torch.float).cuda()
-        L1 = diff[diff>-1.0*gamma]
-        ln_L1 = L1.shape[0]
-        if epoch > -1 :
-            return gamma
-        else :
-            return default_gamma
-
-
     def train(self, train_tuple, eval_tuple):
 
         dset, loader, evaluator = train_tuple
@@ -275,7 +244,6 @@ class HM:
         best_roc = 0.
         ups = 0
         
-        epoch_gamma = 0.20
 
         total_loss = 0.
 
@@ -288,8 +256,8 @@ class HM:
             quesid2ans = {}
             quesid2prob = {}
 
-            epoch_y_pred = []
-            epoch_y_t = []
+            #epoch_y_pred = []
+            #epoch_y_t = []
 
             for i, (ques_id, feats, boxes, sent, label, target) in iter_wrapper(enumerate(loader)):
 
@@ -317,7 +285,7 @@ class HM:
                
 
                 if (epoch > 0) and (args.rcac):
-                    loss = self.roc_star_loss(target, score, epoch_gamma, last_epoch_y_t, last_epoch_y_pred)
+                    loss = self.roc_star_loss(score, target)
                 else:
                     # Note: This loss is the same as CrossEntropy (We splitted it up in logsoftmax & neg. log likelihood loss)
                     loss = self.nllloss(logit.view(-1, 2), target.view(-1))
@@ -328,10 +296,6 @@ class HM:
                 loss.backward()
 
                 total_loss += loss.detach().item()
-
-                if args.rcac:
-                    epoch_y_pred.extend(score.detach())
-                    epoch_y_t.extend(target)
 
                 # Acts as argmax - extracting the higher score & the corresponding index (0 or 1)
                 _, predict = logit.detach().max(1)
@@ -384,12 +348,6 @@ class HM:
                         with open(self.output + "/log.log", 'a') as f:
                             f.write(log_str)
                             f.flush()
-
-            if args.rcac:
-                last_epoch_y_pred = torch.tensor(epoch_y_pred).cuda()
-                last_epoch_y_t = torch.tensor(epoch_y_t).cuda()
-
-                epoch_gamma = self.epoch_update_gamma(last_epoch_y_t, last_epoch_y_pred, epoch)
 
         if (epoch + 1) == args.epochs:
             if args.contrib:
