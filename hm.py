@@ -291,7 +291,7 @@ class HM:
             epoch_y_pred = []
             epoch_y_t = []
 
-            for i, (ques_id, feats, boxes, num_b, sent, label, target) in iter_wrapper(enumerate(loader)):
+            for i, (ques_id, feats, boxes, sent, label, target) in iter_wrapper(enumerate(loader)):
 
                 if ups == args.midsave:
                     self.save("MID")
@@ -415,7 +415,7 @@ class HM:
 
         for i, datum_tuple in enumerate(loader):
 
-            ques_id, feats, boxes, num_b, sent = datum_tuple[:5]
+            ques_id, feats, boxes, sent = datum_tuple[:4]
 
             self.model.eval()
 
@@ -486,7 +486,7 @@ class HM:
     def load(self, path):
         print("Load model from %s" % path)
             
-        state_dict = torch.load("%s.pth" % path)
+        state_dict = torch.load("%s" % path)
         new_state_dict = {}
         for key, value in state_dict.items():
             # N_averaged is a key in SWA models we cannot load, so we skip it

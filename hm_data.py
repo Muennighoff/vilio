@@ -102,8 +102,6 @@ class HMTorchDataset(Dataset):
         #np.testing.assert_array_less(boxes, 1 + 1e-5)
         #np.testing.assert_array_less(-boxes, 0 + 1e-5)
 
-        num_b = -1
-
         # Create target
         if "label" in datum:
             if int(datum["label"]) == 1:
@@ -113,9 +111,9 @@ class HMTorchDataset(Dataset):
             target = torch.tensor(datum["label"], dtype=torch.float) 
             label = torch.tensor(label, dtype=torch.float)
             # Return target for 1 label, label for 2
-            return iid, feats, boxes, num_b, text, label, target
+            return iid, feats, boxes, text, label, target
         else:
-            return iid, feats, boxes, num_b, text
+            return iid, feats, boxes, text
 
 
 class HMEvaluator:

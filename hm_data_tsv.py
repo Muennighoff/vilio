@@ -107,9 +107,6 @@ class HMTorchDataset(Dataset):
             if args.model == "U":
                 boxes = np.concatenate([boxes, boxes[:, 4:5]*boxes[:, 5:]], axis=-1)
 
-        # Pad Boxes
-        num_b = -1
-
         # Provide label (target) - From hm_data
         if 'label' in datum:
             if int(datum["label"]) == 1:
@@ -119,9 +116,9 @@ class HMTorchDataset(Dataset):
             target = torch.tensor(datum["label"], dtype=torch.float) 
             label = torch.tensor(label, dtype=torch.float)
             # Return target for 1 label, label for 2
-            return img_id, feats, boxes, num_b, text, label, target
+            return img_id, feats, boxes, text, label, target
         else:
-            return img_id, feats, boxes, num_b, text
+            return img_id, feats, boxes, text
 
 class HMEvaluator:
     def __init__(self, dataset):
