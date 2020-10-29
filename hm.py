@@ -32,7 +32,7 @@ if args.contrib:
     from torchcontrib.optim import SWA
 
 
-# Largely sticking to the standards set in LXMERT here
+# Largely sticking to standards set in LXMERT here
 DataTuple = collections.namedtuple("DataTuple", 'dataset loader evaluator')
 
 def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
@@ -167,7 +167,7 @@ class HM:
             id2ans = {}
             id2prob = {}
 
-            for i, (ids, feats, boxes, sent, label, target) in iter_wrapper(enumerate(loader)):
+            for i, (ids, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
 
                 if ups == args.midsave:
                     self.save("MID")

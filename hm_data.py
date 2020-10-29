@@ -14,12 +14,6 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-# Load part of the dataset for fast checking.
-# Notice that here is the number of images instead of the number of data,
-# which means all related data to the images would be used.
-TINY_IMG_NUM = 10
-FAST_IMG_NUM = 5000
-
 
 class HMDataset(Dataset):
     def __init__(self, splits):
@@ -33,7 +27,6 @@ class HMTorchDataset(Dataset):
         super().__init__()
         self.name = splits
         self.splits = splits.split(",")
-
 
         # Loading datasets to data
         self.data = []
@@ -55,7 +48,7 @@ class HMTorchDataset(Dataset):
                 annotation_db=None,
                 feature_path=path)
 
-        # No idea why, but for fbmdata final image gets extracted twice causing an error (ID: 81054)
+        # No idea why, but for hmdatafinal oneimage gets extracted twice causing an error (ID: 81054)
         for o in os.listdir(path):
             if "(1)" in o:
                 os.remove(path + o) 
@@ -104,17 +97,10 @@ class HMTorchDataset(Dataset):
 
         # Create target
         if "label" in datum:
-            if int(datum["label"]) == 1:
-                label = [0, 1]
-            else:
-                label = [1, 0]
             target = torch.tensor(datum["label"], dtype=torch.float) 
-            label = torch.tensor(label, dtype=torch.float)
-            # Return target for 1 label, label for 2
-            return iid, feats, boxes, text, label, target
+            return iid, feats, boxes, text, target
         else:
             return iid, feats, boxes, text
-
 
 class HMEvaluator:
     def __init__(self, dataset):
@@ -132,24 +118,23 @@ class HMEvaluator:
  
         return score / total
 
-    def dump_result(self, quesid2ans: dict, path):
+    def dump_json(self, id2ans: dict, path):
 
         with open(path, "w") as f:
             result = []
-            for img_id, ans in quesid2ans.items():
-                result.append({"img_id": ques_id, "pred": ans})
+            for img_id, ans in id2ans.items():
+                result.append({"img_id": img_id, "pred": ans})
             json.dump(result, f, indent=4, sort_keys=True)
 
-    def dump_csv(self, quesid2ans: dict, quesid2prob: dict, path):
+    def dump_csv(self, id2ans: dict, id2prob: dict, path):
 
-        d = {"id": [int(tensor) for tensor in quesid2ans.keys()], "proba": list(quesid2prob.values()), 
-            "label": list(quesid2ans.values())}
+        d = {"id": [int(tensor) for tensor in id2ans.keys()], "proba": list(id2prob.values()), 
+            "label": list(id2ans.values())}
         results = pd.DataFrame(data=d)
         
         print(results.info())
 
         results.to_csv(path_or_buf=path, index=False)
-
 
     def roc_auc(self, id2ans:dict):
         """Calculates roc_auc score"""

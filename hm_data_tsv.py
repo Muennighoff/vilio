@@ -109,14 +109,8 @@ class HMTorchDataset(Dataset):
 
         # Provide label (target) - From hm_data
         if 'label' in datum:
-            if int(datum["label"]) == 1:
-                label = [0, 1]
-            else:
-                label = [1, 0]
             target = torch.tensor(datum["label"], dtype=torch.float) 
-            label = torch.tensor(label, dtype=torch.float)
-            # Return target for 1 label, label for 2
-            return img_id, feats, boxes, text, label, target
+            return img_id, feats, boxes, text, target
         else:
             return img_id, feats, boxes, text
 
@@ -140,24 +134,23 @@ class HMEvaluator:
  
         return score / total
 
-    def dump_result(self, quesid2ans: dict, path):
+    def dump_json(self, id2ans: dict, path):
 
         with open(path, "w") as f:
             result = []
-            for img_id, ans in quesid2ans.items():
-                result.append({"img_id": ques_id, "pred": ans})
+            for img_id, ans in id2ans.items():
+                result.append({"img_id": img_id, "pred": ans})
             json.dump(result, f, indent=4, sort_keys=True)
 
-    def dump_csv(self, quesid2ans: dict, quesid2prob: dict, path):
+    def dump_csv(self, id2ans: dict, id2prob: dict, path):
 
-        d = {"id": [int(tensor) for tensor in quesid2ans.keys()], "proba": list(quesid2prob.values()), 
-            "label": list(quesid2ans.values())}
+        d = {"id": [int(tensor) for tensor in id2ans.keys()], "proba": list(id2prob.values()), 
+            "label": list(id2ans.values())}
         results = pd.DataFrame(data=d)
         
         print(results.info())
 
         results.to_csv(path_or_buf=path, index=False)
-
 
     def roc_auc(self, id2ans:dict):
         """Calculates roc_auc score"""
@@ -201,12 +194,10 @@ def load_obj_tsv(fname, ids, topk=args.topk):
             if int(item["img_id"]) not in ids:
                 continue
 
-            for key in ['img_id', 'img_h', 'img_w', 'num_boxes']:
+            for key in ['img_h', 'img_w', 'num_boxes']:
                 item[key] = int(item[key])
-           
-            # Uncomment & comment the below if boxes of variable len
-            #boxes = item['num_boxes']
-
+            
+            boxes = item['num_boxes']
             decode_config = [
                 ('objects_id', (boxes, ), np.int64),
                 ('objects_conf', (boxes, ), np.float32),
@@ -215,31 +206,19 @@ def load_obj_tsv(fname, ids, topk=args.topk):
                 ('boxes', (boxes, 4), np.float32),
                 ('features', (boxes, -1), np.float32),
             ]
-            try:
-                for key, shape, dtype in decode_config:
-
-                    item[key] = np.frombuffer(base64.b64decode(item[key]), dtype=dtype)
-                    try:
-                        item[key] = item[key].reshape(shape)
-                    # A box might be missing - Copying another box to the end
-                    except:
-                        item['num_boxes'] = boxes # Correct the number of boxes
-
-                        print(key, shape, dtype)
-                        print(item[key].shape)
-                        if item[key].shape[0] == (shape[0] - 1):
-                            arr = item[key][-1:].copy()
-                        else:
-                            # If it is a box, e.g. of shape 196 for 50 boxes
-                            arr = item[key][-4:].copy()
-                        item[key] = np.concatenate((item[key], arr))
-                        item[key] = item[key].reshape(shape)
-
-                    item[key].setflags(write=False)
-            except:
-                print(i)
-                print(item)
-
+            for key, shape, dtype in decode_config:
+                item[key] = np.frombuffer(base64.b64decode(item[key]), dtype=dtype)
+                try:
+                    item[key] = item[key].reshape(shape)
+                except:
+                    # In 1 out of 10K cases, the shape comes out wrong; We make necessary adjustments
+                    shape = list(shape)
+                    shape[0] += 1
+                    shape = tuple(shape)
+                    item[key] = item[key].reshape(shape)  
+ 
+                item[key].setflags(write=False)
+                    
             data.append(item)
             if topk is not None and len(data) == topk:
                 break
