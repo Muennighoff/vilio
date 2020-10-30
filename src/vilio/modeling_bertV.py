@@ -272,8 +272,6 @@ class BertV(BertPreTrainedModel):
         self.encoder = BertEncoder(config)
         self.pooler = BertPooler(config)
 
-        print("OUT?:", self.output_hidden_states)
-
         if self.bypass_transformer:
             self.additional_layer = BertLayer(config)
 
