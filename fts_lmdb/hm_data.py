@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
-from data.features_database import FeaturesDatabase
+from fts_lmdb.features_database import FeaturesDatabase
 import os
 from collections import Counter
 

@@ -13,7 +13,7 @@ from param import args
 
 from sklearn.metrics import roc_auc_score
 
-from hm_data_tsv import load_obj_tsv
+from fts_tsv.hm_data_tsv import load_obj_tsv
 
 class InputExample(object):
     """A single training/test example for the language model."""
