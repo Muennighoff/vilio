@@ -11,9 +11,9 @@ import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 
 if args.tsv:
-    from hm_data_tsv import HMTorchDataset, HMEvaluator, HMDataset
+    from fts_tsv.hm_data_tsv import HMTorchDataset, HMEvaluator, HMDataset
 else:
-    from hm_data import HMTorchDataset, HMEvaluator, HMDataset
+    from fts_lmdb.hm_data import HMTorchDataset, HMEvaluator, HMDataset
 
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 

@@ -2,8 +2,8 @@
 import os
 import torch
 from multiprocessing.pool import ThreadPool
-from image_database import ImageDatabase
-from feature_readers import FeatureReader
+from fts_lmdb.image_database import ImageDatabase
+from fts_lmdb.feature_readers import FeatureReader
 
 class FeaturesDatabase(ImageDatabase):
     def __init__(

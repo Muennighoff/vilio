@@ -27,10 +27,10 @@ class LMDBConversion:
             default="extract"
         )
         parser.add_argument(
-            "--lmdb_path", required=False, type=str, help="LMDB file path", default="./detectron.lmdb"
+            "--lmdb_path", required=False, type=str, help="LMDB file path", default="./data/detectron.lmdb"
         )
         parser.add_argument(
-            "--features_folder", required=False, type=str, help="Features folder", default="./features"
+            "--features_folder", required=False, type=str, help="Features folder", default="./data/features"
         )
         return parser
 
