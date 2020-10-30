@@ -259,7 +259,8 @@ class AlbertV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=False
+        output_hidden_states=False,
+        layeravg=False
     ):
         # Manual config changes:
         config.hidden_act = "gelu_new"
@@ -270,9 +271,7 @@ class AlbertV(BertPreTrainedModel):
 
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
-        config.output_hidden_states = True
-        self.layeravg = True
-
+        config.layeravg = layeravg
         self.config = config
     
         super().__init__(config)
@@ -281,6 +280,7 @@ class AlbertV(BertPreTrainedModel):
         self.output_attentions = config.output_attentions
         self.output_hidden_states = config.output_hidden_states
         self.bypass_transformer = config.bypass_transformer
+        self.layeravg = config.layeravg
 
         self.embeddings = BertVisioLinguisticEmbeddings(config)
         self.encoder = AlbertTransformer(config)
@@ -445,7 +445,7 @@ class AlbertVPretraining(nn.Module):
 
         self.tr_name = tr_name
 
-        self.albert = AlbertV.from_pretrained(self.tr_name)
+        self.albert = AlbertV.from_pretrained(self.tr_name, output_hidden_states=True)
 
         self.vocab_size = self.albert.config.vocab_size
 

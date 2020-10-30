@@ -275,7 +275,8 @@ class RobertaV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=True
+        output_hidden_states=False,
+        layeravg=False
     ):
         # Manual config changes:
         config.hidden_act = "gelu"
@@ -286,8 +287,7 @@ class RobertaV(BertPreTrainedModel):
 
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
-        config.output_hidden_states = True
-        self.layeravg = True
+        config.layeravg = layeravg
 
         self.config = config
     
@@ -297,6 +297,7 @@ class RobertaV(BertPreTrainedModel):
         self.output_attentions = config.output_attentions
         self.output_hidden_states = config.output_hidden_states
         self.bypass_transformer = config.bypass_transformer
+        self.layeravg = config.layeravg
 
         self.embeddings = BertVisioLinguisticEmbeddings(config)
         self.encoder = BertEncoder(config)
@@ -494,7 +495,7 @@ class RobertaVPretraining(nn.Module):
 
         self.tr_name = tr_name
 
-        self.roberta, loading_info = RobertaV.from_pretrained(tr_name, output_loading_info=True)
+        self.roberta, loading_info = RobertaV.from_pretrained(tr_name, output_loading_info=True, output_hidden_states=True)
 
         print("UNEXPECTED: ", loading_info["unexpected_keys"])
         print("MISSING: ", loading_info["missing_keys"])

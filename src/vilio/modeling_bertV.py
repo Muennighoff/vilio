@@ -244,8 +244,8 @@ class BertV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=True,
-        layeravg=True
+        output_hidden_states=False,
+        layeravg=False
     ):
         # Manual config changes:
         config.hidden_act = "gelu"
@@ -429,7 +429,7 @@ class BertVPretraining(nn.Module):
 
         self.tr_name = tr_name
 
-        self.bert = BertV.from_pretrained(self.tr_name, layeravg=False)
+        self.bert = BertV.from_pretrained(self.tr_name, output_hidden_states=True, layeravg=False)
 
         self.vocab_size = self.bert.config.vocab_size
 

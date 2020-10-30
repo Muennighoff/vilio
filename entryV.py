@@ -116,11 +116,11 @@ class ModelV(nn.Module):
 
         ### BUILD MODEL ###
         if tr_name.startswith("roberta"):
-            self.model, loading_info = RobertaV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048)
+            self.model, loading_info = RobertaV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048, output_hidden_states=True, layeravg=args.reg)
         elif tr_name.startswith("bert"):
-            self.model, loading_info = BertV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048)
+            self.model, loading_info = BertV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048, output_hidden_states=True, layeravg=args.reg)
         elif tr_name.startswith("albert"):
-            self.model, loading_info = AlbertV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048)
+            self.model, loading_info = AlbertV.from_pretrained(tr_name, output_loading_info=True, visual_embedding_dim=2048, output_hidden_states=True, layeravg=args.reg)
 
         print("UNEXPECTED: ", loading_info["unexpected_keys"])
         print("MISSING: ", loading_info["missing_keys"])
