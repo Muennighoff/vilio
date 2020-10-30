@@ -493,6 +493,7 @@ class BertVPretraining(nn.Module):
         losses = ()
 
         print("SHAPE:", masked_lm_labels.shape)
+        print("SHAPE:", prediction_scores.shape)
 
         if masked_lm_labels is not None:
             masked_lm_loss = self.loss_fct(
