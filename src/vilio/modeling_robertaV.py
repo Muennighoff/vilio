@@ -275,7 +275,7 @@ class RobertaV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=False,
+        output_hidden_states=True,
         layeravg=False
     ):
         # Manual config changes:
