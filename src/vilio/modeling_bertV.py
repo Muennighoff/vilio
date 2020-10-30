@@ -244,7 +244,8 @@ class BertV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=False
+        output_hidden_states=True,
+        layeravg=True
     ):
         # Manual config changes:
         config.hidden_act = "gelu"
@@ -255,14 +256,14 @@ class BertV(BertPreTrainedModel):
 
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
-        config.output_hidden_states = True
-        self.layeravg = True
+        config.layeravg = layeravg
 
         self.config = config
     
         super().__init__(config)
         print(config)
 
+        self.layeravg = config.layeravg
         self.output_attentions = config.output_attentions
         self.output_hidden_states = config.output_hidden_states
         self.bypass_transformer = config.bypass_transformer
@@ -428,7 +429,7 @@ class BertVPretraining(nn.Module):
 
         self.tr_name = tr_name
 
-        self.bert = BertV.from_pretrained(self.tr_name)
+        self.bert = BertV.from_pretrained(self.tr_name, layeravg=False)
 
         self.vocab_size = self.bert.config.vocab_size
 
@@ -485,18 +486,12 @@ class BertVPretraining(nn.Module):
             num_features
         )
 
-        print("SHAPEP:", pooled_output.shape)
-        print("SHAPES:", sequence_output.shape)
-
         prediction_scores, seq_relationship_score = self.cls(
             sequence_output, pooled_output
         )
 
         total_loss = 0
         losses = ()
-
-        print("SHAPE:", masked_lm_labels.shape)
-        print("SHAPE:", prediction_scores.shape)
 
         if masked_lm_labels is not None:
             masked_lm_loss = self.loss_fct(
