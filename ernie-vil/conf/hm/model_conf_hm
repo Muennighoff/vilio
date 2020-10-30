@@ -1,0 +1,12 @@
+output_model_path="output_hm"
+lr_scheduler="manual_warmup_decay"
+decay_steps="13308;19962"
+lr_decay_ratio=0.1
+num_train_steps=5000
+SAVE_STEPS=1250
+WARMUP_STEPS=500
+BATCH_SIZE=8
+VALID_STEPS=20000
+LR_RATE=1e-5
+WEIGHT_DECAY=0.01
+MAX_LEN=128

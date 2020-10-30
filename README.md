@@ -7,14 +7,11 @@
     <a href="https://circleci.com/gh/huggingface/transformers">
         <img alt="Build" src="https://img.shields.io/circleci/build/github/huggingface/transformers/master">
     </a>
-    <a href="https://github.com/huggingface/transformers/blob/master/LICENSE">
-        <img alt="GitHub" src="https://img.shields.io/github/license/huggingface/transformers.svg?color=blue">
-    </a>
-    <a href="https://huggingface.co/transformers/index.html">
-        <img alt="Documentation" src="https://img.shields.io/website/http/huggingface.co/transformers/index.html.svg?down_color=red&down_message=offline&up_message=online">
-    </a>
     <a href="https://github.com/huggingface/transformers/releases">
         <img alt="GitHub release" src="https://img.shields.io/github/release/huggingface/transformers.svg">
+    </a>
+    <a href="https://huggingface.co/transformers/index.html">
+        <img alt="Transformers Documentation" src="https://img.shields.io/website/http/huggingface.co/transformers/index.html.svg?down_color=red&down_message=offline&up_message=online">
     </a>
     <a href="https://github.com/huggingface/transformers/blob/master/CODE_OF_CONDUCT.md">
         <img alt="Contributor Covenant" src="https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg">
@@ -68,6 +65,8 @@ Follow SCORE_REPROD.md
 
 🥶 Vilio currently provides the following architectures with the outlined language transformers:
 
+1. **[E - ERNIE-VIL](https://arxiv.org/abs/2006.16934)** [ERNIE-ViL: Knowledge Enhanced Vision-Language Representations Through Scene Graph](https://arxiv.org/abs/2006.16934)
+    - [ERNIE: Enhanced Language Representation with Informative Entities](https://arxiv.org/abs/1905.07129)
 1. **[D - DeVLBERT](https://arxiv.org/abs/2008.06884)** [DeVLBert: Learning Deconfounded Visio-Linguistic Representations](https://arxiv.org/abs/2008.06884)
     - [BERT: Bidirectional Transformers](https://arxiv.org/abs/1810.04805)
 1. **[O - OSCAR](https://arxiv.org/abs/2004.06165)** [Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks](https://arxiv.org/abs/2004.06165)
