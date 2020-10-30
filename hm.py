@@ -136,6 +136,7 @@ class HM:
         self.output = args.output
         os.makedirs(self.output, exist_ok=True)
 
+        # SWA Method:
         if args.contrib:
             self.optim = SWA(self.optim, swa_start=self.t_total * 0.75, swa_freq=5, swa_lr=args.lr)
 
@@ -349,7 +350,6 @@ if __name__ == "__main__":
 
     # Test or Train
     if args.test is not None:
-        args.fast = args.tiny = False       # Always loading all data in test
         # To avoid having to reload the tsv everytime:
         for split in args.test.split(","):
             if 'test' in split:
@@ -374,4 +374,3 @@ if __name__ == "__main__":
         else:
             print("DO NOT USE VALIDATION")
         hm.train(hm.train_tuple, hm.valid_tuple)
-
