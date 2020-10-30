@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from param import args
 from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
 
-from src.vilio.transformers import AutoTokenizer
+from src.vilio.transformers.tokenization_auto import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from src.vilio.modeling_bertX import BertXPretraining, set_visual_config
 
