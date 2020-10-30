@@ -272,6 +272,8 @@ class BertV(BertPreTrainedModel):
         self.encoder = BertEncoder(config)
         self.pooler = BertPooler(config)
 
+        print("OUT?:", self.output_hidden_states)
+
         if self.bypass_transformer:
             self.additional_layer = BertLayer(config)
 
@@ -356,7 +358,7 @@ class BertV(BertPreTrainedModel):
         else:
 
             encoded_layers = self.encoder(
-                embedding_output, extended_attention_mask, self.fixed_head_masks, output_hidden_states = self.output_hidden_states
+                embedding_output, extended_attention_mask, self.fixed_head_masks, output_hidden_states=self.output_hidden_states
             )
 
             sequence_output = encoded_layers[0]

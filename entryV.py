@@ -133,11 +133,6 @@ class ModelV(nn.Module):
             # Create a new Embeddings layer, with 2 possible segments IDs instead of 1
             self.model.embeddings.token_type_embeddings = nn.Embedding(2, self.model.config.hidden_size)             
             # Initialize it
-        if args.textb:
-            print("TVS to 3")
-            self.model.config.type_vocab_size = 3
-            self.model.embeddings.token_type_embeddings = nn.Embedding(3, self.model.config.hidden_size)   
-
         print("REINITING TOK TYPES!")
         self.model.embeddings.token_type_embeddings.weight.data.normal_(mean=0.0, std=self.model.config.initializer_range)
 
