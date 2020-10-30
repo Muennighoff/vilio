@@ -244,7 +244,7 @@ class BertV(BertPreTrainedModel):
         embedding_strategy="plain",
         bypass_transformer=False,
         output_attentions=False,
-        output_hidden_states=False,
+        output_hidden_states=True,
         layeravg=False
     ):
         # Manual config changes:
@@ -252,6 +252,7 @@ class BertV(BertPreTrainedModel):
 
         config.bypass_transformer = bypass_transformer
         config.output_attentions = output_attentions
+        config.output_hidden_states = output_hidden_states
 
         config.visual_embedding_dim = visual_embedding_dim
         config.embedding_strategy = embedding_strategy
@@ -261,8 +262,6 @@ class BertV(BertPreTrainedModel):
     
         super().__init__(config)
         print(config)
-
-        config.output_hidden_states = output_hidden_states
 
         self.layeravg = config.layeravg
         self.output_attentions = config.output_attentions
