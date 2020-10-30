@@ -177,7 +177,7 @@ class HM:
                 if args.swa:
                     self.swa_model.train()
                 
-                target = target.long().cuda()
+                feats, boxes, target = feats.cuda(), boxes.cuda(), target.long().cuda()
 
                 # Model expects visual feats as tuple of feats & boxes
                 logit = self.model(sent, (feats, boxes))
