@@ -485,6 +485,9 @@ class BertVPretraining(nn.Module):
             num_features
         )
 
+        print("SHAPEP:", pooled_output.shape)
+        print("SHAPES:", sequence_output.shape)
+
         prediction_scores, seq_relationship_score = self.cls(
             sequence_output, pooled_output
         )
