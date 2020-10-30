@@ -4,7 +4,7 @@
 ### Data preparation
 
 1. Images
-
+> I also have the code for feature extraction on the go if ever needed (will double training time though)
 
 2. Text 
 

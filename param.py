@@ -13,6 +13,11 @@ def parse_args():
     parser.add_argument("--valid", default=None)
     parser.add_argument("--test", default=None)
 
+    # Data-Type
+    parser.add_argument("--tsv", action='store_const', default=False, const=True, help='Whether to use tsv extraction (else lmdb)')
+    parser.add_argument("--num_features", type=int, default=100, help='How many features we have per img (e.g. 100, 80)')
+    parser.add_argument("--num_pos", type=int, default=4, help='How many position feats - 4 or 6')
+
     # Training Hyper-parameters
     parser.add_argument('--batchSize', dest='batch_size', type=int, default=8)
     parser.add_argument('--optim', default='bert')
@@ -20,37 +25,27 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=5)
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--seed', type=int, default=42, help='random seed')
+    parser.add_argument("--clip", type=float, default=5.0, help='Clip Grad Norm')
+    parser.add_argument("--wd", type=float, default=0.0, help='Weight Decay')
+    parser.add_argument("--swa", action='store_const', default=False, const=True)
+    parser.add_argument("--contrib", action='store_const', default=False, const=True)
+    parser.add_argument("--case", action='store_const', default=False, const=True)
+    parser.add_argument("--reg", action='store_const', default=False, const=True) # Applies Multi-sample dropout & Layeravg
+    parser.add_argument("--acc", type=int, default=1, help='Amount of accumulation steps for bigger batch size - make sure to adjust LR')
 
     # Debugging
-    parser.add_argument('--output', type=str, default='/kaggle/working') # For kaggle; prev. default: /snap/test
-    parser.add_argument("--fast", action='store_const', default=False, const=True)
-    parser.add_argument("--tiny", action='store_const', default=False, const=True)
+    parser.add_argument('--output', type=str, default='/kaggle/working', help='Where ckpts, csvs shall be saved to')
     parser.add_argument("--tqdm", action='store_const', default=False, const=True)
-
-    # After competition make this standard / remove
-    parser.add_argument("--reg", action='store_const', default=False, const=True) # Applies Multi-sample dropout, SWA, Other regularization 
-    parser.add_argument("--acc", type=int, default=1, help='Amount of acc steps for bigger batch size - make sure to adjust LR')
-    parser.add_argument("--tr", type=str, default="bert-base-uncased", help="Name of language transformer to be used")
-    parser.add_argument("--swa", action='store_const', default=False, const=True)
-    parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
-    parser.add_argument("--midsave", type=int, default=-1, help='Save a MID model after x steps')
-    parser.add_argument("--textb", action='store_const', default=False, const=True) # Concatenate obj (& attr) preds to text
-    parser.add_argument("--tsv", action='store_const', default=False, const=True)
-    parser.add_argument("--extract", action='store_const', default=False, const=True) # Extract feats on the go
-    parser.add_argument("--num_features", type=int, default=100, help='How many features we have per img (e.g. 100, 80)')
-    parser.add_argument("--num_pos", type=int, default=4, help='How many position feats - 4 or 6')
-    parser.add_argument("--pad", action='store_const', default=False, const=True)
     parser.add_argument("--topk", type=int, default=-1, help='For testing only load topk feats from tsv')
-    parser.add_argument("--wd", type=float, default=0.0, help='Weight Decay')
-    parser.add_argument("--clip", type=float, default=5.0, help='Clip Grad Norm')
-    parser.add_argument("--case", action='store_const', default=False, const=True)
-    parser.add_argument("--contrib", action='store_const', default=False, const=True)
+    parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
     
     # Ensemble-related
     parser.add_argument("--enspath", type=str, default="/kaggle/working", help="Path to folder with all csvs")
 
-    # Model Loading - Note: PATHS must be put in here! 
+    # Model Loading & Saving - Note: PATHS must be put in here! 
     parser.add_argument('--model', type=str, default='X', help='Type of Model, X V O U D')
+    parser.add_argument("--tr", type=str, default="bert-base-uncased", help="Name of NLP transformer to be used")
+    parser.add_argument("--midsave", type=int, default=-1, help='Save a MID model after x steps')
     parser.add_argument('--loadfin', type=str, default=None,
                         help='Load the model (usually the fine-tuned model).')               
     parser.add_argument('--loadpre', type=str, default=None,
@@ -61,16 +56,13 @@ def parse_args():
                              ' not specified, the model would load BERT-pre-trained weights by'
                              ' default. ')
 
-    # Optimization
-    parser.add_argument("--mceLoss", dest='mce_loss', action='store_const', default=False, const=True)
-
     # LXRT Model Config
     # Note: LXRT = L, X, R (three encoders), Transformer
     parser.add_argument("--llayers", default=9, type=int, help='Number of Language layers')
     parser.add_argument("--xlayers", default=5, type=int, help='Number of CROSS-modality layers.')
     parser.add_argument("--rlayers", default=5, type=int, help='Number of object Relationship layers.')
 
-    # LXMERT Pre-training Config
+    # Pre-training Config
     parser.add_argument("--taskHM", dest='task_hm', action='store_const', default=False, const=True)
     parser.add_argument("--taskMatched", dest='task_matched', action='store_const', default=False, const=True)
     parser.add_argument("--taskMaskLM", dest='task_mask_lm', action='store_const', default=False, const=True)
