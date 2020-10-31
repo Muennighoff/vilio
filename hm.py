@@ -373,11 +373,13 @@ def subtrain(train_split="train", test_split="test,test_unseen"):
 if __name__ == "__main__":
 
     # Build Class
-    hm = HM()
 
     print(args.train)
     args.train = "traincleandevex"
     print(args.train)
+    
+    hm = HM()
+
 
     # Load Model
     if args.loadfin is not None:
