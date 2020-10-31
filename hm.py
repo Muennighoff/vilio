@@ -339,6 +339,10 @@ class HM:
         state_dict = new_state_dict
         self.model.load_state_dict(state_dict)
 
+
+#def main(run_type="train"):
+#    pass
+
 if __name__ == "__main__":
 
     # Build Class
@@ -375,17 +379,23 @@ if __name__ == "__main__":
             print("DO NOT USE VALIDATION")
         hm.train(hm.train_tuple, hm.valid_tuple)
 
-    if args.subtraining:
-        print("PHASE 1 training finished")
+    #if args.subtraining:
+    #    print("PHASE 1 training finished")
 
         # Generate dev from model
-        hm.load(os.path.join(hm.output, "LAST.pth"))
-        result = hm.evaluate(
-                    get_tuple(args.valid, bs=args.batch_size,
-                            shuffle=False, drop_last=False),
-                    dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
-                )
+    #    hm.load(os.path.join(hm.output, "LAST.pth"))
+    #    result = hm.evaluate(
+    #                get_tuple(args.valid, bs=args.batch_size,
+    #                        shuffle=False, drop_last=False),
+    #                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
+    #            )
 
+        # > Generate ICTCOC
+
+        # > Rerun on each & create devs (call d=result above via a func)
+    #    hm.load(os.path.join(hm.output, "MID.pth"))
+
+        # if args.full training? 
 
 
 
