@@ -233,7 +233,7 @@ class LXMERT:
         self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
 
         # Build model
-        set_visual_config()
+        set_visual_config(args.llayers, args.xlayers, args.rlayers)
         self.model = BertXPretraining.from_pretrained(
             "bert-base-uncased",
             task_mask_lm=args.task_mask_lm,

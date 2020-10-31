@@ -374,3 +374,20 @@ if __name__ == "__main__":
         else:
             print("DO NOT USE VALIDATION")
         hm.train(hm.train_tuple, hm.valid_tuple)
+
+    if args.subtraining:
+        print("PHASE 1 training finished")
+
+        # Generate dev from model
+        hm.load(os.path.join(hm.output, "LAST.pth"))
+        result = hm.evaluate(
+                    get_tuple(args.valid, bs=args.batch_size,
+                            shuffle=False, drop_last=False),
+                    dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
+                )
+
+
+
+
+
+

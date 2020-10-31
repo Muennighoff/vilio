@@ -19,3 +19,5 @@ os
 collections
 random
 numpy
+imagehash
+PIL
