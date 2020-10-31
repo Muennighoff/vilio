@@ -114,7 +114,7 @@ def random_word(tokens, tokenizer):
 
 
 def random_feat(feats):
-    mask_feats = feats.clone() #copy()
+    mask_feats = feats.copy() #.clone() #copy()
     feat_mask = np.zeros(len(feats), dtype=np.float32)
     for i in range(len(feats)):
         prob = random.random()
