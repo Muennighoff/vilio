@@ -9,7 +9,11 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from param import args
-from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
+
+if args.tsv:
+    from fts_tsv.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
+else:
+    from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
 
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
