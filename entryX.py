@@ -109,9 +109,6 @@ class ModelX(nn.Module):
         ### BUILD TOKENIZER ###
         self.tokenizer = AutoTokenizer.from_pretrained(tr_name)
 
-        # Define own vocabulary
-        #self.tokenizer = BertTokenizer.from_pretrained("data/bert-base-uncased-vocab.txt")
-
         ### BUILD MODEL ###
         if tr_name.startswith("roberta"):
             self.model, loading_info = RobertaX.from_pretrained(tr_name, mode=mode, output_loading_info=True, llayers=args.llayers, 
@@ -131,7 +128,6 @@ class ModelX(nn.Module):
 
         ### CLASSIFICATION HEADS ###
         # LXRT Default classifier tends to perform best; For Albert gelu_new outperforms gelu
-        # --reg classifier consistently worsens performance by 2% (same as huggingface classifiers)
             
         if self.tr_name.startswith("albert"):
             self.classifier = nn.Sequential(

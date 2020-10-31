@@ -41,12 +41,7 @@ def preprocess_bert(sents, max_seq_len, tokenizer):
         tokens = ["[CLS]"] + tokens + ["[SEP]"]
         input_ids = tokenizer.convert_tokens_to_ids(tokens)
 
-        if args.textb:
-            # Format: [CLS] texta [SEP] textb [SEP] -- where the outer CLS & SEP are added above & the inner is already in tokens
-            segment_ids = [0] * tokens.index("[SEP]") + [0] # This will be exactly until 1 before the first ["SEP"] so + 1
-            segment_ids += [1] * (len(tokens) - len(segment_ids))
-        else:
-            segment_ids = [0] * len(input_ids)
+        segment_ids = [0] * len(input_ids)
 
         input_mask = [1] * len(input_ids)
 
