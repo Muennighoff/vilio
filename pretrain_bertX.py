@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from param import args
 
 if args.tsv:
-    from fts_tsv.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
+    from fts_tsv.hm_pretrain_data_tsv import InputExample, LXMERTDataset, LXMERTTorchDataset
 else:
     from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset
 
