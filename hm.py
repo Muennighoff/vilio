@@ -340,13 +340,44 @@ class HM:
         self.model.load_state_dict(state_dict)
 
 
-#def main(run_type="train"):
-#    pass
+def subtrain(train_split="train", test_split="test,test_unseen"):
+    """
+    Trains & produces predictions on given input using the LAST model.
+    """
+    hm = HM()
+    # Manually set the args?
+
+
+    hm.train(hm.train_tuple, hm.valid_tuple)
+
+    hm.load(os.path.join(hm.output, "LAST.pth"))
+
+    for split in args.test.split(","):
+        if 'test' in split:
+            hm.predict(
+                get_tuple(split, bs=args.batch_size,
+                        shuffle=False, drop_last=False),
+                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
+            )
+        elif 'dev' in split or 'valid' in split or 'train' in split:
+            result = hm.evaluate(
+                get_tuple(split, bs=args.batch_size,
+                        shuffle=False, drop_last=False),
+                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
+            )
+            print(result)
+        else:
+            assert False, "No such test option for %s" % args.test
+
 
 if __name__ == "__main__":
 
     # Build Class
     hm = HM()
+
+    print(args.train)
+    args.train = "traincleandevex"
+    print(args.train)
 
     # Load Model
     if args.loadfin is not None:
@@ -379,18 +410,25 @@ if __name__ == "__main__":
             print("DO NOT USE VALIDATION")
         hm.train(hm.train_tuple, hm.valid_tuple)
 
-    #if args.subtraining:
-    #    print("PHASE 1 training finished")
+    if args.subtraining:
+        print("PHASE 1 training finished. Entering Subtraining.")
 
         # Generate dev from model
-    #    hm.load(os.path.join(hm.output, "LAST.pth"))
-    #    result = hm.evaluate(
-    #                get_tuple(args.valid, bs=args.batch_size,
-    #                        shuffle=False, drop_last=False),
-    #                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
-    #            )
+        hm.load(os.path.join(hm.output, "LAST.pth"))
+
+        result = hm.evaluate(
+                    get_tuple(args.valid, bs=args.batch_size,
+                              shuffle=False, drop_last=False),
+                    dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
+                )
 
         # > Generate ICTCOC
+
+        # Rerun + devs
+        for i in range(1, 3):
+            # args.train + str(i) args.test + str(i) ? 
+            subtrain("train" + str(i), "test" + str(i) + ",test_unseen" + str(i))
+
 
         # > Rerun on each & create devs (call d=result above via a func)
     #    hm.load(os.path.join(hm.output, "MID.pth"))
