@@ -420,7 +420,7 @@ if __name__ == "__main__":
     main()
 
     # Subtrain/Finetune on parts of the data in addition
-    if args.subtraining:
+    if args.subtrain:
         
         create_subdata("./data")
         
@@ -437,7 +437,7 @@ if __name__ == "__main__":
             main()
 
         # Combine & output
-        
+
 
 
 

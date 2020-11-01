@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--case", action='store_const', default=False, const=True)
     parser.add_argument("--reg", action='store_const', default=False, const=True) # Applies Multi-sample dropout & Layeravg
     parser.add_argument("--acc", type=int, default=1, help='Amount of accumulation steps for bigger batch size - make sure to adjust LR')
-    parser.add_argument('--subtraining', action='store_const', default=False, const=True)
+    parser.add_argument('--subtrain', action='store_const', default=False, const=True)
 
     # Debugging
     parser.add_argument('--output', type=str, default='/kaggle/working', help='Where ckpts, csvs shall be saved to')
