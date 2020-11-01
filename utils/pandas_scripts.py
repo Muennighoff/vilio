@@ -198,13 +198,13 @@ def create_subdata(data_path="./data"):
         train.to_json(data_path + '/train_' + i + '.jsonl', lines=True, orient="records")
 
         dev = dists[i].loc[dists[i].identity == "dev"][["id", "img", "label", "text"]]
-        dev.to_json(data_path + '/dev_' + i + '.jsonl', lines=True, orient="records")
+        dev.to_json(data_path + '/dev_seen_' + i + '.jsonl', lines=True, orient="records")
 
         traindev = pd.concat([train, dev])
         traindev.to_json(data_path + '/traindev_' + i + '.jsonl', lines=True, orient="records")
 
         test = dists[i].loc[dists[i].identity == "test"][["id", "img", "text"]]
-        test.to_json(data_path + '/test_' + i + '.jsonl', lines=True, orient="records")
+        test.to_json(data_path + '/test_seen_' + i + '.jsonl', lines=True, orient="records")
 
         test_unseen = dists[i].loc[dists[i].identity == "test_unseen"][["id", "img", "text"]]
         test_unseen.to_json(data_path + '/test_unseen_' + i + '.jsonl', lines=True, orient="records")
