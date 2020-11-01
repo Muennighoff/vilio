@@ -35,13 +35,13 @@ def parse_args():
     parser.add_argument('--subtrain', action='store_const', default=False, const=True)
 
     # Debugging
-    parser.add_argument('--output', type=str, default='/kaggle/working', help='Where ckpts, csvs shall be saved to')
+    parser.add_argument('--output', type=str, default='./data', help='Where ckpts, csvs shall be saved to')
     parser.add_argument("--tqdm", action='store_const', default=False, const=True)
     parser.add_argument("--topk", type=int, default=-1, help='For testing only load topk feats from tsv')
     parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
     
     # Ensemble-related
-    parser.add_argument("--enspath", type=str, default="/kaggle/working", help="Path to folder with all csvs")
+    parser.add_argument("--enspath", type=str, default="./data", help="Path to folder with all csvs")
 
     # Model Loading & Saving - Note: PATHS must be put in here! 
     parser.add_argument('--model', type=str, default='X', help='Type of Model, X V O U D')
