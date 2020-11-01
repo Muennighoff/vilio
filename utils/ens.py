@@ -306,15 +306,21 @@ def combine_subdata(path, gt_path="./data/"):
     test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
 
     preds = {}
-    for i in ["ic", "tc", "oc"]:
-        for d in ["dev", "test", "test_unseen"]:
+    for d in ["dev", "test", "test_unseen"]:
+        for i in ["ic", "tc", "oc"]:
             for csv in sorted(os.listdir(path)):
-                if (i in csv) and (d in csv):
+                if (d in csv) and (i in csv):
                     preds[d+i] = pd.read_csv(path + csv)
             preds[d+i+"all"] = pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
     
-    print(preds.keys)
+    for d in ["dev", "test", "test_unseen"]:
+        for i in ["ic", "tc", "oc"]:
+            for x in ["", "all"]
+                preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
+                preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
+                preds[d+i+x] = preds[d+i+x]["proba"+i+x][["id"], ["proba"+i+x]]
 
+    print(preds.keys())
 
 
 def main(path, gt_path="./data/"):
