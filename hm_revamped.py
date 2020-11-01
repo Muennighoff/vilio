@@ -17,6 +17,7 @@ else:
 
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from utils.pandas_scripts import clean_data, create_subdata
+from utils.ens import combine_subdata
 
 from entryU import ModelU
 from entryX import ModelX
@@ -437,6 +438,8 @@ if __name__ == "__main__":
             main()
 
         # Combine & output
+
+        combine_subdata("./data")
 
 
 
