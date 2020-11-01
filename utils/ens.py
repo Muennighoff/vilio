@@ -311,7 +311,7 @@ def combine_subdata(path, gt_path="./data/"):
             for csv in sorted(os.listdir(path)):
                 if (i in csv) and (d in csv):
                     preds[d+i] = pd.read_csv(path + csv)
-            preds[d+i+"all"]pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
+            preds[d+i+"all"] = pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
     
     print(preds.keys)
 
