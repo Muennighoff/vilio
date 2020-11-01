@@ -315,7 +315,7 @@ def combine_subdata(path, gt_path="./data/"):
     
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
-            for x in ["", "all"]
+            for x in ["", "all"]:
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
                 preds[d+i+x] = preds[d+i+x]["proba"+i+x][["id"], ["proba"+i+x]]
