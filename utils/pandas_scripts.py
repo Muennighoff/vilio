@@ -138,7 +138,7 @@ def clean_data(data_path="./data"):
     pretrain.to_json(path_or_buf=os.path.join(data_path, "pretrain.jsonl"), orient='records', lines=True)
 
     # b) Cleaned Train + unused data from dev_unseen
-    train = [~train['id'].isin(remove_ids)].copy()
+    train = [~train['id'].isin(rmv_ids)].copy()
     trainclean = pd.concat([train, dev_unseen])
     trainclean.to_json(path_or_buf=os.path.join(data_path, "train.jsonl"), orient='records', lines=True)
 
@@ -215,7 +215,7 @@ def create_subdata(data_path="./data"):
     test_unseen.to_json('./test_unseen_tc.jsonl', lines=True, orient="records")
 
     # Create oc dist to focus on all the rest; i.e. on the diverse part
-    oc_dist = oc_dist[~((full_dist['id'].isin(ic_dist.id.values)) | (full_dist['id'].isin(tc_dist.id.values)))]
+    oc_dist = full_dist[~((full_dist['id'].isin(ic_dist.id.values)) | (full_dist['id'].isin(tc_dist.id.values)))]
 
     train = oc_dist.loc[oc_dist.identity == "train"][["id", "img", "label", "text"]]
     train.to_json('./train_oc.jsonl', lines=True, orient="records")
