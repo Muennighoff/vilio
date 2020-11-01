@@ -137,8 +137,8 @@ def clean_data(data_path="./data"):
     pretrain["label"].fillna(0, inplace=True)
     pretrain.to_json(path_or_buf=os.path.join(data_path, "pretrain.jsonl"), orient='records', lines=True)
 
-    # b) Cleaned Train + unused data from dev_unseen
-    train = [~train['id'].isin(rmv_ids)].copy()
+    # b) Cleaned Train + unused data from dev_unseen (All duplicates are in train, hence the following suffices)
+    train = train[~train['id'].isin(rmv_ids)].copy()
     trainclean = pd.concat([train, dev_unseen])
     trainclean.to_json(path_or_buf=os.path.join(data_path, "train.jsonl"), orient='records', lines=True)
 

@@ -135,3 +135,8 @@ Download the pre-trained models here and here.
 
 1. Ensembling
 > Place all files in data (Should be 3 csv's per model (dev, test, test_unseen) for a total of 21 csvs) - > Run ens.sh 
+
+
+
+
+# > Create a notebook with everything in one
