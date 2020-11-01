@@ -432,7 +432,7 @@ if __name__ == "__main__":
             new_test = ''
             for split in arg_te.split(","):
                 new_test += split + i + ","
-            args.test = new_test
+            args.test = new_test[:-1] # Remove the last comma
             args.loadfin = os.path.join(args.output, "MID.pth")
             main()
 
