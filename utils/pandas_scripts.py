@@ -163,7 +163,7 @@ def create_subdata(data_path="./data"):
     full_dist = pd.concat([df.assign(identity=key) for key,df in df_dict.items()])
 
     # Create full path for easy image loading
-    full_dist['full_path'] = full_dist['img'].apply(lambda x: data_path + str(x))
+    full_dist['full_path'] = full_dist['img'].apply(lambda x: os.path.join(data_path, str(x)))
 
     full_dist['phash'] = full_dist['full_path'].apply(lambda x: phash(x))
     full_dist['crhash'] = full_dist['full_path'].apply(lambda x: crude_hash(x))
