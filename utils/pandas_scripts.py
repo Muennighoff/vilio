@@ -215,7 +215,7 @@ def create_subdata(data_path="./data"):
     test_unseen.to_json('./test_unseen_tc.jsonl', lines=True, orient="records")
 
     # Create oc dist to focus on all the rest; i.e. on the diverse part
-    oc_dist = oc_dist[~((full_dist['id'].isin(ic_dist.id.values) | (full_dist['id'].isin(tc_dist.id.values)))]
+    oc_dist = oc_dist[~((full_dist['id'].isin(ic_dist.id.values)) | (full_dist['id'].isin(tc_dist.id.values)))]
 
     train = oc_dist.loc[oc_dist.identity == "train"][["id", "img", "label", "text"]]
     train.to_json('./train_oc.jsonl', lines=True, orient="records")
