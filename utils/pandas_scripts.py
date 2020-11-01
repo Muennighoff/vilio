@@ -66,6 +66,10 @@ def clean_data(data_path="./data"):
 
     data_path: Path to folder with train.jsonl, dev_unseen.jsonl, dev_seen.jsonl
     """
+    # Check if the statement was already run and the necessary data exists:
+    if os.path.exists(os.path.join(data_path, "pretrain.jsonl")):
+        return
+
     ## Load all files
     train = pd.read_json(os.path.join(data_path, "train.jsonl"), lines=True, orient="records")
     dev_seen = pd.read_json(os.path.join(data_path, "dev_seen.jsonl"), lines=True, orient="records")
@@ -193,7 +197,7 @@ def create_subdata(data_path="./data"):
     test_unseen.to_json('./test_unseen_ic.jsonl', lines=True, orient="records")
 
     # Create tc dist to focus on data with similar images
-    tc_dist = full_dist[(full_dist["phash_dups"].map(len)) + full_dist["crhash_dups"].map(len)) > 2].copy()
+    tc_dist = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
 
     train = tc_dist.loc[tc_dist.identity == "train"][["id", "img", "label", "text"]]
     train.to_json('./train_tc.jsonl', lines=True, orient="records")

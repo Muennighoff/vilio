@@ -32,7 +32,7 @@ b) Setup extraction:
 
 This will take a couple of minutes, if you run into any problems, refer to the README under vilio/py-bottom-up-attention/README.md or the notebook. 
 
-c) Place the img folder of the HM-challenge in vilio/py-bottom-up-attention/data; Make sure to place the whole img folder in there, i.e. the images will be at vilio/py-bottom-up-attention/data/img/
+c) Place the img folder of the HM-challenge in `vilio/py-bottom-up-attention/data`; Make sure to place the whole img folder in there, i.e. the images will be at vilio/`py-bottom-up-attention/data/img/`
 
 d) Extract features - We use 6 different features for diversity in our model. Run them all at once with:
 `cd vilio/py-bottom-up-attention; bash hm_feats.bash` - > TEST!
@@ -56,14 +56,14 @@ https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features
 
 With the downloaded detectron.lmdb, we now have 7 different feature files.
 
-For our PyTorch models the second part, place the following in vilio/data:
+For our PyTorch models in the second part, place the following in `vilio/data`:
 - hm_vgattr3636.tsv
 - hm_vgattr5050.tsv
 - hm_vgattr7272.tsv
 - hm_vg5050.tsv
 - /img/ folder
 
-For our ERNIE-model make copies of the files where necessary and place the following in vilio/ernie-vil/data/hm:
+For our ERNIE-model make copies of the files where necessary and place the following in `vilio/ernie-vil/data/hm`:
 - hm_vgattr3636.tsv
 - hm_vgattr7272.tsv
 - hm_vgattr10100.tsv
@@ -95,6 +95,17 @@ Run `cd vilio; bash /bash/hm_D.bash`.
 Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take /large-vg-labels/ep_20_590000/pytorch_model.bin, and place the file pytorch_model.bin under `vilio/data`.
 Run `cd vilio; bash /bash/hm_O.bash`.
 
+- U-Model:
+Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
+
+- V-Model:
+Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) and place the file model.pth under `vilio/data`.
+
+- X-Model:
+Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
+
+
+
 The following does all of the above for each model. We will end up with three csv's per model in data:
 `cd vilio; bash /bash/hm_D.bash`
 `cd vilio; bash /bash/hm_O.bash`
@@ -102,12 +113,19 @@ The following does all of the above for each model. We will end up with three cs
 `cd vilio; bash /bash/hm_V.bash`
 `cd vilio; bash /bash/hm_X.bash`
 
+https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt
 
 > Topk first for quick checking
 > Run the shell file for each model (This will run run three seeds of the specific model and then take the simple average of the seeds)
 
 2. PaddlePaddle / E:
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data.
+
+- E - Large:
+Download the pre-trained models here and here.
+
+- E - Small:
+Download the pre-trained models here and here.
 
 > Ernie is written in PaddlePaddle and makes for a bit more complicated running; It is however the best performing model of all (by about 2% absolute RCAC on the HM challenge)
 > Run ERV-S shell 
