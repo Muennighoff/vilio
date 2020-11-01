@@ -153,6 +153,9 @@ def create_subdata(data_path="./data"):
 
     data_path: Path to data folder containing all jsonl's & images under /img
     """
+    # Check if the statement was already run and the necessary data exists:
+    if os.path.exists(os.path.join(data_path, "train_ic.jsonl")):
+        return
 
     train = pd.read_json(data_path + '/train.jsonl', lines=True) # Note: This is the updated train, incl. data from dev_unseen
     dev = pd.read_json(data_path + '/dev_seen.jsonl', lines=True)
@@ -177,6 +180,7 @@ def create_subdata(data_path="./data"):
 
     full_dist["text_dups"] = full_dist["text_clean"].apply(lambda x: full_dist.loc[full_dist['text_clean'] == x].id.values)
     full_dist["phash_dups"] = full_dist["phash"].apply(lambda x: full_dist.loc[full_dist['phash'] == x].id.values)
+    full_dist["crhash_dups"] = full_dist["crhash"].apply(lambda x: full_dist.loc[full_dist['crhash'] == x].id.values)
 
     # Create ic dist to focus on data with similar text
     ic_dist = full_dist[full_dist["text_dups"].map(len) > 1].copy()
