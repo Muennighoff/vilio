@@ -157,10 +157,10 @@ def create_subdata(data_path="./data"):
     if os.path.exists(os.path.join(data_path, "train_ic.jsonl")):
         return
 
-    train = pd.read_json(data_path + '/train.jsonl', lines=True) # Note: This is the updated train, incl. data from dev_unseen
-    dev = pd.read_json(data_path + '/dev_seen.jsonl', lines=True)
-    test = pd.read_json(data_path + '/test_seen.jsonl', lines=True)
-    test_unseen = pd.read_json(data_path + '/test_unseen.jsonl', lines=True)
+    train = pd.read_json(os.path.join(data_path + '/train.jsonl'), lines=True) # Note: This is the updated train, incl. data from dev_unseen
+    dev = pd.read_json(os.path.join(data_path + '/dev_seen.jsonl'), lines=True)
+    test = pd.read_json(os.path.join(data_path + '/test_seen.jsonl'), lines=True)
+    test_unseen = pd.read_json(os.path.join(data_path + '/test_unseen.jsonl'), lines=True)
 
     df_dict = {'train': train, 'dev': dev, 'test': test, 'test_unseen': test_unseen}
     full_dist = pd.concat([df.assign(identity=key) for key,df in df_dict.items()])
@@ -182,59 +182,85 @@ def create_subdata(data_path="./data"):
     full_dist["phash_dups"] = full_dist["phash"].apply(lambda x: full_dist.loc[full_dist['phash'] == x].id.values)
     full_dist["crhash_dups"] = full_dist["crhash"].apply(lambda x: full_dist.loc[full_dist['crhash'] == x].id.values)
 
+    dists = {}
     # Create ic dist to focus on data with similar text
-    ic_dist = full_dist[full_dist["text_dups"].map(len) > 1].copy()
+    dists["ic"] = full_dist[full_dist["text_dups"].map(len) > 1].copy()
 
+    # Create tc dist to focus on data with similar images
+    dists["tc"] = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
+
+    # Create oc dist to focus on all the rest; i.e. on the diverse part
+    dists["oc"] = full_dist[~((full_dist['id'].isin(dists["ic"].id.values)) | (full_dist['id'].isin(dists["tc"].id.values)))]
+
+    for i in ["ic", "tc", "oc"]:
+    
+        train = dists[i].loc[dists[i].identity == "train"][["id", "img", "label", "text"]]
+        train.to_json(data_path + '/train_' + i + '.jsonl', lines=True, orient="records")
+
+        dev = dists[i].loc[dists[i].identity == "dev"][["id", "img", "label", "text"]]
+        dev.to_json(data_path + '/dev_' + i + '.jsonl', lines=True, orient="records")
+
+        traindev = pd.concat([train, dev])
+        traindev.to_json(data_path + '/traindev_' + i + '.jsonl', lines=True, orient="records")
+
+        test = dists[i].loc[dists[i].identity == "test"][["id", "img", "text"]]
+        test.to_json(data_path + '/test_' + i + '.jsonl', lines=True, orient="records")
+
+        test_unseen = dists[i].loc[dists[i].identity == "test_unseen"][["id", "img", "text"]]
+        test_unseen.to_json(data_path + '/test_unseen_' + i + '.jsonl', lines=True, orient="records")
+
+
+def unused():
     train = full_dist.loc[full_dist.identity == "train"][["id", "img", "label", "text"]]
-    train.to_json('./train_ic.jsonl', lines=True, orient="records")
+    train.to_json(data_path + '/train_ic.jsonl', lines=True, orient="records")
 
     dev = full_dist.loc[full_dist.identity == "dev"][["id", "img", "label", "text"]]
-    dev.to_json('./devseen_ic.jsonl', lines=True, orient="records")
+    dev.to_json(data_path + '/devseen_ic.jsonl', lines=True, orient="records")
 
     traindev = pd.concat([train, dev])
-    traindev.to_json('./traindev_ic.jsonl', lines=True, orient="records")
+    traindev.to_json(data_path + '/traindev_ic.jsonl', lines=True, orient="records")
 
     test = full_dist.loc[full_dist.identity == "test"][["id", "img", "text"]]
-    test.to_json('./test_ic.jsonl', lines=True, orient="records")
+    test.to_json(data_path + '/test_ic.jsonl', lines=True, orient="records")
 
     test_unseen = full_dist.loc[full_dist.identity == "test_unseen"][["id", "img", "text"]]
-    test_unseen.to_json('./test_unseen_ic.jsonl', lines=True, orient="records")
+    test_unseen.to_json(data_path + '/test_unseen_ic.jsonl', lines=True, orient="records")
 
     # Create tc dist to focus on data with similar images
     tc_dist = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
 
     train = tc_dist.loc[tc_dist.identity == "train"][["id", "img", "label", "text"]]
-    train.to_json('./train_tc.jsonl', lines=True, orient="records")
+    train.to_json(data_path + '/train_tc.jsonl', lines=True, orient="records")
 
     dev = tc_dist.loc[tc_dist.identity == "dev"][["id", "img", "label", "text"]]
-    dev.to_json('./dev_tc.jsonl', lines=True, orient="records")
+    dev.to_json(data_path + '/dev_tc.jsonl', lines=True, orient="records")
 
     traindev = pd.concat([train, dev])
-    traindev.to_json('./traindev_tc.jsonl', lines=True, orient="records")
+    traindev.to_json(data_path + '/traindev_tc.jsonl', lines=True, orient="records")
 
     test = tc_dist.loc[tc_dist.identity == "test"][["id", "img", "text"]]
-    test.to_json('./test_tc.jsonl', lines=True, orient="records")
+    test.to_json(data_path + '/test_tc.jsonl', lines=True, orient="records")
 
     test_unseen = tc_dist.loc[tc_dist.identity == "test_unseen"][["id", "img", "text"]]
-    test_unseen.to_json('./test_unseen_tc.jsonl', lines=True, orient="records")
+    test_unseen.to_json(data_path + '/test_unseen_tc.jsonl', lines=True, orient="records")
 
     # Create oc dist to focus on all the rest; i.e. on the diverse part
     oc_dist = full_dist[~((full_dist['id'].isin(ic_dist.id.values)) | (full_dist['id'].isin(tc_dist.id.values)))]
 
     train = oc_dist.loc[oc_dist.identity == "train"][["id", "img", "label", "text"]]
-    train.to_json('./train_oc.jsonl', lines=True, orient="records")
+    train.to_json(data_path + '/train_oc.jsonl', lines=True, orient="records")
 
     dev = oc_dist.loc[oc_dist.identity == "dev"][["id", "img", "label", "text"]]
-    dev.to_json('./dev_oc.jsonl', lines=True, orient="records")
+    dev.to_json(data_path + '/dev_oc.jsonl', lines=True, orient="records")
 
     traindev = pd.concat([train, dev])
-    traindev.to_json('./traindev_oc.jsonl', lines=True, orient="records")
+    traindev.to_json(data_path + '/traindev_oc.jsonl', lines=True, orient="records")
 
     test = oc_dist.loc[oc_dist.identity == "test"][["id", "img", "text"]]
-    test.to_json('./test_oc.jsonl', lines=True, orient="records")
+    test.to_json(data_path + '/test_oc.jsonl', lines=True, orient="records")
 
     test_unseen = oc_dist.loc[oc_dist.identity == "test_unseen"][["id", "img", "text"]]
-    test_unseen.to_json('./test_unseen_oc.jsonl', lines=True, orient="records")
+    test_unseen.to_json(data_path + '/test_unseen_oc.jsonl', lines=True, orient="records")
 
 
 
