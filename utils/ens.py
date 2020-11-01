@@ -291,7 +291,31 @@ def Simplex(devs, label, df_list=False, scale=1):
 
     return best_weights
 
-### MAIN FUNCTION - WORKFLOW
+### APPLYING THE HELPER FUNCTIONS ###
+
+def combine_subdata(path, gt_path="./data/"):
+    """
+    Combines predictions from submodels & main model.
+
+    path: String to directory with csvs of all models
+    gt_path: Path to folder with ground truth for dev
+    """
+    # GT & bases
+    dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
+    test_df = pd.read_json(os.path.join(gt_path, 'test_seen.jsonl'), lines=True)
+    test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
+
+    preds = {}
+    for i in ["ic", "tc", "oc"]:
+        for d in ["dev", "test", "test_unseen"]:
+            for csv in sorted(os.listdir(path)):
+                if (i in csv) and (d in csv):
+                    preds[d+i] = pd.read_csv(path + csv)
+            preds[d+i+"all"]pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
+    
+    print(preds.keys)
+
+
 
 def main(path, gt_path="./data/"):
     """
@@ -304,7 +328,7 @@ def main(path, gt_path="./data/"):
     """
     # Ground truth
     gt_path = "data/"
-    dev_df = pd.read_json(gt_path + 'devseen.jsonl', lines=True)
+    dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
 
     # Make sure the lists will be ordered, i.e. test[0] is the same model as devs[0]
     dev, test, test_unseen = [], [], []
