@@ -16,6 +16,7 @@ else:
     from fts_lmdb.hm_data import HMTorchDataset, HMEvaluator, HMDataset
 
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
+from utils.pandas_scripts import clean_data, create_subdata
 
 from entryU import ModelU
 from entryX import ModelX
@@ -368,8 +369,7 @@ def subtrain():
             assert False, "No such test option for %s" % args.test
 
 
-if __name__ == "__main__":
-
+def main():
     # Build Class
     hm = HM()
 
@@ -377,16 +377,30 @@ if __name__ == "__main__":
     if args.loadfin is not None:
         hm.load(args.loadfin)
 
-    # Test or Train
+    # Train and/or Test:
+    if args.train is not None:
+        print('Splits in Train data:', hm.train_tuple.dataset.splits)
+        if hm.valid_tuple is not None:
+            print('Splits in Valid data:', hm.valid_tuple.dataset.splits)
+        else:
+            print("DO NOT USE VALIDATION")
+        hm.train(hm.train_tuple, hm.valid_tuple)
+
+        # If we also test afterwards load the last model
+        if args.test is not None:
+            hm.load(os.path.join(hm.output, "LAST.pth"))
+
     if args.test is not None:
-        # To avoid having to reload the tsv everytime:
+        # We can specify multiple test args e.g. test,test_unseen
         for split in args.test.split(","):
+            # Anthing that has no labels:
             if 'test' in split:
                 hm.predict(
                     get_tuple(split, bs=args.batch_size,
                             shuffle=False, drop_last=False),
                     dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
                 )
+            # Anything else that has labels:
             elif 'dev' in split or 'valid' in split or 'train' in split:
                 result = hm.evaluate(
                     get_tuple(split, bs=args.batch_size,
@@ -396,46 +410,40 @@ if __name__ == "__main__":
                 print(result)
             else:
                 assert False, "No such test option for %s" % args.test
-    else:
-        print('Splits in Train data:', hm.train_tuple.dataset.splits)
-        if hm.valid_tuple is not None:
-            print('Splits in Valid data:', hm.valid_tuple.dataset.splits)
-        else:
-            print("DO NOT USE VALIDATION")
-        hm.train(hm.train_tuple, hm.valid_tuple)
 
+
+if __name__ == "__main__":
+
+    # Create pretrain.jsonl & traindev data
+    clean_data("./data")
+
+    main()
+
+    # Subtrain/Finetune on parts of the data in addition
     if args.subtraining:
-        print("PHASE 1 training finished. Entering Subtraining.")
+        
+        create_subdata("./data")
+        
+        arg_tr = args.train
+        arg_te = args.test
 
-        # Generate dev from model
-        hm.load(os.path.join(hm.output, "LAST.pth"))
+        for i in ["_ic", "_tc", "_oc"]:
+            args.train = arg_tr + i
+            new_test = ''
+            for split in arg_te.split(","):
+                new_test += split + i + ","
+            args.test = new_test
+            args.loadfin = os.path.join(args.output, "MID.pth")
+            main()
 
-        result = hm.evaluate(
-                    get_tuple(args.valid, bs=args.batch_size,
-                              shuffle=False, drop_last=False),
-                    dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, args.valid))
-                )
-
-        # > Generate ICTCOC
-
-        # Rerun + devs
-        for i in range(1, 3):
-            args.train = "x"
-            args.test = "y"
-
-            # args.train + str(i) args.test + str(i) ? 
-            subtrain()
-
-
-        # > Rerun on each & create devs (call d=result above via a func)
-    #    hm.load(os.path.join(hm.output, "MID.pth"))
-
-        # if args.full training? 
+        # Combine & output
+        
 
 
 
 
-    #print(args.train)
-    #args.train = "traincleandevex"
-    #print(args.train)
+
+
+
+
 
