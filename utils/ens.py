@@ -325,8 +325,38 @@ def combine_subdata(path, gt_path="./data/"):
 
 def smooth_distance(path):
     """
-    Similar to label smoothing, smoothes the distance between predictions.
+    Similar to label smoothing, smoothes the distance between predictions based on similar data. 
+
+    The intuition is that even when data is similar the model does the right job at ranking the data correctly in isolation, however
+    when combined with the whole data, it is ranked incorrectly. By increasing their distance we can adapt it to the whole data. 
     """
+    def smoothed_proba(x):
+        """
+        Outputs a new proba smoothed based on distance
+        """
+        avgt = 0
+        for i in x["text_dups"]:
+            avgt += test_unseen_ALL.loc[test_unseen_ALL["id"] == i].proba.values[0]
+        avgt /= len(x["text_dups"])
+        
+        avgp = 0
+        for i in x["phash_dups"]:
+            avgp += test_unseen_ALL.loc[test_unseen_ALL["id"] == i].proba.values[0]
+        avgp /= len(x["phash_dups"])
+        
+        if (avgt != 0) & (avgp != 0):
+            avg = (avgp + avgt) / 2
+        else:
+            avg = (avgp + avgt)
+        
+        dist = avg - x["proba"]
+        
+        if dist == 0:
+            return x["proba"]
+        new_val = x["proba"] - (1 / dist)
+        
+        return new_val
+        
     pass
 
 def main(path, gt_path="./data/"):
