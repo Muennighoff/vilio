@@ -257,11 +257,12 @@ def create_hashdata(data_path="./data", jsonl="test_unseen.jsonl"):
         df[f.__name__] = df['full_path'].apply(lambda x: f(x))
         df[f.__name__ + "_dups"] = df[f.__name__].apply(lambda x: df.loc[df[f.__name__] == x].id.values)
 
+    df["text_clean"] = df["text"].str.replace("'", "")
+    df["text_clean"] = df["text"].str.replace('"', '')
+    df["text_dups"] = df["text_clean"].apply(lambda x: df.loc[df['text_clean'] == x].id.values)
 
+    df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "ic", lines=True, orient="records")
 
+    df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "tc", lines=True, orient="records")
     
-
-
-
-    
-
+    df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "oc", lines=True, orient="records")
