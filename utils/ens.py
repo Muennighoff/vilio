@@ -316,25 +316,39 @@ def combine_subdata(path, gt_path="./data/"):
                     elif "csv" in csv:
                         preds[d] = pd.read_csv(os.path.join(path, csv)) # Loads base preds
 
-    print(preds.keys())
-    
     # Normalize probabilities
     for d in ["dev", "test", "test_unseen"]:
         for x in ["", "gt"]:
             for i in ["ic", "tc", "oc"]:
+                if x == "gt":
+                    preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
                 preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]           
-            preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], how="inner")
+            preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
             preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
             preds[d+"itc"+x] = preds[d+"itc"+x][["id"], ["proba"+"itc"+x]]
             for i in ["ic", "tc"]:
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
 
+
     # Combine
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
-            preds[d] = preds[d].merge(preds[d+i])
+            for x in ["", "gt"]:
+                preds[d] = preds[d].merge(preds[d+i+x])
+        preds[d].fillna(0, inplace=True)
+
+    # Decide on probas
+    fin_probas = ["proba"]
+    for i in ["ic", "tc", "oc", "itc"]:
+        score = roc_auc_score(preds["dev"+i].merge(preds["devgt"], on="id")["label"], preds["dev"+i].merge(preds["devgt"], on="id")["proba"+i])
+        score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
+        fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
+
+    # Run optimization
+    #probas_only = dev[final_probas]
+    #gt_only = dev_GT.label
 
 
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
