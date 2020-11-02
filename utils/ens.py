@@ -293,13 +293,14 @@ def Simplex(devs, label, df_list=False, scale=1):
 
 ### APPLYING THE HELPER FUNCTIONS ###
 
-def combine_subdata(path, gt_path="./data/"):
+def combine_subdata(path, gt_path="./data/", subpreds=True):
     """
     Combines predictions from submodels & main model.
 
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
-    """ 
+    subpreds: Whether preds on subdata are available (if not taken from full preds)
+    """
     lookfor = ["", "gt"]
     # Load data
     preds = {}
@@ -334,9 +335,9 @@ def combine_subdata(path, gt_path="./data/"):
 
     # Combine
     for d in ["dev", "test", "test_unseen"]:
-        for i in ["ic", "tc", "oc"]:
+        for i in ["ic", "tc", "oc", "itc"]:
             for x in ["", "gt"]:
-                preds[d] = preds[d].merge(preds[d+i+x])
+                preds[d] = preds[d].merge(preds[d+i+x], on="id", how="left")
         preds[d].fillna(0, inplace=True)
 
     # Decide on probas
@@ -346,7 +347,7 @@ def combine_subdata(path, gt_path="./data/"):
             score = roc_auc_score(preds["dev"+i].merge(preds["devgt"], on="id")["label"], preds["dev"+i].merge(preds["devgt"], on="id")["proba"+i])
             score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
 
-            fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
+            fin_probas.append("proba"+i) if score > score_gt else fin_probas.append("proba"+i+"gt")
         except:
             continue
 

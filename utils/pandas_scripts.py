@@ -145,6 +145,8 @@ def clean_data(data_path="./data"):
     traincleandev = pd.concat([train, dev_unseen, dev_seen])
     traincleandev.to_json(path_or_buf=os.path.join(data_path, "traindev.jsonl"), orient='records', lines=True)
 
+    print("FINISHED?!", os.listdir(data_path))
+
 
 def create_subdata(data_path="./data"):
     """
