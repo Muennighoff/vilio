@@ -13,7 +13,35 @@ import imagehash
 def phash(img_path):
     phash = imagehash.phash(Image.open(img_path))
     return phash
-    
+
+def whash(img_path):
+    whash = imagehash.whash(Image.open(img_path))
+    return whash
+
+def dhash(img_path):
+    dhash = imagehash.dhash(Image.open(img_path))
+    return dhash
+
+def wdbhash(img_path):
+    wdbhhash = imagehash.whash(Image.open(img_path), mode='db4')
+    return wdbhash
+
+def wsymhash(img_path):
+    wsymhash = imagehash.whash(Image.open(img_path), mode='sym4')
+    return wsymhash
+
+def wbiorhash(img_path):
+    wcoifhash = imagehash.whash(Image.open(img_path), mode='bior4.4')
+    return wcoifhash
+
+def wrbiohash(img_path):
+    wcoifhash = imagehash.whash(Image.open(img_path), mode='rbio4.4')
+    return wcoifhash
+
+def wdmeyhash(img_path):
+    wdmeyhash = imagehash.whash(Image.open(img_path), mode='dmey')
+    return wdmeyhash
+
 def crude_hash(img_path):
     """
     The function generates a hash based on simple comparisons such as dimensions of an image
@@ -136,6 +164,8 @@ def clean_data(data_path="./data"):
     pretrain["label"].fillna(0, inplace=True)
     pretrain.to_json(path_or_buf=os.path.join(data_path, "pretrain.jsonl"), orient='records', lines=True)
 
+    print("FINISHED EARLY??!", os.listdir(data_path))
+
     # b) Cleaned Train + unused data from dev_unseen (All duplicates are in train, hence the following suffices)
     train = train[~train['id'].isin(rmv_ids)].copy()
     trainclean = pd.concat([train, dev_unseen])
@@ -209,3 +239,29 @@ def create_subdata(data_path="./data"):
 
         test_unseen = dists[i].loc[dists[i].identity == "test_unseen"][["id", "img", "text"]]
         test_unseen.to_json(data_path + '/test_unseen_' + i + '.jsonl', lines=True, orient="records")
+
+def create_hashdata(data_path="./data", jsonl="test_unseen.jsonl"):
+    """
+    Used for smoothing & distances!
+    In contrast to create_subdata; we create it within the data here, not globally
+
+    jsonl: json lines file with img entry
+    """
+    df = pd.read_json(os.path.join(data_path, jsonl), lines=True, orient="records")
+    df['full_path'] = df['img'].apply(lambda x: os.path.join(data_path, str(x)))
+
+    funcs = [phash, whash, dhash, wdbhash, wsymhash, wbiorhash, wrbiohash, wdmeyhash]
+
+    # Apply all hash funcs
+    for f in funcs:
+        df[f.__name__] = df['full_path'].apply(lambda x: f(x))
+        df[f.__name__ + "_dups"] = df[f.__name__].apply(lambda x: df.loc[df[f.__name__] == x].id.values)
+
+
+
+    
+
+
+
+    
+
