@@ -334,6 +334,8 @@ def combine_subdata(path, gt_path="./data/"):
 
                 print(preds[d+i+x]["proba"+i+x])
 
+                print(preds[d+i+x])
+
                 preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]    
 
             preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
@@ -367,8 +369,15 @@ def combine_subdata(path, gt_path="./data/"):
         for i in range(1, len(fin_probas)):
             preds[d] += preds[fin_probas[i]] * sx_weights[i]
 
+    # Output csvs & remove unneeded csvs
+    for d in ["dev", "test", "test_unseen"]:
+        for i in ["ic", "tc", "oc"]:
+            for csv in sorted(os.listdir(path)):
+                if (d in csv) and (i in csv) and ("csv" in csv):
+                    os.remove(path + csv) # Remove sub preds
+                elif (d in csv) and ("csv" in csv):
+                    preds[d].to_csv(os.path.join(path, csv), index=False) # Replace base preds
 
-    #> This func will be used both for ito optimization in the middle & at the very end based only on alls
 
 def smooth_distance(path):
     """
