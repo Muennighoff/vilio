@@ -325,9 +325,15 @@ def combine_subdata(path, gt_path="./data/"):
 
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
+
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
 
+                print(preds[d+i+x]["proba"+i+x])
+
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
+
+                print(preds[d+i+x]["proba"+i+x])
+
                 preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]    
 
             preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
@@ -355,6 +361,11 @@ def combine_subdata(path, gt_path="./data/"):
     gt_only = preds["devgt"].label
     sx_weights = Simplex(probas_only, gt_only, df_list=False, scale=50)
 
+
+    for d in ["dev", "test", "test_unseen"]:
+        preds[d] = preds[fin_probas[0]] * sx_weights[0]
+        for i in range(1, len(fin_probas)):
+            preds[d] += preds[fin_probas[i]] * sx_weights[i]
 
 
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
