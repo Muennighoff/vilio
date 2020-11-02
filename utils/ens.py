@@ -300,6 +300,7 @@ def combine_subdata(path, gt_path="./data/"):
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
     """ 
+    lookfor = ["", "gt"]
     # Load data
     preds = {}
     for d in ["dev", "test", "test_unseen"]:
