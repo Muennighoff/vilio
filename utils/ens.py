@@ -341,9 +341,12 @@ def combine_subdata(path, gt_path="./data/"):
     # Decide on probas
     fin_probas = ["proba"]
     for i in ["ic", "tc", "oc", "itc"]:
-        score = roc_auc_score(preds["dev"+i].merge(preds["devgt"], on="id")["label"], preds["dev"+i].merge(preds["devgt"], on="id")["proba"+i])
-        score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
-        fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
+        try: # If ITC contains both tc & oc it will throw an error
+            score = roc_auc_score(preds["dev"+i].merge(preds["devgt"], on="id")["label"], preds["dev"+i].merge(preds["devgt"], on="id")["proba"+i])
+            score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
+
+            fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
+
 
     # Run optimization
     probas_only = preds["dev"][fin_probas]
