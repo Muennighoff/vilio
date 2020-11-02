@@ -312,12 +312,12 @@ def combine_subdata(path, gt_path="./data/"):
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
             for csv in sorted(os.listdir(path)):
-                if (d in csv) and (i in csv) and (f in csv):
+                if (d in csv) and (i in csv):
                     if "jsonl" in csv:
                         preds[d+i+"all"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads sub gt
                     elif "csv" in csv:
                         preds[d+i] = pd.read_csv(os.path.join(path, csv)) # Loads sub preds
-                elif (d in csv) and (f in csv):
+                elif (d in csv):
                     if "jsonl" in csv:
                         preds[d+"all"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads base gt
                     elif "csv" in csv:
