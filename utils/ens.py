@@ -320,27 +320,14 @@ def combine_subdata(path, gt_path="./data/"):
     for d in ["dev", "test", "test_unseen"]:
         for x in ["", "gt"]:
             for i in ["ic", "tc", "oc"]:
-            
-                print(d, i, x)
-
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
-
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
-
-                print(preds[d+i+x]["proba"+i+x])
-
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
-
-                print(preds[d+i+x]["proba"+i+x])
-
-                print(preds[d+i+x])
-
-                preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]    
-
+                preds[d+i+x] = preds[d+i+x][["id", "proba"+i+x]]    
             preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
             preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
-            preds[d+"itc"+x] = preds[d+"itc"+x][["id"], ["proba"+"itc"+x]]
+            preds[d+"itc"+x] = preds[d+"itc"+x][["id", "proba"+"itc"+x]]
             for i in ["ic", "tc"]:
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
 
@@ -362,7 +349,6 @@ def combine_subdata(path, gt_path="./data/"):
     probas_only = preds["dev"][fin_probas]
     gt_only = preds["devgt"].label
     sx_weights = Simplex(probas_only, gt_only, df_list=False, scale=50)
-
 
     for d in ["dev", "test", "test_unseen"]:
         preds[d] = preds[fin_probas[0]] * sx_weights[0]
