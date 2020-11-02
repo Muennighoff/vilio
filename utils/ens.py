@@ -299,8 +299,7 @@ def combine_subdata(path, gt_path="./data/"):
 
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
-    """
-
+    """ 
     # Load data
     preds = {}
     for d in ["dev", "test", "test_unseen"]:
@@ -335,19 +334,7 @@ def combine_subdata(path, gt_path="./data/"):
     # Combine
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
-
-    
-    dev = dev_ALL.merge(dev_IC, on="id", how="left").merge(dev_TC, on="id", how="left").merge(dev_OC, on="id", how="left")
-    dev = dev.merge(dev_IC_ALL, on="id", how="left").merge(dev_TC_ALL, on="id", how="left").merge(dev_OC_ALL, on="id", how="left")
-    dev.fillna(0, inplace=True)
-
-    test = test_ALL.merge(test_IC, on="id", how="left").merge(test_TC, on="id", how="left").merge(test_OC, on="id", how="left")
-    test = test.merge(test_IC_ALL, on="id", how="left").merge(test_TC_ALL, on="id", how="left").merge(test_OC_ALL, on="id", how="left")
-    test.fillna(0, inplace=True)
-
-    test_unseen = test_unseen_ALL.merge(test_unseen_IC, on="id", how="left").merge(test_unseen_TC, on="id", how="left").merge(test_unseen_OC, on="id", how="left")
-    test_unseen = test_unseen.merge(test_unseen_IC_ALL, on="id", how="left").merge(test_unseen_TC_ALL, on="id", how="left").merge(test_unseen_OC_ALL, on="id", how="left")    
-    test_unseen.fillna(0, inplace=True)
+            preds[d] = preds[d].merge(preds[d+i])
 
 
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
