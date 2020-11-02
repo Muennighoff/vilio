@@ -320,17 +320,21 @@ def combine_subdata(path, gt_path="./data/"):
     for d in ["dev", "test", "test_unseen"]:
         for x in ["", "gt"]:
             for i in ["ic", "tc", "oc"]:
+            
+            print(d, i, x)
+
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
+
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
-                preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]           
+                preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]    
+                       
             preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
             preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
             preds[d+"itc"+x] = preds[d+"itc"+x][["id"], ["proba"+"itc"+x]]
             for i in ["ic", "tc"]:
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
-
 
     # Combine
     for d in ["dev", "test", "test_unseen"]:
@@ -347,8 +351,10 @@ def combine_subdata(path, gt_path="./data/"):
         fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
 
     # Run optimization
-    #probas_only = dev[final_probas]
-    #gt_only = dev_GT.label
+    probas_only = preds["dev"][fin_probas]
+    gt_only = preds["devgt"].label
+    sx_weights = Simplex(probas_only, gt_only, df_list=False, scale=50)
+
 
 
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
