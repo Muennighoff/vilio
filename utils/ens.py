@@ -316,6 +316,7 @@ def combine_subdata(path, gt_path="./data/"):
         for i in ["ic", "tc", "oc"]:
             for csv in sorted(os.listdir(path)):
                 if (d in csv) and (i in csv):
+                    print(csv, d+i)
                     preds[d+i] = pd.read_csv(os.path.join(path, csv))
             preds[d+i+"all"] = pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
     
@@ -334,19 +335,7 @@ def combine_subdata(path, gt_path="./data/"):
 
     # Combine
 
-    
-
-    dev = dev_ALL.merge(dev_IC_ALL, on="id", how="left").merge(dev_TC_ALL, on="id", how="left").merge(dev_OC_ALL, on="id", how="left")
-    dev = dev.merge(dev_ITC_ALL, on="id", how="left") ###############
-    dev.fillna(0, inplace=True)
-
-    test = test_ALL.merge(test_IC_ALL, on="id", how="left").merge(test_TC_ALL, on="id", how="left").merge(test_OC_ALL, on="id", how="left")
-    test = test.merge(test_ITC_ALL, on="id", how="left") ########################
-    test.fillna(0, inplace=True)
-
-    test_unseen = test_unseen_ALL.merge(test_unseen_IC_ALL, on="id", how="left").merge(test_unseen_TC_ALL, on="id", how="left").merge(test_unseen_OC_ALL, on="id", how="left")
-    test_unseen = test_unseen.merge(test_unseen_ITC_ALL, on="id", how="left")   ###################################
-    test_unseen.fillna(0, inplace=True)
+ 
 
     print(preds.keys())
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
