@@ -302,8 +302,6 @@ def combine_subdata(path, gt_path="./data/"):
     """
     # GT & bases
 
-    for f in [".jsonl", ".csv"]
-
     dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
     test_df = pd.read_json(os.path.join(gt_path, 'test_seen.jsonl'), lines=True)
     test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
