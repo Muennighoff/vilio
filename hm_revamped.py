@@ -438,15 +438,6 @@ if __name__ == "__main__":
             main()
 
         # Combine & output
-
-        combine_subdata("./data")
-
-
-
-
-
-
-
-
-
+        if args.combine:
+            combine_subdata("./data")
 

@@ -300,12 +300,8 @@ def combine_subdata(path, gt_path="./data/"):
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
     """
-    # GT & bases
 
-    #dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
-    #test_df = pd.read_json(os.path.join(gt_path, 'test_seen.jsonl'), lines=True)
-    #test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
-
+    # Load data
     preds = {}
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
@@ -337,9 +333,23 @@ def combine_subdata(path, gt_path="./data/"):
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
 
     # Combine
-    print(preds.keys())
+    for d in ["dev", "test", "test_unseen"]:
+        for i in ["ic", "tc", "oc"]:
 
     
+    dev = dev_ALL.merge(dev_IC, on="id", how="left").merge(dev_TC, on="id", how="left").merge(dev_OC, on="id", how="left")
+    dev = dev.merge(dev_IC_ALL, on="id", how="left").merge(dev_TC_ALL, on="id", how="left").merge(dev_OC_ALL, on="id", how="left")
+    dev.fillna(0, inplace=True)
+
+    test = test_ALL.merge(test_IC, on="id", how="left").merge(test_TC, on="id", how="left").merge(test_OC, on="id", how="left")
+    test = test.merge(test_IC_ALL, on="id", how="left").merge(test_TC_ALL, on="id", how="left").merge(test_OC_ALL, on="id", how="left")
+    test.fillna(0, inplace=True)
+
+    test_unseen = test_unseen_ALL.merge(test_unseen_IC, on="id", how="left").merge(test_unseen_TC, on="id", how="left").merge(test_unseen_OC, on="id", how="left")
+    test_unseen = test_unseen.merge(test_unseen_IC_ALL, on="id", how="left").merge(test_unseen_TC_ALL, on="id", how="left").merge(test_unseen_OC_ALL, on="id", how="left")    
+    test_unseen.fillna(0, inplace=True)
+
+
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
 
 def smooth_distance(path):
