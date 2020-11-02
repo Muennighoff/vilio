@@ -301,24 +301,54 @@ def combine_subdata(path, gt_path="./data/"):
     gt_path: Path to folder with ground truth for dev
     """
     # GT & bases
+
+    for f in [".jsonl", ".csv"]
+
     dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
     test_df = pd.read_json(os.path.join(gt_path, 'test_seen.jsonl'), lines=True)
     test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
 
+    # Load data
     preds = {}
     for d in ["dev", "test", "test_unseen"]:
+        # Load GT & bases
+        #for f in [".jsonl", ".csv"]
+        #    preds[d+f] = pd.read_csv(os.path.join(path, d+f))
+        # Load subtrained
         for i in ["ic", "tc", "oc"]:
             for csv in sorted(os.listdir(path)):
                 if (d in csv) and (i in csv):
                     preds[d+i] = pd.read_csv(os.path.join(path, csv))
             preds[d+i+"all"] = pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
     
+    # Normalize probabilities
     for d in ["dev", "test", "test_unseen"]:
-        for i in ["ic", "tc", "oc"]: # add itc?
-            for x in ["", "all"]:
+        for x in ["", "all"]:
+            for i in ["ic", "tc", "oc"]:
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
-                preds[d+i+x] = preds[d+i+x]["proba"+i+x][["id"], ["proba"+i+x]]
+                preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]           
+            preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], how="inner")
+            preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
+            preds[d+"itc"+x] = preds[d+"itc"+x][["id"], ["proba"+"itc"+x]]
+            for i in ["ic", "tc"]:
+                preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
+
+    # Combine
+
+    
+
+    dev = dev_ALL.merge(dev_IC_ALL, on="id", how="left").merge(dev_TC_ALL, on="id", how="left").merge(dev_OC_ALL, on="id", how="left")
+    dev = dev.merge(dev_ITC_ALL, on="id", how="left") ###############
+    dev.fillna(0, inplace=True)
+
+    test = test_ALL.merge(test_IC_ALL, on="id", how="left").merge(test_TC_ALL, on="id", how="left").merge(test_OC_ALL, on="id", how="left")
+    test = test.merge(test_ITC_ALL, on="id", how="left") ########################
+    test.fillna(0, inplace=True)
+
+    test_unseen = test_unseen_ALL.merge(test_unseen_IC_ALL, on="id", how="left").merge(test_unseen_TC_ALL, on="id", how="left").merge(test_unseen_OC_ALL, on="id", how="left")
+    test_unseen = test_unseen.merge(test_unseen_ITC_ALL, on="id", how="left")   ###################################
+    test_unseen.fillna(0, inplace=True)
 
     print(preds.keys())
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
@@ -356,7 +386,7 @@ def smooth_distance(path):
         new_val = x["proba"] - (1 / dist)
         
         return new_val
-        
+
     pass
 
 def main(path, gt_path="./data/"):
