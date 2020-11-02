@@ -306,44 +306,26 @@ def combine_subdata(path, gt_path="./data/"):
     #test_df = pd.read_json(os.path.join(gt_path, 'test_seen.jsonl'), lines=True)
     #test_unseen_df = pd.read_json(os.path.join(gt_path, 'test_unseen.jsonl'), lines=True)
 
-
-
     preds = {}
     for d in ["dev", "test", "test_unseen"]:
         for i in ["ic", "tc", "oc"]:
             for csv in sorted(os.listdir(path)):
                 if (d in csv) and (i in csv):
                     if "jsonl" in csv:
-                        preds[d+i+"all"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads sub gt
+                        preds[d+i+"gt"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads sub gt
                     elif "csv" in csv:
                         preds[d+i] = pd.read_csv(os.path.join(path, csv)) # Loads sub preds
                 elif (d in csv):
                     if "jsonl" in csv:
-                        preds[d+"all"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads base gt
+                        preds[d+"gt"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads base gt
                     elif "csv" in csv:
                         preds[d] = pd.read_csv(os.path.join(path, csv)) # Loads base preds
 
     print(preds.keys())
-
-
-    # Load data
-    preds = {}
-    for d in ["dev", "test", "test_unseen"]:
-        # Load GT & bases
-        #for f in [".jsonl", ".csv"]
-        #    preds[d+f] = pd.read_csv(os.path.join(path, d+f))
-        # Load subtrained
-        for i in ["ic", "tc", "oc"]:
-            for csv in sorted(os.listdir(path)):
-                if (d in csv) and (i in csv):
-                    print(csv, d+i)
-                    preds[d+i] = pd.read_csv(os.path.join(path, csv))
-            preds[d+i+"all"] = pd.read_json(d + "_" + i + ".jsonl", lines=True, orient="records")
     
-
     # Normalize probabilities
     for d in ["dev", "test", "test_unseen"]:
-        for x in ["", "all"]:
+        for x in ["", "gt"]:
             for i in ["ic", "tc", "oc"]:
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
@@ -355,10 +337,9 @@ def combine_subdata(path, gt_path="./data/"):
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
 
     # Combine
-
- 
-
     print(preds.keys())
+
+    
     #> This func will be used both for ito optimization in the middle & at the very end based only on alls
 
 def smooth_distance(path):
