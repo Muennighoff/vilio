@@ -346,6 +346,8 @@ def combine_subdata(path, gt_path="./data/"):
             score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
 
             fin_probas.append(i) if score > score_gt else fin_probas.append(i+"gt")
+        except:
+            continue
 
 
     # Run optimization
