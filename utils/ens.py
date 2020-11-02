@@ -321,7 +321,7 @@ def combine_subdata(path, gt_path="./data/"):
         for x in ["", "gt"]:
             for i in ["ic", "tc", "oc"]:
             
-            print(d, i, x)
+                print(d, i, x)
 
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
@@ -329,7 +329,7 @@ def combine_subdata(path, gt_path="./data/"):
 
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
                 preds[d+i+x] = preds[d+i+x][["id"], ["proba"+i+x]]    
-                       
+
             preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
             preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
             preds[d+"itc"+x] = preds[d+"itc"+x][["id"], ["proba"+"itc"+x]]
