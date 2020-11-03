@@ -164,8 +164,6 @@ def clean_data(data_path="./data"):
     pretrain["label"].fillna(0, inplace=True)
     pretrain.to_json(path_or_buf=os.path.join(data_path, "pretrain.jsonl"), orient='records', lines=True)
 
-    print("FINISHED EARLY??!", os.listdir(data_path))
-
     # b) Cleaned Train + unused data from dev_unseen (All duplicates are in train, hence the following suffices)
     train = train[~train['id'].isin(rmv_ids)].copy()
     trainclean = pd.concat([train, dev_unseen])
@@ -174,8 +172,6 @@ def clean_data(data_path="./data"):
     # c) Cleaned Train + unused data from dev_unseen + dev_seen
     traincleandev = pd.concat([train, dev_unseen, dev_seen])
     traincleandev.to_json(path_or_buf=os.path.join(data_path, "traindev.jsonl"), orient='records', lines=True)
-
-    print("FINISHED?!", os.listdir(data_path))
 
 
 def create_subdata(data_path="./data"):
@@ -264,5 +260,5 @@ def create_hashdata(data_path="./data", jsonl="test_unseen.jsonl"):
     df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "ic", lines=True, orient="records")
 
     df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "tc", lines=True, orient="records")
-    
+
     df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "oc", lines=True, orient="records")
