@@ -11,6 +11,8 @@ import math
 
 from param import args
 
+from utils.pandas_scripts import create_hashdata
+
 ### FUNCTIONS IMPLEMENTING ENSEMBLE METHODS ###
 
 ### HELPERS ###
@@ -391,21 +393,35 @@ def smooth_distance(path):
     The intuition is that even when data is similar the model does the right job at ranking the data correctly in isolation, however
     when combined with the whole data, it is ranked incorrectly. By increasing their distance we can adapt it to the whole data. 
     """
-    # Load data 
+    # Load data
+    data = ["test_unseen"]
+    subdata = ["ic", "tc", "oc"]
+
+    preds = {}
+    for csv in sorted(os.listdir(path)):
+        if any(d in csv for d in data):
+            if "jsonl" in csv:
+                preds[data[0]] + [s for s in subdata if s in csv][0]] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
+            if "csv" in csv:
+                preds[[data[0]] = pd.read_csv(os.path.join(path, csv))
+
+    preds[data[0] + subdata[0]] = pd.concat([preds[data[0] + subdata[0]], preds[data[0] + subdata[1]], preds[data[0] + subdata[2]]])
+    preds[data[0] + subdata[0]].drop_duplicates(subset=["id"], inplace=True)
+    preds[data[0] + subdata[0]] = preds[data[0]].merge(preds[data[0] + subdata[0]], on="id")
 
 
-    def smoothed_proba(x):
+    def smooth(x):
         """
         Outputs a new proba smoothed based on distance
         """
         avgt = 0
         for i in x["text_dups"]:
-            avgt += test_unseen_ALL.loc[test_unseen_ALL["id"] == i].proba.values[0]
+            avgt += preds[[data[0]].loc[preds[[data[0]]["id"] == i].proba.values[0]
         avgt /= len(x["text_dups"])
         
         avgp = 0
         for i in x["phash_dups"]:
-            avgp += test_unseen_ALL.loc[test_unseen_ALL["id"] == i].proba.values[0]
+            avgp += preds[[data[0]].loc[preds[[data[0]]["id"] == i].proba.values[0]
         avgp /= len(x["phash_dups"])
         
         if (avgt != 0) & (avgp != 0):
@@ -421,10 +437,22 @@ def smooth_distance(path):
         
         return new_val
 
-    # Smooth data
+    preds[data[0] + subdata[0]]["proba_newx"] = preds[data[0] + subdata[0]].apply(smooth, axis=1)
+    preds[data[0] + subdata[0]] = preds[data[0] + subdata[0]][["id", "proba_newx"]]
+    preds[data[0]] = preds[data[0]].merge(preds[data[0] + subdata[0]], on="id", how="left")
+    preds[data[0]].fillna(0, inplace=True)
 
+    preds[data[0]].loc[(preds[data[0]].proba_newx != 0) & (preds[data[0]].proba_newx != preds[data[0]].proba), "proba"] = \
+        preds[data[0]].loc[(preds[data[0]].proba_newx != 0) & (preds[data[0]].proba_newx != preds[data[0]].proba), "proba_newx"]
 
-    pass
+    # Cleanup & output
+    for csv in sorted(os.listdir(path)):
+        if any(d in csv for d in data):
+            if any(s in csv for s in subdata[:3]):
+                os.remove(os.path.join(path, csv))
+            elif "csv" in csv:
+                preds[data[0]].to_csv(path + csv, index=False)
+
 
 def main(path, gt_path="./data/"):
     """
@@ -577,7 +605,7 @@ def main(path, gt_path="./data/"):
         # I found the loop to not add any value after 2 rounds.
         if loop == 2:
             break
-
+    
     print("Finished with {} after {} loops.".format(last_score, loop))
 
     # Get accuracy thresholds & optimize (This does not add value to the roc auc, but just to also have an acc score)
@@ -586,10 +614,22 @@ def main(path, gt_path="./data/"):
     test_SX.label = test_SX.apply(set_acc, axis=1, args=[threshold])
     test_unseen_SX.label = test_unseen_SX.apply(set_acc, axis=1, args=[threshold])
 
+    # Set path instd of /k/w ; Remove all csv data / load the exact same 3 files again as put out
     # As Simplex at some point simply weighs the highest of all - lets take sx as the final prediction after x loops
     dev_SX.to_csv("/kaggle/working/ens_dev_" + args.exp + "_" + str(loop) + ".csv", index=False)
     test_SX.to_csv("/kaggle/working/ens_test_" + args.exp + "_" + str(loop) + ".csv", index=False)
     test_unseen_SX.to_csv("/kaggle/working/ens_test_unseen" + args.exp + "_" + str(loop) + ".csv", index=False)
+
+    # Smooth distances & submerge
+    #create_hashdata("dev_seen.jsonl")
+    #create_hashdata("train.jsonl")
+    #create_hashdata("test_unseen.jsonl")
+    #combine_subdata(subtrain=False)
+    #
+    #smooth_distance()
+
+    # Cleanup all i/t/o's .jsonl
+
     
 if __name__ == "__main__":
     
