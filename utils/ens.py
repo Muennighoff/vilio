@@ -242,7 +242,7 @@ class SimpleTuner:
 
 		plotter.show()
 
-def Simplex(devs, label, df_list=False, scale=1):
+def Simplex(devs, label, df_list=False, exploration=0.01, scale=1):
     """
     devs: list of dataframes with "proba" column
     label: list/np array of ground truths
@@ -279,7 +279,7 @@ def Simplex(devs, label, df_list=False, scale=1):
 
     
     number_of_iterations = 3000
-    exploration = 0.01 # optional, default 0.15
+    exploration = exploration # optional, default 0.01
 
     # Optimize weights
     tuner = SimpleTuner(optimization_domain_vertices, roc_auc, exploration_preference=exploration)
@@ -355,7 +355,7 @@ def combine_subdata(path, gt_path="./data/", subpreds=True):
     # Run optimization
     probas_only = preds["dev"][fin_probas]
     gt_only = preds["devgt"].label
-    sx_weights = Simplex(probas_only, gt_only, df_list=False, scale=50)
+    sx_weights = Simplex(probas_only, gt_only, df_list=False, exploration=1, scale=50)
 
     for d in ["dev", "test", "test_unseen"]:
         preds[d] = preds[fin_probas[0]] * sx_weights[0]
@@ -410,7 +410,7 @@ def smooth_distance(path):
         return new_val
 
     # Smooth data
-    
+
 
     pass
 
