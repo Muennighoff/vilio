@@ -293,34 +293,39 @@ def Simplex(devs, label, df_list=False, exploration=0.01, scale=1):
 
 ### APPLYING THE HELPER FUNCTIONS ###
 
-def combine_subdata(path, gt_path="./data/", subpreds=True):
+import pandas as pd
+import numpy as np
+import os
+from sklearn.metrics import roc_auc_score
+
+def combine_subdata(path, gt_path="./data/", subtrain=True):
     """
     Combines predictions from submodels & main model.
 
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
-    subpreds: Whether preds on subdata are available (if not taken from full preds)
-    """
-    lookfor = ["", "gt"]
+    subpreds: Whether to use preds from subtrained or from the pred on full
+    """ 
+
+    data = ["dev_seen", "test_seen", "test_unseen"]
+    subdata = ["ic", "tc", "oc", ""]
+    if subtrain:
+        types = ["", "gt"]
+    else:
+        types = ["gt"]
+    
     # Load data
     preds = {}
-    for d in ["dev", "test", "test_unseen"]:
-        for i in ["ic", "tc", "oc"]:
-            for csv in sorted(os.listdir(path)):
-                if (d in csv) and (i in csv):
-                    if "jsonl" in csv:
-                        preds[d+i+"gt"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads sub gt
-                    elif "csv" in csv:
-                        preds[d+i] = pd.read_csv(os.path.join(path, csv)) # Loads sub preds
-                elif (d in csv):
-                    if "jsonl" in csv:
-                        preds[d+"gt"] = pd.read_json(os.path.join(gt_path, csv), lines=True, orient="records") # Loads base gt
-                    elif "csv" in csv:
-                        preds[d] = pd.read_csv(os.path.join(path, csv)) # Loads base preds
+    for csv in sorted(os.listdir(path)):
+        if any(d in csv for d in data):
+            if "jsonl" in csv:
+                preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
+            if "csv" in csv:
+                preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
     # Normalize probabilities
-    for d in ["dev", "test", "test_unseen"]:
-        for x in ["", "gt"]:
+    for d in data:
+        for x in types:
             for i in ["ic", "tc", "oc"]:
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
@@ -332,44 +337,51 @@ def combine_subdata(path, gt_path="./data/", subpreds=True):
             preds[d+"itc"+x] = preds[d+"itc"+x][["id", "proba"+"itc"+x]]
             for i in ["ic", "tc"]:
                 preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
-
+        
     # Combine
-    for d in ["dev", "test", "test_unseen"]:
+    for d in data:
         for i in ["ic", "tc", "oc", "itc"]:
-            for x in ["", "gt"]:
+            for x in types:
                 preds[d] = preds[d].merge(preds[d+i+x], on="id", how="left")
         preds[d].fillna(0, inplace=True)
-
+        
     # Decide on probas
     fin_probas = ["proba"]
     for i in ["ic", "tc", "oc", "itc"]:
-        try: # If ITC contains both tc & oc it will throw an error
-            score = roc_auc_score(preds["dev"+i].merge(preds["devgt"], on="id")["label"], preds["dev"+i].merge(preds["devgt"], on="id")["proba"+i])
-            score_gt = roc_auc_score(preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["label"], preds["dev"+i+"gt"].merge(preds["devgt"], on="id")["proba"+i+"gt"])
-
-            fin_probas.append("proba"+i) if score > score_gt else fin_probas.append("proba"+i+"gt")
-        except:
-            continue
-
-
+        scores = {}
+        for x in types:
+            df = preds["dev_seen"+i+x].merge(preds["dev_seengt"], on="id")
+            if len(df) > 1:
+                scores[x] = roc_auc_score(df["label"], df["proba"+i+x])
+        print(i)
+        print(scores)
+        if len(scores) > 0:
+            fin_probas.append("proba" + i + max(scores, key=scores.get))
+    
+    print("PICKING: ", fin_probas)
+    
     # Run optimization
-    probas_only = preds["dev"][fin_probas]
-    gt_only = preds["devgt"].label
+    probas_only = preds["dev_seen"][fin_probas]
+    gt_only = preds["dev_seen"][["id"]].merge(preds["dev_seengt"], how="left", on="id").label
+    
+    if len(gt_only) < len(preds["dev_seengt"].label):
+        print("Your predictions do not include the full dev!")
+     
     sx_weights = Simplex(probas_only, gt_only, df_list=False, exploration=1, scale=50)
-
-    for d in ["dev", "test", "test_unseen"]:
-        preds[d] = preds[fin_probas[0]] * sx_weights[0]
+    
+    print("STARTING WITH: ", roc_auc_score(preds["dev_seengt"].label, preds["dev_seen"].proba))
+    
+    for d in data:
+        preds[d]["proba"] = preds[d][fin_probas[0]] * sx_weights[0]
         for i in range(1, len(fin_probas)):
-            preds[d] += preds[fin_probas[i]] * sx_weights[i]
-
-    # Output csvs & remove unneeded csvs
-    for d in ["dev", "test", "test_unseen"]:
-        for i in ["ic", "tc", "oc"]:
-            for csv in sorted(os.listdir(path)):
-                if (d in csv) and (i in csv) and ("csv" in csv):
-                    os.remove(path + csv) # Remove sub preds
-                elif (d in csv) and ("csv" in csv):
-                    preds[d].to_csv(os.path.join(path, csv), index=False) # Replace base preds
+            preds[d]["proba"] += preds[d][fin_probas[i]] * sx_weights[i]
+        
+    for csv in sorted(os.listdir(path)):
+        if any(d in csv for d in data) and ("csv" in csv):
+            if any(s in csv for s in subdata[:3]):
+                os.remove(os.path.join(path, csv))
+            else:
+                preds[d].to_csv(path + csv, index=False)
 
 
 def smooth_distance(path):
