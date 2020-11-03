@@ -452,6 +452,9 @@ def main(path):
     print("PICKING: ", final_probas)
     print("SCORES:", ic_score, ic_all_score, tc_score, tc_all_score, oc_score, oc_all_score)
 
+    print(probas_only)
+    print(gt_only)
+
     sx_weights = Simplex(dev, probas_only, gt_only, df_list=False)
 
     print("STARTING WITH: ", roc_auc_score(dev_GT.label, dev.proba))
