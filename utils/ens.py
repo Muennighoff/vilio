@@ -379,6 +379,9 @@ def smooth_distance(path):
     The intuition is that even when data is similar the model does the right job at ranking the data correctly in isolation, however
     when combined with the whole data, it is ranked incorrectly. By increasing their distance we can adapt it to the whole data. 
     """
+    # Load data 
+
+
     def smoothed_proba(x):
         """
         Outputs a new proba smoothed based on distance
@@ -405,6 +408,9 @@ def smooth_distance(path):
         new_val = x["proba"] - (1 / dist)
         
         return new_val
+
+    # Smooth data
+    
 
     pass
 

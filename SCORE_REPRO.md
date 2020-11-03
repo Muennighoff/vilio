@@ -18,7 +18,7 @@ We will install specific packages for each subprocess as outlined below.
 ## Data preparation
 
 1. **Images**
-We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
+- We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
 
 Refer to the feature_extraction notebook under notebooks if you run into any problems:
 
@@ -140,6 +140,13 @@ Download the pre-trained models here and here.
 
 
 ## Inference-only
+
+Following features:
+- Reextract?
+
+
+Following weights:
+- Re-train all using vilio? 
 
 
 # > Create a notebook with everything in one

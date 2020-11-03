@@ -257,37 +257,39 @@ def main(path):
 
     ### 1/3 LOADING ###
 
+    # ADAPTED TO COMPARE WITH NEW IMPLEMENTATION
+
     # GT & bases
-    dev_GT = pd.read_json("./data/devseen.jsonl", lines=True, orient="records")
-    test = pd.read_json("./data/test.jsonl", lines=True, orient="records")
+    dev_GT = pd.read_json("./data/dev_seen.jsonl", lines=True, orient="records")
+    test = pd.read_json("./data/test_seen.jsonl", lines=True, orient="records")
     test_unseen = pd.read_json("./data/test_unseen.jsonl", lines=True, orient="records")
 
     # IC & Full Preds
     for csv in sorted(os.listdir(path)):
         if "dev" in csv:
-            if "IC" in csv:
+            if "ic" in csv:
                 dev_IC = pd.read_csv(path + csv)
-            elif "TC" in csv:
+            elif "tc" in csv:
                 dev_TC = pd.read_csv(path + csv)
-            elif "OC" in csv:
+            elif "oc" in csv:
                 dev_OC = pd.read_csv(path + csv)
             else:
                 dev_ALL = pd.read_csv(path + csv)
         elif "test_unseen" in csv:
-            if "IC" in csv:
+            if "ic" in csv:
                 test_unseen_IC = pd.read_csv(path + csv)
-            elif "TC" in csv:
+            elif "tc" in csv:
                 test_unseen_TC = pd.read_csv(path + csv)
-            elif "OC" in csv:
+            elif "oc" in csv:
                 test_unseen_OC = pd.read_csv(path + csv)
             else:
                 test_unseen_ALL = pd.read_csv(path + csv)
         elif "test" in csv:
-            if "IC" in csv:
+            if "ic" in csv:
                 test_IC = pd.read_csv(path + csv)
-            elif "TC" in csv:
+            elif "tc" in csv:
                 test_TC = pd.read_csv(path + csv)
-            elif "OC" in csv:
+            elif "oc" in csv:
                 test_OC = pd.read_csv(path + csv)
             else:
                 test_ALL = pd.read_csv(path + csv)
