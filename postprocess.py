@@ -300,7 +300,7 @@ def main(path):
     test_unseen_IC_ALL = pd.read_json("./data/test_unseen_ic.jsonl", lines=True, orient="records")
 
     dev_TC_ALL = pd.read_json("./data/dev_seen_tc.jsonl", lines=True, orient="records")
-    test_TC_ALL = pd.read_json("./data/test_tc.jsonl", lines=True, orient="records")
+    test_TC_ALL = pd.read_json("./data/test_seen_tc.jsonl", lines=True, orient="records")
     test_unseen_TC_ALL = pd.read_json("./data/test_unseen_tc.jsonl", lines=True, orient="records")
 
     dev_OC_ALL = pd.read_json("./data/dev_seen_oc.jsonl", lines=True, orient="records")
