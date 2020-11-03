@@ -266,6 +266,7 @@ def main(path):
 
     # IC & Full Preds
     for csv in sorted(os.listdir(path)):
+        print(csv)
         if "dev" in csv:
             if "ic" in csv:
                 dev_IC = pd.read_csv(path + csv)
