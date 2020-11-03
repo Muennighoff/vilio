@@ -6,7 +6,7 @@ For the purpose of having everything in one repo, I combined three separate repo
 - ernie-vil (For running E-Models)
 - vilio (For X, D, V, U, O-Models & everything else)
 
-The pipeline to reproduce the roc-auc score on the public & private leaderboard on the Hateful Memes challenge follows:
+The pipeline to reproduce the roc-auc score on the public & private leaderboard from scratch on the Hateful Memes challenge follows. If you want to use the pre-trained models and perform inference only, scroll to the end.
 
 # Soft- & Hardware
 
@@ -17,7 +17,7 @@ We will install specific packages for each subprocess as outlined below.
 
 ## Data preparation
 
-1. Images
+1. **Images**
 We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
 
 Refer to the feature_extraction notebook under notebooks if you run into any problems:
@@ -72,8 +72,8 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 - /img/ folder
 
 
-2. Text 
-- Download the updated train.jsonl, dev_seen.jsonl, dev_unseen.jsonl, test_seen.jsonl, test_unseen.jsonl from the HM Challenge and place them in BOTH the data folder under vilio/data and the data folder under vilio/ernie-vil/data/hm.
+2. **Text** 
+- Download the updated train.jsonl, dev_seen.jsonl, dev_unseen.jsonl, test_seen.jsonl, test_unseen.jsonl from the HM Challenge and place them in BOTH the data folder under `vilio/data` and the data folder under `vilio/ernie-vil/data/hm`
 
 
 ## Individual Model Pretraining & Training
@@ -97,6 +97,7 @@ Run `cd vilio; bash /bash/hm_O.bash`.
 
 - U-Model:
 Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
+Run `cd vilio; bash /bash/hm_U.bash`.
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) and place the file model.pth under `vilio/data`.
@@ -137,6 +138,8 @@ Download the pre-trained models here and here.
 > Place all files in data (Should be 3 csv's per model (dev, test, test_unseen) for a total of 21 csvs) - > Run ens.sh 
 
 
+
+## Inference-only
 
 
 # > Create a notebook with everything in one
