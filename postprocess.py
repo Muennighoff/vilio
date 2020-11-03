@@ -401,18 +401,61 @@ def main(path):
     test_unseen_OC_ALL["proba_oc_all"] = (test_unseen_OC_ALL.proba_oc_all - test_unseen_OC_ALL.proba_oc_all.min())/(test_unseen_OC_ALL.proba_oc_all.max()-test_unseen_OC_ALL.proba_oc_all.min())
     test_unseen_OC_ALL = test_unseen_OC_ALL[["id", "proba_oc_all"]]
 
+    # EXP
+    dev_ITC = dev_TC.merge(dev_IC, how="inner")
+    dev_ITC["proba_itc"] = (dev_ITC["proba_ic"] + dev_ITC["proba_tc"]) / 2  
+    dev_ITC = dev_ITC[["id", "proba_itc"]]
+    dev_ITC_ALL = dev_TC_ALL.merge(dev_IC_ALL, how="inner")
+    dev_ITC_ALL["proba_itc_all"] = (dev_ITC_ALL["proba_ic_all"] + dev_ITC_ALL["proba_tc_all"]) / 2  
+    dev_ITC_ALL = dev_ITC_ALL[["id", "proba_itc_all"]]
+
+    test_ITC = test_TC.merge(test_IC, how="inner")
+    test_ITC["proba_itc"] = (test_ITC["proba_ic"] + test_ITC["proba_tc"]) / 2  
+    test_ITC = test_ITC[["id", "proba_itc"]]
+    test_ITC_ALL = test_TC_ALL.merge(test_IC_ALL, how="inner")
+    test_ITC_ALL["proba_itc_all"] = (test_ITC_ALL["proba_ic_all"] + test_ITC_ALL["proba_tc_all"]) / 2  
+    test_ITC_ALL = test_ITC_ALL[["id", "proba_itc_all"]]
+
+    test_unseen_ITC = test_unseen_TC.merge(test_unseen_IC, how="inner")
+    test_unseen_ITC["proba_itc"] = (test_unseen_ITC["proba_ic"] + test_unseen_ITC["proba_tc"]) / 2  
+    test_unseen_ITC = test_unseen_ITC[["id", "proba_itc"]]
+    test_unseen_ITC_ALL = test_unseen_TC_ALL.merge(test_unseen_IC_ALL, how="inner")
+    test_unseen_ITC_ALL["proba_itc_all"] = (test_unseen_ITC_ALL["proba_ic_all"] + test_unseen_ITC_ALL["proba_tc_all"]) / 2  
+    test_unseen_ITC_ALL = test_unseen_ITC_ALL[["id", "proba_itc_all"]]
+
+    dev_IC = dev_IC.loc[~dev_IC.id.isin(dev_ITC.id.values)]
+    dev_TC = dev_TC.loc[~dev_TC.id.isin(dev_ITC.id.values)]
+
+    test_IC = test_IC.loc[~test_IC.id.isin(test_ITC.id.values)]
+    test_TC = test_TC.loc[~test_TC.id.isin(test_ITC.id.values)]
+
+    test_unseen_IC = test_unseen_IC.loc[~test_unseen_IC.id.isin(test_unseen_ITC.id.values)]
+    test_unseen_TC = test_unseen_TC.loc[~test_unseen_TC.id.isin(test_unseen_ITC.id.values)]
+
+    dev_IC_ALL = dev_IC_ALL.loc[~dev_IC_ALL.id.isin(dev_ITC_ALL.id.values)]
+    dev_TC_ALL = dev_TC_ALL.loc[~dev_TC_ALL.id.isin(dev_ITC_ALL.id.values)]
+
+    test_IC_ALL = test_IC_ALL.loc[~test_IC_ALL.id.isin(test_ITC_ALL.id.values)]
+    test_TC_ALL = test_TC_ALL.loc[~test_TC_ALL.id.isin(test_ITC_ALL.id.values)]
+
+    test_unseen_IC_ALL = test_unseen_IC_ALL.loc[~test_unseen_IC_ALL.id.isin(test_unseen_ITC_ALL.id.values)]
+    test_unseen_TC_ALL = test_unseen_TC_ALL.loc[~test_unseen_TC_ALL.id.isin(test_unseen_ITC_ALL.id.values)]
+
     # 3/3 Merge into one pred df based on ID & Fillna's with 0 #
 
     dev = dev_ALL.merge(dev_IC, on="id", how="left").merge(dev_TC, on="id", how="left").merge(dev_OC, on="id", how="left")
     dev = dev.merge(dev_IC_ALL, on="id", how="left").merge(dev_TC_ALL, on="id", how="left").merge(dev_OC_ALL, on="id", how="left")
+    dev = dev.merge(dev_ITC, on="id", how="left").merge(dev_ITC_ALL, on="id", how="left") ###############
     dev.fillna(0, inplace=True)
 
     test = test_ALL.merge(test_IC, on="id", how="left").merge(test_TC, on="id", how="left").merge(test_OC, on="id", how="left")
     test = test.merge(test_IC_ALL, on="id", how="left").merge(test_TC_ALL, on="id", how="left").merge(test_OC_ALL, on="id", how="left")
+    test = test.merge(test_ITC, on="id", how="left").merge(test_ITC_ALL, on="id", how="left") ########################
     test.fillna(0, inplace=True)
 
     test_unseen = test_unseen_ALL.merge(test_unseen_IC, on="id", how="left").merge(test_unseen_TC, on="id", how="left").merge(test_unseen_OC, on="id", how="left")
     test_unseen = test_unseen.merge(test_unseen_IC_ALL, on="id", how="left").merge(test_unseen_TC_ALL, on="id", how="left").merge(test_unseen_OC_ALL, on="id", how="left")    
+    test_unseen = test_unseen.merge(test_unseen_ITC, on="id", how="left").merge(test_unseen_ITC_ALL, on="id", how="left")   ###################################
     test_unseen.fillna(0, inplace=True)
 
 
@@ -446,6 +489,18 @@ def main(path):
     else:
         final_probas.append("proba_oc_all")
 
+        
+    #########################################
+    #final_probas = ["proba"]
+    itc_score = roc_auc_score(dev_ITC.merge(dev_GT, on="id").label, dev_ITC.merge(dev_GT, on="id").proba_itc)
+    itc_all_score = roc_auc_score(dev_ITC_ALL.merge(dev_GT, on="id").label, dev_ITC_ALL.merge(dev_GT, on="id").proba_itc_all)
+    
+    if itc_score > itc_all_score:
+        final_probas.append("proba_itc")
+    else:
+        final_probas.append("proba_itc_all")
+    ########################################
+
     probas_only = dev[final_probas]
     gt_only = dev_GT.label
 
@@ -459,10 +514,10 @@ def main(path):
 
     print("STARTING WITH: ", roc_auc_score(dev_GT.label, dev.proba))
 
-    dev["proba"] = (dev[final_probas[0]] * sx_weights[0]) + (dev[final_probas[1]] * sx_weights[1]) + (dev[final_probas[2]] * sx_weights[2]) + (dev[final_probas[3]] * sx_weights[3])
-    test["proba"] = (test[final_probas[0]] * sx_weights[0]) + (test[final_probas[1]] * sx_weights[1]) + (test[final_probas[2]] * sx_weights[2]) + (test[final_probas[3]] * sx_weights[3])
-    test_unseen["proba"] = (test_unseen[final_probas[0]] * sx_weights[0]) + (test_unseen[final_probas[1]] * sx_weights[1]) + (test_unseen[final_probas[2]] * sx_weights[2]) + (test_unseen[final_probas[3]] * sx_weights[3])
-
+    dev["proba"] = (dev[final_probas[0]] * sx_weights[0]) + (dev[final_probas[1]] * sx_weights[1]) + (dev[final_probas[2]] * sx_weights[2]) + (dev[final_probas[3]] * sx_weights[3]) + (dev[final_probas[4]] * sx_weights[4])
+    test["proba"] = (test[final_probas[0]] * sx_weights[0]) + (test[final_probas[1]] * sx_weights[1]) + (test[final_probas[2]] * sx_weights[2]) + (test[final_probas[3]] * sx_weights[3]) + (test[final_probas[4]] * sx_weights[4])
+    test_unseen["proba"] = (test_unseen[final_probas[0]] * sx_weights[0]) + (test_unseen[final_probas[1]] * sx_weights[1]) + (test_unseen[final_probas[2]] * sx_weights[2]) + (test_unseen[final_probas[3]] * sx_weights[3]) + (test_unseen[final_probas[4]] * sx_weights[4])
+    
     print("FINISHING WITH: ", roc_auc_score(dev_GT.label, dev.proba))
 
     # Reduce to necessary cols
