@@ -295,17 +295,17 @@ def main(path):
                 test_ALL = pd.read_csv(path + csv)
 
     # ALL versions
-    dev_IC_ALL = pd.read_json("./data/devseen_ICALL.jsonl", lines=True, orient="records")
-    test_IC_ALL = pd.read_json("./data/test_ICALL.jsonl", lines=True, orient="records")
-    test_unseen_IC_ALL = pd.read_json("./data/test_unseen_ICALL.jsonl", lines=True, orient="records")
+    dev_IC_ALL = pd.read_json("./data/dev_seen_ic.jsonl", lines=True, orient="records")
+    test_IC_ALL = pd.read_json("./data/test_seen_ic.jsonl", lines=True, orient="records")
+    test_unseen_IC_ALL = pd.read_json("./data/test_unseen_ic.jsonl", lines=True, orient="records")
 
-    dev_TC_ALL = pd.read_json("./data/devseen_TCALL.jsonl", lines=True, orient="records")
-    test_TC_ALL = pd.read_json("./data/test_TCALL.jsonl", lines=True, orient="records")
-    test_unseen_TC_ALL = pd.read_json("./data/test_unseen_TCALL.jsonl", lines=True, orient="records")
+    dev_TC_ALL = pd.read_json("./data/dev_seen_tc.jsonl", lines=True, orient="records")
+    test_TC_ALL = pd.read_json("./data/test_tc.jsonl", lines=True, orient="records")
+    test_unseen_TC_ALL = pd.read_json("./data/test_unseen_tc.jsonl", lines=True, orient="records")
 
-    dev_OC_ALL = pd.read_json("./data/devseen_OCALL.jsonl", lines=True, orient="records")
-    test_OC_ALL = pd.read_json("./data/test_OCALL.jsonl", lines=True, orient="records")
-    test_unseen_OC_ALL = pd.read_json("./data/test_unseen_OCALL.jsonl", lines=True, orient="records")
+    dev_OC_ALL = pd.read_json("./data/dev_seen_oc.jsonl", lines=True, orient="records")
+    test_OC_ALL = pd.read_json("./data/test_seen_oc.jsonl", lines=True, orient="records")
+    test_unseen_OC_ALL = pd.read_json("./data/test_unseen_oc.jsonl", lines=True, orient="records")
 
 
     ### 2/3 PREPARATION ###
