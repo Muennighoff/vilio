@@ -244,10 +244,6 @@ def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
 
     jsonl: json lines file with img entry
     """
-    # Check if the statement was already run and the necessary data exists:
-    if os.path.exists(os.path.join(data_path, "pretrain.jsonl")):
-        return
-        
     data = ["train", "dev_seen", "traindev", "test_seen", "test_unseen"]
 
     preds = {}
