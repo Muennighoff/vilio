@@ -426,6 +426,7 @@ if __name__ == "__main__":
         create_subdata("./data")
         
         arg_tr = args.train
+        arg_va = args.valid
         arg_te = args.test
         # Set midsave & loadpre to none
         args.midsave = -1
@@ -433,6 +434,7 @@ if __name__ == "__main__":
 
         for i in ["_ic", "_tc", "_oc"]:
             args.train = arg_tr + i
+            args.valid = arg_va + i
             new_test = ''
             for split in arg_te.split(","):
                 new_test += split + i + ","
