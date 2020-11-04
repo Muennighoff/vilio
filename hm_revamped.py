@@ -427,6 +427,9 @@ if __name__ == "__main__":
         
         arg_tr = args.train
         arg_te = args.test
+        # Set midsave & loadpre to none
+        args.midsave = -1
+        args.loadpre = None
 
         for i in ["_ic", "_tc", "_oc"]:
             args.train = arg_tr + i
