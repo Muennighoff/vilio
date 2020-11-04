@@ -416,12 +416,12 @@ def smooth_distance(path):
         """
         avgt = 0
         for i in x["text_dups"]:
-            avgt += preds[[data[0]].loc[preds[[data[0]]["id"] == i].proba.values[0]
+            avgt += preds[data[0]].loc[preds[data[0]]["id"] == i].proba.values[0]
         avgt /= len(x["text_dups"])
         
         avgp = 0
         for i in x["phash_dups"]:
-            avgp += preds[[data[0]].loc[preds[[data[0]]["id"] == i].proba.values[0]
+            avgp += preds[data[0]].loc[preds[data[0]]["id"] == i].proba.values[0]
         avgp /= len(x["phash_dups"])
         
         if (avgt != 0) & (avgp != 0):
