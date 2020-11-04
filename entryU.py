@@ -8,7 +8,7 @@ from param import args
 from src.vilio.modeling_bertX import BertLayerNorm, GeLU, BertLayer
 from src.vilio.modeling_albertX import GeLU_new
 
-from src.vilio.modeling_bertU import BertU, UniterConfig
+from src.vilio.modeling_bertU import BertU
 from src.vilio.modeling_robertaU import RobertaU
 
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
