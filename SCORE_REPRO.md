@@ -128,11 +128,15 @@ Download the pre-trained models here and here.
 - E - Small:
 Download the pre-trained models here and here.
 
+Plan:
+Double all dev/test files in len
+Regenerate subdata?
+
 > Ernie is written in PaddlePaddle and makes for a bit more complicated running; It is however the best performing model of all (by about 2% absolute RCAC on the HM challenge)
 > Run ERV-S shell 
 > Run ERV-L shell
 
-## Post-processing & ensembling
+## Ensembling
 
 1. Ensembling
 > Place all files in data (Should be 3 csv's per model (dev, test, test_unseen) for a total of 21 csvs) - > Run ens.sh 
