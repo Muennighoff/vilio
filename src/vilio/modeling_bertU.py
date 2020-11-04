@@ -15,8 +15,8 @@ import math
 import torch
 from torch import nn
 # They used apex's FusedLayerNorm in or. repo --- In case users would like to use FusedLayerNorm, import the original one from apex
-from transformers.modeling_bert import BertLayerNorm as FusedLayerNorm
-from transformers.modeling_bert import BertLayerNorm
+from src.vilio.transformers.modeling_bert import BertLayerNorm as FusedLayerNorm
+from src.vilio.transformers.modeling_bert import BertLayerNorm
 
 import math
 import torch
