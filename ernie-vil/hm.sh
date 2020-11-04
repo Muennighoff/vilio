@@ -26,15 +26,15 @@ cp -r ./output_hm/step_1250 ./data/
 ######
 
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
-../input/erniesmall/vocab.txt \
-../input/erniesmall/ernie_vil_config.base.json \
+./data/erniesmall/vocab.txt \
+./data/erniesmall/ernie_vil_config.base.json \
 ./data/step_1250 \
 trainic \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-../input/erniesmall/vocab.txt \
-../input/erniesmall/ernie_vil_config.base.json \
+./data/erniesmall/vocab.txt \
+./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
 valic N36 False
