@@ -89,22 +89,21 @@ O, V & X are first pretrained with combinations of MaskedLM and ITM (Image-Text-
 
 - D-Model:
 Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data`
-Run `cd vilio; bash /bash/hm_D.bash`.
+Run `cd vilio; bash /bash/hm_D.sh`.
 
 - O-Model:
 Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take /large-vg-labels/ep_20_590000/pytorch_model.bin, and place the file pytorch_model.bin under `vilio/data`.
-Run `cd vilio; bash /bash/hm_O.bash`.
+Run `cd vilio; bash /bash/hm_O.sh`.
 
 - U-Model:
 Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
-Run `cd vilio; bash /bash/hm_U.bash`.
+Run `cd vilio; bash /bash/hm_U.sh`.
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) and place the file model.pth under `vilio/data`.
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
-
 
 
 The following does all of the above for each model. We will end up with three csv's per model in data:
@@ -114,17 +113,17 @@ The following does all of the above for each model. We will end up with three cs
 `cd vilio; bash /bash/hm_V.bash`
 `cd vilio; bash /bash/hm_X.bash`
 
-https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt
 
 > Topk first for quick checking
 > Run the shell file for each model (This will run run three seeds of the specific model and then take the simple average of the seeds)
 
 2. PaddlePaddle / E:
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data. 
-Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed.
+Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. 
 
 - E - Large:
-Download the pre-trained models here and here and put both into `vilio/ernie-vil/data`. (data only, not the hm folder in data)
+Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. 
+
 Run `cd vilio/ernie-vil; bash hm_EL`. On my setup this would run for around 19 hours, as it runs 5 different features. If that's too long, you can run the five bash scripts in x?. 
 
 - E - Small:
