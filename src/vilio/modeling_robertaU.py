@@ -15,8 +15,11 @@ import math
 import torch
 from torch import nn
 # They used apex's FusedLayerNorm in or. repo --- In case users would like to use FusedLayerNorm, import the original one from apex
-from transformers.modeling_bert import BertLayerNorm as FusedLayerNorm
-from transformers.modeling_bert import BertLayerNorm
+from src.vilio.transformers.modeling_bert import BertLayerNorm as FusedLayerNorm
+from src.vilio.transformers.modeling_bert import BertLayerNorm, BertPreTrainedModel
+
+
+from src.vilio.transformers.modeling_roberta import RobertaConfig
 
 import math
 import torch
@@ -27,7 +30,7 @@ from torch.nn import functional as F
 import importlib
 
 ### BOTTOM-UP APPROACH ###
-# We start with the lowest level & then go up step by step (Other way around is not always possible, as inheriting only works if previously defined)
+# We start with the lowest level & then go up step by step
 
 # A) ACTIVATION FUNCS & LOGGER
 # B) CONFIGS / HYPERPARAMS FOR VISION & LANG
@@ -37,7 +40,7 @@ import importlib
 # F) ENCODER & LAYERS
 # G) FINAL UNITER MODEL
 
-### A) ACTIVATION FUNCS & LOGGER ###
+### A) ACTIVATION FUNCS ###
 
 def gelu(x):
     """Implementation of the gelu activation function.
@@ -56,8 +59,7 @@ ACT2FN = {"gelu": gelu, "relu": torch.nn.functional.relu, "swish": swish}
 logger = logging.getLogger(__name__)
 
 ### B) CONFIGS ###
-
-from transformers.modeling_roberta import RobertaConfig
+# Imported
 
 ### C) BERT HELPER FUNCS ###
 
@@ -196,8 +198,7 @@ class BertPooler(nn.Module):
         return pooled_output
 
 ### D) PRETRAINED MODEL ###
-
-from transformers.modeling_bert import BertPreTrainedModel
+# Imported
 
 ### E) EMBEDDINGS FOR LANG & VISION ###
 
