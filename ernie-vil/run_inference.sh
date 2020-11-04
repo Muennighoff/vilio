@@ -11,6 +11,8 @@ ERNIE_VIL_CONFIG=$6
 MODEL_PATH=$7
 RES_FILE=$8
 SPLIT=$9
+EXP=${10}
+COMB=${11}
 
 source $CONF_FILE
 
@@ -46,6 +48,8 @@ python finetune.py --use_cuda "True"                                           \
                 --ernie_config_path ${ERNIE_VIL_CONFIG}                        \
                 --max_seq_len ${MAX_LEN}                                       \
                 --skip_steps 10                                                \
-                --split ${SPLIT}
+                --split ${SPLIT}                                               \
+                --exp ${EXP}                                                   \
+                --combine ${COMB}
 
 

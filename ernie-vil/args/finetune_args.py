@@ -31,6 +31,7 @@ model_g.add_arg("ernie_config_path", str, "./config/ernie_config.json", "json fi
 model_g.add_arg("init_checkpoint", str, None, "Init checkpoint to resume training from.")
 model_g.add_arg("checkpoints", str, "checkpoints", "Path to save checkpoints.")
 model_g.add_arg("task_name", str, "vcr", "Task to finetune on ERNIE-ViL")
+model_g.add_arg("exp", str, "experiment", "Name of the experiment, Tagged onto csv")
 
 train_g = ArgumentGroup(parser, "training", "training options.")
 train_g.add_arg("epoch", int, 100, "Number of epoches for training.")
@@ -76,6 +77,8 @@ run_type_g.add_arg("use_fast_executor", bool, False, "If set, use fast parallel 
 run_type_g.add_arg("do_train", bool, False, "Whether to perform evaluation on test data set.")
 run_type_g.add_arg("do_test", bool, False, "Whether to perform evaluation on test data set.")
 run_type_g.add_arg("do_val", bool, False, "Whether to perform evaluation on val data set.")
+run_type_g.add_arg("subtrain", bool, False, "Whether to perform training on subdata.")
+run_type_g.add_arg("combine", bool, False, "Whether to combine all trained files.")
 run_type_g.add_arg("output_file", str, "", "The output file to save model output.")
 run_type_g.add_arg("split", str, "train", "The data on which to train on - must be present in the conf .json file")
 run_type_g.add_arg("stop_steps", int, 5000, "Break tr loop to e.g. get new features")

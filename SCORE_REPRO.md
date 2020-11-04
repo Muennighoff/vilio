@@ -120,17 +120,19 @@ https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt
 > Run the shell file for each model (This will run run three seeds of the specific model and then take the simple average of the seeds)
 
 2. PaddlePaddle / E:
-Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data.
+Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data. 
+Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed.
 
 - E - Large:
-Download the pre-trained models here and here.
+Download the pre-trained models here and here and put both into `vilio/ernie-vil/data`. (data only, not the hm folder in data)
+Run `cd vilio/ernie-vil; bash hm_EL`. On my setup this would run for around 19 hours, as it runs 5 different features. If that's too long, you can run the five bash scripts in x?. 
 
 - E - Small:
 Download the pre-trained models here and here.
 
 Plan:
-Double all dev/test files in len
-Regenerate subdata?
+Double all dev/test files in len; also train
+Regenerate subdata! > Add it to the hm_finetuning file
 
 > Ernie is written in PaddlePaddle and makes for a bit more complicated running; It is however the best performing model of all (by about 2% absolute RCAC on the HM challenge)
 > Run ERV-S shell 

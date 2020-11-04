@@ -31,6 +31,7 @@ from model.ernie_vil import ErnieVilModel, ErnieVilConfig
 from optim.optimization import optimization
 from utils.args import print_arguments
 from utils.init import init_checkpoint, init_pretraining_params
+from utils.pandas_scripts import clean_data, create_subdata, double_data
 from args.finetune_args import parser
 
 import paddle.fluid as fluid
@@ -264,7 +265,7 @@ def predict_wrapper(args,
 
 
         # Dump preds to csv for submission
-        dump_csv(quesid2ans, quesid2prob, "/kaggle/working/preds.csv")
+        dump_csv(quesid2ans, quesid2prob, "./data/" + args.split + args.exp + ".csv")
 
         print("average_acc:", sum_acc / steps)
         print("rocauc:", roc_auc_score(label_list, pred_list))
@@ -537,5 +538,15 @@ def main(args):
 
 if __name__ == '__main__':
     print_arguments(args)
+
+    if args.task_name == "hm":
+        # Create pretrain.jsonl & traindev data
+        clean_data("./data")
+        create_subdata("./data")
+        double_data("./data")
+
     main(args)
 
+    # Combine & output
+    #if args.combine:
+    #    combine_subdata("./data")
