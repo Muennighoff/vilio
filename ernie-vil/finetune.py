@@ -541,9 +541,9 @@ if __name__ == '__main__':
 
     if args.task_name == "hm":
         # Create pretrain.jsonl & traindev data
-        clean_data("./data")
-        create_subdata("./data")
-        double_data("./data")
+        clean_data("./data/hm")
+        create_subdata("./data/hm")
+        double_data("./data/hm")
 
     main(args)
 
