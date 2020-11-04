@@ -183,6 +183,8 @@ def create_subdata(data_path="./data"):
     # Check if the statement was already run and the necessary data exists:
     if os.path.exists(os.path.join(data_path, "train_ic.jsonl")):
         return
+    else:
+        print("Preparing...")
 
     train = pd.read_json(os.path.join(data_path + '/train.jsonl'), lines=True) # Note: This is the updated train, incl. data from dev_unseen
     dev = pd.read_json(os.path.join(data_path + '/dev_seen.jsonl'), lines=True)
