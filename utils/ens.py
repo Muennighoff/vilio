@@ -401,9 +401,9 @@ def smooth_distance(path):
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
             if "jsonl" in csv:
-                preds[data[0]] + [s for s in subdata if s in csv][0]] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
+                preds[data[0] + [s for s in subdata if s in csv][0]] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
             if "csv" in csv:
-                preds[[data[0]] = pd.read_csv(os.path.join(path, csv))
+                preds[data[0]] = pd.read_csv(os.path.join(path, csv))
 
     preds[data[0] + subdata[0]] = pd.concat([preds[data[0] + subdata[0]], preds[data[0] + subdata[1]], preds[data[0] + subdata[2]]])
     preds[data[0] + subdata[0]].drop_duplicates(subset=["id"], inplace=True)
