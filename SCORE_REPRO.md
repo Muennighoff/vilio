@@ -51,8 +51,7 @@ After completing extraction, we have the following files in vilio/py-bottom-up-a
 - hm_vg5050.tsv
 - hm_vg10100.tsv
 
-We also make use of the lmdb feats provided by mmf for one of our models, download them at:
-https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features/features.tar.gz
+We also make use of the lmdb feats provided by mmf for one of our models, download them [here](https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features/features.tar.gz)
 
 With the downloaded detectron.lmdb, we now have 7 different feature files.
 
@@ -89,7 +88,7 @@ O, V & X are first pretrained with combinations of MaskedLM and ITM (Image-Text-
 
 - D-Model:
 Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data`
-Run `cd vilio; bash /bash/hm_D.sh`.
+Run `cd vilio; bash /bash/hm_D.sh`. P100 Runtime: 7h
 
 - O-Model:
 Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take /large-vg-labels/ep_20_590000/pytorch_model.bin, and place the file pytorch_model.bin under `vilio/data`.
@@ -97,13 +96,15 @@ Run `cd vilio; bash /bash/hm_O.sh`.
 
 - U-Model:
 Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
-Run `cd vilio; bash /bash/hm_U.sh`.
+Run `cd vilio; bash /bash/hm_U.sh`. P100 Runtime: 7h
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) and place the file model.pth under `vilio/data`.
+Run `cd vilio; bash /bash/hm_V.sh`. 
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
+Run `cd vilio; bash /bash/hm_X.sh`.
 
 
 The following does all of the above for each model. We will end up with three csv's per model in data:
