@@ -19,24 +19,23 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
-        parser.add_argument(
-            "--enstype",
-            required=False,
-            type=str,
-            help="Mode can either be `convert` (for conversion of \n"
-            + "features to an LMDB file) or `extract` (extract \n"
-            + "raw features from a LMDB file)",
-            default="loop"
-        )
-        parser.add_argument(
-            "--enspath", required=False, type=str, help="Path to csvs", default="./data/"
-        )
-        parser.add_argument(
-            "--exp", required=False, type=str, help="Features folder", default="./data/features"
-        )
-        return parser
+    parser.add_argument(
+        "--enstype",
+        required=False,
+        type=str,
+        help="Mode can either be `convert` (for conversion of \n"
+        + "features to an LMDB file) or `extract` (extract \n"
+        + "raw features from a LMDB file)",
+        default="loop"
+    )
+    parser.add_argument(
+        "--enspath", required=False, type=str, help="Path to csvs", default="./data/"
+    )
+    parser.add_argument(
+        "--exp", required=False, type=str, help="Features folder", default="./data/features"
+    )
+    return parser
 
 ### FUNCTIONS IMPLEMENTING ENSEMBLE METHODS ###
 
