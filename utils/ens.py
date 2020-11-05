@@ -9,9 +9,34 @@ from scipy.stats import rankdata
 
 import math
 
-from param import args
+#from param import args
 
 from utils.pandas_scripts import create_hashdata
+
+
+
+import argparse
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+
+        parser.add_argument(
+            "--enstype",
+            required=False,
+            type=str,
+            help="Mode can either be `convert` (for conversion of \n"
+            + "features to an LMDB file) or `extract` (extract \n"
+            + "raw features from a LMDB file)",
+            default="loop"
+        )
+        parser.add_argument(
+            "--enspath", required=False, type=str, help="Path to csvs", default="./data/"
+        )
+        parser.add_argument(
+            "--exp", required=False, type=str, help="Features folder", default="./data/features"
+        )
+        return parser
 
 ### FUNCTIONS IMPLEMENTING ENSEMBLE METHODS ###
 
@@ -681,6 +706,8 @@ def main(path, gt_path="./data/"):
 
     
 if __name__ == "__main__":
+
+    args = parse_args()
     
     if args.enstype == "loop":
         main(args.enspath)
