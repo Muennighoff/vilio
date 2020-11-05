@@ -37,6 +37,8 @@ def parse_args():
     )
     return parser
 
+args = parse_args()
+
 ### FUNCTIONS IMPLEMENTING ENSEMBLE METHODS ###
 
 ### HELPERS ###
@@ -703,10 +705,8 @@ def main(path, gt_path="./data/"):
 
     # Cleanup all i/t/o's .jsonl
 
-    
+       
 if __name__ == "__main__":
-
-    args = parse_args()
     
     if args.enstype == "loop":
         main(args.enspath)
