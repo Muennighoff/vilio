@@ -570,6 +570,10 @@ def main(path, gt_path="./data/"):
     test_or = test.copy()
     test_unseen_or = test_unseen.copy()
 
+    if len(dev_df) > len(dev_probas):
+        print("Your predictions do not include the full dev!")
+        dev_df = dev_probas[["id"]].merge(dev_df, how="left", on="id")
+
     loop, last_score, delta = 0, 0, 0.1
 
     while (delta > 0.0001):
