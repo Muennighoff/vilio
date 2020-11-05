@@ -250,7 +250,7 @@ def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
 
     preds = {}
     for csv in sorted(os.listdir(data_path)):
-        if any(d in csv for d in data) and ("jsonl" in csv):
+        if any(d in csv for d in data) and ("jsonl" in csv) and ("long" not in csv):
             df = pd.read_json(os.path.join(data_path, csv), lines=True, orient="records")
             if "test" in csv:
                 df["label"] = 0
