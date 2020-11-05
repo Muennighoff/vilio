@@ -541,6 +541,7 @@ def main(path, gt_path="./data/"):
 
     gt_path: Path to folder with ground truth for dev
     """
+    print(args.exp)
     # Ground truth
     dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
 
