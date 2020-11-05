@@ -371,10 +371,10 @@ def combine_subdata(path, gt_path="./data/", subtrain=True):
     
     if len(gt_only) < len(preds["dev_seengt"].label):
         print("Your predictions do not include the full dev!")
+
+    print("STARTED WITH: ", roc_auc_score(gt_only, preds["dev_seen"].proba))
      
     sx_weights = Simplex(probas_only, gt_only, df_list=False, exploration=1, scale=50)
-    
-    print("STARTING WITH: ", roc_auc_score(preds["dev_seengt"].label, preds["dev_seen"].proba))
     
     for d in data:
         preds[d]["proba"] = preds[d][fin_probas[0]] * sx_weights[0]
