@@ -9,32 +9,18 @@ from scipy.stats import rankdata
 
 import math
 
-#from param import args
-
 from pandas_scripts import create_hashdata
 
-
-
 import argparse
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "--enstype",
-        required=False,
-        type=str,
-        help="Mode can either be `convert` (for conversion of \n"
-        + "features to an LMDB file) or `extract` (extract \n"
-        + "raw features from a LMDB file)",
-        default="loop"
-    )
-    parser.add_argument(
-        "--enspath", required=False, type=str, help="Path to csvs", default="./data/"
-    )
-    parser.add_argument(
-        "--exp", required=False, type=str, help="Features folder", default="./data/features"
-    )
+    parser.add_argument("--enspath", type=str, default="./data", help="Path to folder with all csvs")
+    parser.add_argument("--enstype", type=str, default="loop", help="Type of ensembling to be performed - Current options: loop / sa")
+    parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
+    
     # Parse the arguments.
     args = parser.parse_args()
 
@@ -541,7 +527,6 @@ def main(path, gt_path="./data/"):
 
     gt_path: Path to folder with ground truth for dev
     """
-    print(args.exp)
     # Ground truth
     dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
 
@@ -714,8 +699,7 @@ def main(path, gt_path="./data/"):
     #smooth_distance()
 
     # Cleanup all i/t/o's .jsonl
-
-       
+  
 if __name__ == "__main__":
 
     args = parse_args()
