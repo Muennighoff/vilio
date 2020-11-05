@@ -61,7 +61,7 @@ bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./data/step_1250 \
-traintc \
+trainoc \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
@@ -69,7 +69,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-valtc ES36 False
+valoc ES36 False
 
 
 # Wait until combine fully works for vilio > then add here
