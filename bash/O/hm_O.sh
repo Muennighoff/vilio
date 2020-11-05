@@ -37,7 +37,7 @@ python hm.py --seed 84 --model O \
 --num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL126 --subtrain --combine --topk $topk
 
 # 36 Feats, Seed 42
-cp ./data/hm_vg5050.tsv ./data/HM_img.tsv
+cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
 
 python pretrain_bertO.py --seed 42 --taskMaskLM --taskMatched --wordMaskRate 0.15 --train pretrain --tsv --tr bert-large-uncased \
 --batchSize 16 --lr 0.25e-5 --epochs 8 --num_features 36 --loadpre ./data/pytorch_model.bin --topk $topk
