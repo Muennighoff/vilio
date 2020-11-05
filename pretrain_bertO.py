@@ -80,11 +80,6 @@ def random_word(tokens, tokenizer):
 
     for i, token in enumerate(tokens):
 
-        # For textb only
-        if token == "[SEP]":
-            output_label.append(-1)
-            continue
-
         prob = random.random()
         # mask token with probability
         ratio = args.word_mask_rate
@@ -165,12 +160,7 @@ def convert_example_to_features(example: InputExample, max_seq_length, tokenizer
     lm_label_ids = ([-1] + masked_label + [-1])
     input_mask = [1] * len(input_ids)
 
-    if args.textb:
-        # Format: [CLS] texta [SEP] textb [SEP] -- where the outer CLS & SEP are added above & the inner is already in tokens
-        segment_ids = [0] * masked_tokens.index("[SEP]") + [0] # This will be exactly until 1 before the first ["SEP"] so + 1
-        segment_ids += [1] * (len(masked_tokens) - len(segment_ids))
-    else:
-        segment_ids = [0] * len(input_ids)
+    segment_ids = [0] * len(input_ids)
 
     # Zero-pad up to the sequence length.
     while len(input_ids) < max_seq_length:
