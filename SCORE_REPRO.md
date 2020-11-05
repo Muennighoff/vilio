@@ -100,23 +100,12 @@ We follow the same procedure as for D-Model, i.e. run `cd vilio; bash /bash/U/hm
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) untar it and place the file model.pth under `vilio/data`.
-Run `cd vilio; bash /bash/hm_V.sh`. 
+We use the lmdb features only for V as well as pretraining. Run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
-Run `cd vilio; bash /bash/hm_X.sh`.
+We perform pretraining and use different tsv features. Run `cd vilio; bash /bash/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/X/hm_X36.sh`, `cd vilio; bash /bash/X/hm_X50.sh`, `cd vilio; bash /bash/X/hm_X50.sh` `cd vilio; bash /bash/X/hm_XSA.sh` P100 Runtime in total:  **~15h**.
 
-
-The following does all of the above for each model. We will end up with three csv's per model in data:
-`cd vilio; bash /bash/hm_D.bash`
-`cd vilio; bash /bash/hm_O.bash`
-`cd vilio; bash /bash/hm_U.bash`
-`cd vilio; bash /bash/hm_V.bash`
-`cd vilio; bash /bash/hm_X.bash`
-
-
-> Topk first for quick checking
-> Run the shell file for each model (This will run run three seeds of the specific model and then take the simple average of the seeds)
 
 2. PaddlePaddle / E:
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data. 
