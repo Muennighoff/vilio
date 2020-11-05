@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Allows for quick test runs - Set topk to e.g. 10 & midsave to 5
+# Allows for quick test runs - Set topk to e.g. 20 & midsave to 5
 topk=${1:--1}
 midsave=${2:-2000}
 

@@ -163,38 +163,15 @@ class ModelO(nn.Module):
         input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
         segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long).cuda()
 
-
-        if args.pad:
-            img_feat, img_pos_feat, num_b = visual_feats
-        else:
-            img_feat, img_pos_feat = visual_feats
+        img_feat, img_pos_feat = visual_feats
 
         # Cat Pos feats into img feats
         img_feat = torch.cat((img_feat, img_pos_feat), dim = -1).cuda()
         # They only use 50 feats in or repo
         img_feat = img_feat[:, :self.max_img_seq_len]
 
-        #for f in img_feat:
-        #    if f.size(0) > self.max_img_seq_length:
-        #        f = f[0:self.max_img_seq_length, ]
-        #        if self.max_img_seq_length > 0:
-        #            input_mask = input_mask + 1 * f.shape[0]
-
-
-        if args.pad:
-            imasks = []
-            for b in num_b:
-                img_mask1 = torch.ones((1, b), dtype=input_mask.dtype)
-                img_mask0 = torch.zeros((1, args.num_features - b), dtype=input_mask.dtype)
-                imasks.append(torch.cat((img_mask1, img_mask0), dim=-1))
-
-            image_mask = torch.cat(imasks, dim=0)
-            input_mask = torch.cat((input_mask, image_mask), dim=-1).cuda()
-
-        else:
-            image_mask = torch.ones((input_ids.shape[0], self.max_img_seq_len), dtype=torch.long)
-            input_mask = torch.cat((input_mask, image_mask), dim = -1).cuda()
-
+        image_mask = torch.ones((input_ids.shape[0], self.max_img_seq_len), dtype=torch.long)
+        input_mask = torch.cat((input_mask, image_mask), dim = -1).cuda()
 
         seq_out, output = self.model(input_ids, token_type_ids=segment_ids, attention_mask=input_mask, img_feats=img_feat)
 
@@ -215,7 +192,7 @@ class ModelO(nn.Module):
 
     def save(self, path):
         torch.save(self.model.state_dict(),
-                   os.path.join("%s_V.pth" % path))
+                   os.path.join("%s_O.pth" % path))
 
     def load(self, path):
         # Load state_dict from snapshot file
