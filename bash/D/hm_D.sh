@@ -39,4 +39,4 @@ python hm.py --seed 147 --model D \
 --num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --subtrain --combine --topk $topk
 
 # Simple Average
-python utils/ens.py --enspath ./data/ --enstype sa --exp D507236
+python utils/ens.py --enspath ./data/ --enstype sa --exp D365072

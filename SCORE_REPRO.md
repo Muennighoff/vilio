@@ -78,9 +78,9 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 ## Individual Model Pretraining & Training
 
 1. PyTorch / D O U V X :
-Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under vilio/data.
+Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
 Install the necessary packages with: 
-`cd vilio; pip install -r requirements_full.txt` - > TEST; Generate with pipx
+`cd vilio; pip install -r requirements_full.txt` - > TEST; Generate with pipx; Take versions from Kaggle? e.g. check for pytoch version there?
 
 We now proceed to the training of our models. For all models we make use of pre-trained models provided by the creators of each model. I will put the original DL-Links for all models below, but I have reuploaded all model weights to datasets on kaggle, so contact me in case any of the original DL-Links does not work anymore.
 
@@ -89,7 +89,6 @@ O, V & X are first task-specific pretrained with combinations of MaskedLM and IT
 - D-Model:
 Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data/pytorch_model_11.bin`
 The file `vilio/bash/D/hm_D.sh` will run the model on three different features & seeds and then simple average them. First to make sure everything works correctly, run the file once with only a tiny part of data by changing the midsave & topk arguments, for example as follows: `cd vilio; bash /bash/D/hm_D.sh 20 5`. This will run the file with only 10 images. If there are any file errors make sure the the necessary files are under vilio/data as outlined above. Else raise an issue and I will look into it. If there are no apparent errors, run `cd vilio; bash /bash/D/hm_D.sh`. On a P100, each model takes around 4 hours, hence it will run for **~12h**. If that's too long, we also provide .sh files separating the steps. For separating the steps run `cd vilio; bash /bash/D/hm_D36.sh`, `cd vilio; bash /bash/D/hm_D50.sh`, `cd vilio; bash /bash/D/hm_D72.sh`, make sure to save the csv files (3 per run) (? Perhaps in subfolders) and then run `cd vilio; bash /bash/D/hm_DSA.sh` to simple average the results. This will create a new dir within ./data/ named after the experiment (D365072), where it will store the final **3 csvs (dev_seen, test_seen, test_unseen)** for the D-Model, which will go into the final ensemble. If you plan to reset your environment, make sure to save those 3 csvs, everything else can be discarded.
-
 
 - O-Model:
 Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take `/large-vg-labels/ep_20_590000/pytorch_model.bin`, and place the file pytorch_model.bin under `vilio/data/pytorch_model.bin`. Everything is the same as for the D-Model, except that we also perform task-specific pretraining using pretrain_bertO.py, which increases running time. Run `cd vilio; bash /bash/O/hm_O.sh` to run all three feats + simple averaging **(~27h)**. Alternatively, run `cd vilio; bash /bash/O/hm_O50VG.sh`, `cd vilio; bash /bash/O/hm_O50ATT.sh` and `cd vilio; bash /bash/O/hm_O36ATT.sh` (I didn't have the memory to run 72 feats for O, but you could run that as well). Then run  `cd vilio; bash /bash/D/hm_OSA.sh` and make sure you do not discard those final 3 csvs in the folder `./data/O365050`. You can run a quick test via e.g. `cd vilio; bash /bash/O/hm_O.sh 20 5`.
@@ -100,15 +99,16 @@ We follow the same procedure as for D-Model, i.e. run `cd vilio; bash /bash/U/hm
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) untar it and place the file model.pth under `vilio/data`.
-We use the lmdb features only for V as well as pretraining. Run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
+For V we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). 
+We use the lmdb features only for V as well as pretraining. After installing PyTorch 1.6, run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
-We perform pretraining and use different tsv features. Run `cd vilio; bash /bash/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/X/hm_X36.sh`, `cd vilio; bash /bash/X/hm_X50.sh`, `cd vilio; bash /bash/X/hm_X50.sh` `cd vilio; bash /bash/X/hm_XSA.sh` P100 Runtime in total:  **~15h**.
+For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash /bash/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/X/hm_X36.sh`, `cd vilio; bash /bash/X/hm_X50.sh`, `cd vilio; bash /bash/X/hm_X50.sh` `cd vilio; bash /bash/X/hm_XSA.sh` P100 Runtime in total:  **~15h**.
 
 
 2. PaddlePaddle / E:
-Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under vilio/data. 
+Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie-vil/hm/data`
 Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. 
 
 - E - Large:
