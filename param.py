@@ -43,6 +43,7 @@ def parse_args():
     
     # Ensemble-related
     parser.add_argument("--enspath", type=str, default="./data", help="Path to folder with all csvs")
+    parser.add_argument("--enstype", type=str, default="loop", help="Type of ensembling to be performed - Current options: loop / sa")
 
     # Model Loading & Saving - Note: PATHS must be put in here! 
     parser.add_argument('--model', type=str, default='X', help='Type of Model, X V O U D')

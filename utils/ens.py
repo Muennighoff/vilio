@@ -383,7 +383,7 @@ def combine_subdata(path, gt_path="./data/", subtrain=True):
             if any(s in csv for s in subdata[:3]):
                 os.remove(os.path.join(path, csv))
             else:
-                preds[d].to_csv(path + csv, index=False)
+                preds[d].to_csv(os.path.join(path + csv), index=False)
 
 
 def smooth_distance(path):
@@ -451,7 +451,55 @@ def smooth_distance(path):
             if any(s in csv for s in subdata[:3]):
                 os.remove(os.path.join(path, csv))
             elif "csv" in csv:
-                preds[data[0]].to_csv(path + csv, index=False)
+                preds[data[0]].to_csv(os.path.join(path + csv), index=False)
+
+
+def sa_wrapper(data_path="./data"):
+    """
+    Applies simple average.
+
+    data_path: path to folder with  X * (dev_seen, test_seen & test_unseen) .csv files
+    """
+    # Make sure the lists will be ordered, i.e. test[0] is the same model as devs[0]
+    dev, test, test_unseen = [], [], []
+    dev_probas, test_probas, test_unseen_probas = {}, {}, {} # Never dynamically add to a pd Dataframe
+
+    for csv in sorted(os.listdir(data_path)):
+        print(csv)
+        if ".csv" in csv:
+            if ("dev" in csv) or ("val" in csv):
+                dev.append(pd.read_csv(data_path + csv))
+                dev_probas[csv[:-8]] = pd.read_csv(data_path + csv).proba.values
+            elif "test_unseen" in csv:
+                test_unseen.append(pd.read_csv(data_path + csv))
+                test_unseen_probas[csv[:-14]] = pd.read_csv(data_path + csv).proba.values
+            elif "test" in csv:
+                test.append(pd.read_csv(data_path + csv))
+                test_probas[csv[:-7]] = pd.read_csv(data_path + csv).proba.values
+
+    dev_probas = pd.DataFrame(dev_probas)
+    test_probas = pd.DataFrame(test_probas)
+    test_unseen_probas = pd.DataFrame(test_unseen_probas)
+
+    dev_SA = simple_average(dev_probas, dev[0])
+    test_SA = simple_average(test_probas, test[0])
+    test_unseen_SA = simple_average(test_unseen_probas, test_unseen[0])
+
+    # Create output dir
+    os.makedirs(os.path.join(data_path, args.exp), exist_ok=True)
+
+    for csv in sorted(os.listdir(data_path)):
+        print(csv)
+        if ".csv" in csv:
+            if ("dev" in csv) or ("val" in csv):
+                os.remove(os.path.join(data_path, csv))
+                dev_SA.to_csv(os.path.join(data_path, args.exp, args.exp + "_dev_seen_SA.csv"), index=False)   
+            elif "test_unseen" in csv:
+                os.remove(os.path.join(data_path, csv))
+                test_unseen_SA.to_csv(os.path.join(data_path, args.exp, args.exp + "_test_unseen_SA.csv"), index=False)   
+            elif "test" in csv:
+                os.remove(os.path.join(data_path, csv))
+                test_SA.to_csv(os.path.join(data_path, args.exp, args.exp + "_test_seen_SA.csv"), index=False)
 
 
 def main(path, gt_path="./data/"):
@@ -464,7 +512,6 @@ def main(path, gt_path="./data/"):
     gt_path: Path to folder with ground truth for dev
     """
     # Ground truth
-    gt_path = "data/"
     dev_df = pd.read_json(os.path.join(gt_path, 'dev_seen.jsonl'), lines=True)
 
     # Make sure the lists will be ordered, i.e. test[0] is the same model as devs[0]
@@ -506,7 +553,6 @@ def main(path, gt_path="./data/"):
             print(column, score)
 
         print('-'*50)
-
 
         if loop > 0:
             while len(dev) > 5:
@@ -633,4 +679,9 @@ def main(path, gt_path="./data/"):
     
 if __name__ == "__main__":
     
-    main(args.enspath)
+    if args.enstype == "loop":
+        main(args.enspath)
+    elif args.enstype == "sa":
+        sa_wrapper(args.enspath)
+    else:
+        print(args.enstype, " is not yet enabled. Feel free to add the code :)")
