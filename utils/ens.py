@@ -9,8 +9,6 @@ from scipy.stats import rankdata
 
 import math
 
-from pandas_scripts import create_hashdata
-
 import argparse
 
 
@@ -701,6 +699,8 @@ def main(path, gt_path="./data/"):
     # Cleanup all i/t/o's .jsonl
   
 if __name__ == "__main__":
+    
+    from pandas_scripts import create_hashdata
 
     args = parse_args()
     
