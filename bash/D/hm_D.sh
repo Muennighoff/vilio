@@ -40,6 +40,3 @@ python hm.py --seed 147 --model D \
 
 # Simple Average
 python utils/ens.py --enspath ./data/ --enstype sa --exp D507236
-
-# Add EXPs to differ? 
-# SA as sep. command?

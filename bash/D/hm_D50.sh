@@ -4,7 +4,6 @@
 topk=${1:--1}
 midsave=${2:-2000}
 
-
 # 50 Feats, Seed 49
 cp ./data/hm_vgattr5050.tsv ./data/HM_img.tsv
 
