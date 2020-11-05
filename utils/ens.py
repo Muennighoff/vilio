@@ -572,7 +572,7 @@ def main(path, gt_path="./data/"):
 
     if len(dev_df) > len(dev_probas):
         print("Your predictions do not include the full dev!")
-        dev_df = dev_probas[["id"]].merge(dev_df, how="left", on="id")
+        dev_df = dev[0][["id"]].merge(dev_df, how="left", on="id")
 
     loop, last_score, delta = 0, 0, 0.1
 
