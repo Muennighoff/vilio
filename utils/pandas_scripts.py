@@ -96,6 +96,8 @@ def clean_data(data_path="./data"):
     # Check if the statement was already run and the necessary data exists:
     if os.path.exists(os.path.join(data_path, "pretrain.jsonl")):
         return
+    else:
+        print("Preparing...")
 
     ## Load all files
     train = pd.read_json(os.path.join(data_path, "train.jsonl"), lines=True, orient="records")
