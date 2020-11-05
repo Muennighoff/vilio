@@ -172,7 +172,7 @@ class HM:
 
             for i, (ids, feats, boxes, sent, target) in iter_wrapper(enumerate(loader)):
 
-                if (ups == args.midsave) or ((ups == args.topk) and (args.midsave > 0)):
+                if ups == args.midsave:# or ((ups == args.topk) and (args.midsave > 0)):
                     self.save("MID")
 
                 self.model.train()
