@@ -444,5 +444,5 @@ if __name__ == "__main__":
 
         # Combine & output
         if args.combine:
-            combine_subdata("./data")
+            combine_subdata("./data", exp=args.exp)
 

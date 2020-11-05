@@ -311,12 +311,14 @@ import numpy as np
 import os
 from sklearn.metrics import roc_auc_score
 
-def combine_subdata(path, gt_path="./data/", subtrain=True):
+def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     """
     Combines predictions from submodels & main model.
 
     path: String to directory with csvs of all models
     gt_path: Path to folder with ground truth for dev
+
+    exp: Define an exp to make sure we do not load unrelated csvs
     subpreds: Whether to use preds from subtrained or from the pred on full
     """ 
 
@@ -334,7 +336,7 @@ def combine_subdata(path, gt_path="./data/", subtrain=True):
             if "jsonl" in csv:
                 print("JLoading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
-            if "csv" in csv:
+            if ("csv" in csv) and (exp in csv):
                 print("Loading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
