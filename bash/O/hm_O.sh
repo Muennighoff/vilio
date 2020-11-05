@@ -30,11 +30,11 @@ python pretrain_bertO.py --seed 84 --taskMaskLM --taskMatched --wordMaskRate 0.1
 
 python hm.py --seed 84 --model O \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL126 --subtrain --topk $topk
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL84 --subtrain --topk $topk
 
 python hm.py --seed 84 --model O \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL126 --subtrain --combine --topk $topk
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL84 --subtrain --combine --topk $topk
 
 # 36 Feats, Seed 42
 cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
@@ -44,11 +44,11 @@ python pretrain_bertO.py --seed 42 --taskMaskLM --taskMatched --wordMaskRate 0.1
 
 python hm.py --seed 42 --model O \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL126 --subtrain --topk $topk
+--num_features 36 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL42 --subtrain --topk $topk
 
 python hm.py --seed 42 --model O \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL126 --subtrain --combine --topk $topk
+--num_features 36 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL42 --subtrain --combine --topk $topk
 
 # Simple Average
 python utils/ens.py --enspath ./data/ --enstype sa --exp O505036
