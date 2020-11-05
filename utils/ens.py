@@ -332,8 +332,10 @@ def combine_subdata(path, gt_path="./data/", subtrain=True):
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
             if "jsonl" in csv:
+                print("JLoading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
             if "csv" in csv:
+                print("Loading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
     # Normalize probabilities
@@ -699,7 +701,7 @@ def main(path, gt_path="./data/"):
     # Cleanup all i/t/o's .jsonl
   
 if __name__ == "__main__":
-    
+
     from pandas_scripts import create_hashdata
 
     args = parse_args()
