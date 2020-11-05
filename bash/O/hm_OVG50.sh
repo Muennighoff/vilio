@@ -4,13 +4,16 @@
 topk=${1:--1}
 midsave=${2:-2000}
 
-# 36 Feats, Seed 147
-cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
+# 50 VG feats, Seed 84
+cp ./data/hm_vg5050.tsv ./data/HM_img.tsv
 
-python hm.py --seed 147 --model D \
---train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --subtrain --topk $topk
+python pretrain_bertO.py --seed 84 --taskMaskLM --taskMatched --wordMaskRate 0.15 --train pretrain --tsv --tr bert-large-uncased \
+--batchSize 16 --lr 0.25e-5 --epochs 8 --num_features 50 --loadpre ./data/pytorch_model.bin --topk $topk
 
-python hm.py --seed 147 --model D \
---train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --subtrain --combine --topk $topk
+python hm.py --seed 84 --model O \
+--train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL84 --subtrain --topk $topk
+
+python hm.py --seed 84 --model O \
+--train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp OBL84 --subtrain --combine --topk $topk
