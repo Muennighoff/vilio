@@ -341,35 +341,6 @@ class HM:
         state_dict = new_state_dict
         self.model.load_state_dict(state_dict)
 
-
-def subtrain():
-    """
-    Trains & produces predictions on given input using the LAST model.
-    """
-    hm = HM()
-
-    hm.train(hm.train_tuple, hm.valid_tuple)
-
-    hm.load(os.path.join(hm.output, "LAST.pth"))
-
-    for split in args.test.split(","):
-        if 'test' in split:
-            hm.predict(
-                get_tuple(split, bs=args.batch_size,
-                        shuffle=False, drop_last=False),
-                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
-            )
-        elif 'dev' in split or 'valid' in split or 'train' in split:
-            result = hm.evaluate(
-                get_tuple(split, bs=args.batch_size,
-                        shuffle=False, drop_last=False),
-                dump=os.path.join(args.output, '{}_{}.csv'.format(args.exp, split))
-            )
-            print(result)
-        else:
-            assert False, "No such test option for %s" % args.test
-
-
 def main():
     # Build Class
     hm = HM()
