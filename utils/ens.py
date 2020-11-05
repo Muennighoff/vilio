@@ -35,8 +35,11 @@ def parse_args():
     parser.add_argument(
         "--exp", required=False, type=str, help="Features folder", default="./data/features"
     )
-    return parser
+    # Parse the arguments.
+    args = parser.parse_args()
 
+    return args
+    
 args = parse_args()
 
 ### FUNCTIONS IMPLEMENTING ENSEMBLE METHODS ###
@@ -707,6 +710,7 @@ def main(path, gt_path="./data/"):
 
        
 if __name__ == "__main__":
+
     
     if args.enstype == "loop":
         main(args.enspath)
