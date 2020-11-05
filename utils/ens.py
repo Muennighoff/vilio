@@ -354,7 +354,10 @@ def combine_subdata(path, gt_path="./data/", subtrain=True):
         for x in types:
             df = preds["dev_seen"+i+x].merge(preds["dev_seengt"], on="id")
             if len(df) > 1:
-                scores[x] = roc_auc_score(df["label"], df["proba"+i+x])
+                try: # Fails when only one label present
+                    scores[x] = roc_auc_score(df["label"], df["proba"+i+x])
+                except:
+                    scores[x] = 0
         print(i)
         print(scores)
         if len(scores) > 0:
