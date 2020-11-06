@@ -704,7 +704,7 @@ def main(path, gt_path="./data/"):
   
 if __name__ == "__main__":
 
-    from pandas_scripts import create_hashdata, clean_data, combine_subdata
+    from pandas_scripts import create_hashdata, clean_data
 
     args = parse_args()
     
