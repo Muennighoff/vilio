@@ -340,10 +340,13 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
                 print("Loading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
+    print("PREDS:", preds)
+
     # Normalize probabilities
     for d in data:
         for x in types:
             for i in ["ic", "tc", "oc"]:
+                print(d + i + x)
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
