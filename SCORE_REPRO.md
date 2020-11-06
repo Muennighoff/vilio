@@ -100,7 +100,7 @@ We follow the same procedure as for D-Model, i.e. run `cd vilio; bash /bash/U/hm
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) untar it and place the file model.pth under `vilio/data`.
 For V we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). 
-We use the lmdb features only for V as well as pretraining. After installing PyTorch 1.6, run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
+We use the lmdb features  for V as well as pretraining, so make sure you have installed lmdb as in requirements.txt. After installing PyTorch 1.6, run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.

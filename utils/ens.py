@@ -693,9 +693,9 @@ def main(path, gt_path="./data/"):
     test_unseen_SX.to_csv(os.path.join("/FIN_test_unseen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
 
     # Smooth distances & submerge
-    create_hashdata(jsonl="dev_seen.jsonl")
-    create_hashdata(jsonl="test_seen.jsonl")
-    create_hashdata(jsonl="test_unseen.jsonl")
+    create_hashdata(jsonl="dev_seen")
+    create_hashdata(jsonl="test_seen")
+    create_hashdata(jsonl="test_unseen")
     combine_subdata(path, exp=args.exp, subtrain=False)
     
     #smooth_distance()

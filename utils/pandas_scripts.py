@@ -240,14 +240,14 @@ def create_subdata(data_path="./data"):
         test_unseen = dists[i].loc[dists[i].identity == "test_unseen"][["id", "img", "text"]]
         test_unseen.to_json(data_path + '/test_unseen_' + i + '.jsonl', lines=True, orient="records")
 
-def create_hashdata(data_path="./data", jsonl="test_unseen.jsonl"):
+def create_hashdata(data_path="./data", jsonl="test_unseen"):
     """
     Used for smoothing & distances!
     In contrast to create_subdata; we create it within the data here, not globally
 
     jsonl: json lines file with img entry
     """
-    df = pd.read_json(os.path.join(data_path, jsonl), lines=True, orient="records")
+    df = pd.read_json(os.path.join(data_path, jsonl + ".jsonl"), lines=True, orient="records")
     df['full_path'] = df['img'].apply(lambda x: os.path.join(data_path, str(x)))
 
     funcs = [phash, whash, dhash, wdbhash, wsymhash, wbiorhash, wrbiohash, wdmeyhash]
@@ -261,8 +261,8 @@ def create_hashdata(data_path="./data", jsonl="test_unseen.jsonl"):
     df["text_clean"] = df["text"].str.replace('"', '')
     df["text_dups"] = df["text_clean"].apply(lambda x: df.loc[df['text_clean'] == x].id.values)
 
-    df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "ic", lines=True, orient="records")
+    df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "_ic.jsonl", lines=True, orient="records")
 
-    df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "tc", lines=True, orient="records")
+    df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "_tc.jsonl", lines=True, orient="records")
 
-    df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "oc", lines=True, orient="records")
+    df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "_oc.jsonl", lines=True, orient="records")
