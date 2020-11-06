@@ -698,7 +698,7 @@ def main(path, gt_path="./data/"):
     #create_hashdata(jsonl="test_unseen")
 
     #create_subdata("./data")
-    #combine_subdata(path, exp=args.exp, subtrain=False)
+    combine_subdata(path, exp=args.exp, subtrain=False)
     
     #smooth_distance()
 
