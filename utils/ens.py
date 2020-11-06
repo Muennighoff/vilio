@@ -694,9 +694,11 @@ def main(path, gt_path="./data/"):
 
     # Smooth distances & submerge
     create_hashdata(jsonl="dev_seen")
-    create_hashdata(jsonl="test_seen")
-    create_hashdata(jsonl="test_unseen")
-    combine_subdata(path, exp=args.exp, subtrain=False)
+    #create_hashdata(jsonl="test_seen")
+    #create_hashdata(jsonl="test_unseen")
+
+    #create_subdata("./data")
+    #combine_subdata(path, exp=args.exp, subtrain=False)
     
     #smooth_distance()
 
@@ -704,7 +706,7 @@ def main(path, gt_path="./data/"):
   
 if __name__ == "__main__":
 
-    from pandas_scripts import create_hashdata, clean_data
+    from pandas_scripts import create_hashdata, clean_data, create_subdata
 
     args = parse_args()
     

@@ -254,6 +254,7 @@ def create_hashdata(data_path="./data", jsonl="test_unseen"):
 
     # Apply all hash funcs
     for f in funcs:
+        print("DOING:", f.__name__)
         df[f.__name__] = df['full_path'].apply(lambda x: f(x))
         df[f.__name__ + "_dups"] = df[f.__name__].apply(lambda x: df.loc[df[f.__name__] == x].id.values)
 

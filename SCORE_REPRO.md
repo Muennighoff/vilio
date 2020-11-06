@@ -91,41 +91,32 @@ Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAl
 The file `vilio/bash/D/hm_D.sh` will run the model on three different features & seeds and then simple average them. First to make sure everything works correctly, run the file once with only a tiny part of data by changing the midsave & topk arguments, for example as follows: `cd vilio; bash /bash/D/hm_D.sh 20 5`. This will run the file with only 10 images. If there are any file errors make sure the the necessary files are under vilio/data as outlined above. Else raise an issue and I will look into it. If there are no apparent errors, run `cd vilio; bash /bash/D/hm_D.sh`. On a P100, each model takes around 4 hours, hence it will run for **~12h**. If that's too long, we also provide .sh files separating the steps. For separating the steps run `cd vilio; bash /bash/D/hm_D36.sh`, `cd vilio; bash /bash/D/hm_D50.sh`, `cd vilio; bash /bash/D/hm_D72.sh`, make sure to save the csv files (3 per run) (? Perhaps in subfolders) and then run `cd vilio; bash /bash/D/hm_DSA.sh` to simple average the results. This will create a new dir within ./data/ named after the experiment (D365072), where it will store the final **3 csvs (dev_seen, test_seen, test_unseen)** for the D-Model, which will go into the final ensemble. If you plan to reset your environment, make sure to save those 3 csvs, everything else can be discarded.
 
 - O-Model:
-Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take `/large-vg-labels/ep_20_590000/pytorch_model.bin`, and place the file pytorch_model.bin under `vilio/data/pytorch_model.bin`. Everything is the same as for the D-Model, except that we also perform task-specific pretraining using pretrain_bertO.py, which increases running time. Run `cd vilio; bash /bash/O/hm_O.sh` to run all three feats + simple averaging **(~27h)**. Alternatively, run `cd vilio; bash /bash/O/hm_O50VG.sh`, `cd vilio; bash /bash/O/hm_O50ATT.sh` and `cd vilio; bash /bash/O/hm_O36ATT.sh` (I didn't have the memory to run 72 feats for O, but you could run that as well). Then run  `cd vilio; bash /bash/D/hm_OSA.sh` and make sure you do not discard those final 3 csvs in the folder `./data/O365050`. You can run a quick test via e.g. `cd vilio; bash /bash/O/hm_O.sh 20 5`.
+Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take `/large-vg-labels/ep_20_590000/pytorch_model.bin`, and place the file pytorch_model.bin under `vilio/data/pytorch_model.bin`. Everything is the same as for the D-Model, except that we also perform task-specific pretraining using pretrain_bertO.py, which increases running time. Run `cd vilio; bash /bash/O/hm_O.sh` to run all three feats + simple averaging **(~27h)**. Alternatively, run `cd vilio; bash /bash/O/hm_OV50.sh`, `cd vilio; bash /bash/O/hm_O50.sh` and `cd vilio; bash /bash/O/hm_O36.sh` (I didn't have the memory to run 72 feats for O, hence we run O50, once with vgattr extraction, once with vg extraction). Then run `cd vilio; bash /bash/D/hm_OSA.sh` and make sure you do not discard those final 3 csvs in the folder `./data/O365050`. You can run a quick test via e.g. `cd vilio; bash /bash/O/hm_O.sh 20 5`.
 
 - U-Model:
 Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
-We follow the same procedure as for D-Model, i.e. run `cd vilio; bash /bash/U/hm_U.sh`. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total: **~16h**.
+We follow the same procedure as for D-Model, i.e. run `cd vilio; bash /bash/U/hm_U.sh`. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U72.sh` `cd vilio; bash /bash/U/hm_USA.sh`. You can run a test with `cd vilio; bash /bash/U/hm_U.sh 20 5`. P100 Runtime in total: **~16h**.
 
 - V-Model:
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) untar it and place the file model.pth under `vilio/data`.
 For V we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). 
-We use the lmdb features  for V as well as pretraining, so make sure you have installed lmdb as in requirements.txt. After installing PyTorch 1.6, run `cd vilio; bash /bash/V/hm_V.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/U/hm_U36.sh`, `cd vilio; bash /bash/U/hm_U50.sh`, `cd vilio; bash /bash/U/hm_U50.sh` `cd vilio; bash /bash/U/hm_USA.sh` P100 Runtime in total:  **~12h**.
+We use the lmdb features  for V as well as pretraining, so make sure you have installed lmdb as in requirements.txt. After installing PyTorch 1.6, run `cd vilio; bash /bash/V/hm_V.sh`to extract lmdb feats, run three different seeds and averaging. Alternatively run `cd vilio; bash /bash/V/hm_VLMDB.sh` to extract lmdb feats and then `cd vilio; bash /bash/V/hm_V45.sh`, `cd vilio; bash /bash/V/hm_V90.sh`, `cd vilio; bash /bash/V/hm_V135.sh`, followed by `cd vilio; bash /bash/V/hm_VSA.sh`. If you want to test, I recommend just running one of the single bash files with extraction before, which should run in around 4 hours (Modify the epochs parameter to test quicker). P100 Runtime in total:  **~12h**.
 
 - X-Model:
 Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
-For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash /bash/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/X/hm_X36.sh`, `cd vilio; bash /bash/X/hm_X50.sh`, `cd vilio; bash /bash/X/hm_X50.sh` `cd vilio; bash /bash/X/hm_XSA.sh` P100 Runtime in total:  **~15h**.
+For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash /bash/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash /bash/X/hm_X36.sh`, `cd vilio; bash /bash/X/hm_X50.sh`, `cd vilio; bash /bash/X/hm_X72.sh` `cd vilio; bash /bash/X/hm_XSA.sh`.  You can run a test with `cd vilio; bash /bash/X/hm_X.sh 20 5`. P100 Runtime in total:  **~15h**.
 
 
 2. PaddlePaddle / E:
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie-vil/hm/data`
-Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. 
+Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. In my experience, Ernie (L, then S) is the best performing model. 
 
 - E - Large:
-Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. 
-
-Run `cd vilio/ernie-vil; bash hm_EL`. On my setup this would run for around 19 hours, as it runs 5 different features. If that's too long, you can run the five bash scripts in x?. 
+Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. Next run `cd vilio/ernie-vil; bash /bash/EL/hm_EL.sh`On my setup this would run for **~19h**, as it runs 5 different features. If that's too long, you can run `cd vilio/ernie-vil; bash /bash/EL/hm_EL36.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELV50.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_EL72.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELVCR36.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELVCR72.sh`, followed by `cd vilio/ernie-vil; bash /bash/EL/hm_ELSA.sh`. I am not very advanced in PaddlePaddle, but do let me know if there are any issues. (When the output ends with _2950 Aborted (core dumped)_, that is normal).
 
 - E - Small:
-Download the pre-trained models here and here.
+Download the pre-trained model SMALL PRETRAINED here and here.
 
-Plan:
-Double all dev/test files in len; also train
-Regenerate subdata! > Add it to the hm_finetuning file
-
-> Ernie is written in PaddlePaddle and makes for a bit more complicated running; It is however the best performing model of all (by about 2% absolute RCAC on the HM challenge)
-> Run ERV-S shell 
-> Run ERV-L shell
 
 ## Ensembling
 
@@ -139,5 +130,12 @@ Following features:
 
 Following weights:
 - Re-train all using vilio? 
+
+Provide 4 weights per model. 
+
+> How?
+a) Provide devs + 4 weights > Need to run 4 cmds as 4x loading
+b) Provide 4 * 3 weights (seeds)
+c
 
 # > Create a notebook with everything in one
