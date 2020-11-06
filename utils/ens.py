@@ -404,7 +404,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
                 preds[d].to_csv(os.path.join(path, csv), index=False)
 
 
-def smooth_distance(path):
+def smooth_distance(path, exp=""):
     """
     Similar to label smoothing, smoothes the distance between predictions based on similar data. 
 
@@ -418,14 +418,20 @@ def smooth_distance(path):
     preds = {}
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
-            if "jsonl" in csv:
+            if ("jsonl" in csv) and any(s in csv for s in subdata):
                 preds[data[0] + [s for s in subdata if s in csv][0]] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
-            if "csv" in csv:
+            if (".csv" in csv) and (exp in csv):
+                print(csv)
                 preds[data[0]] = pd.read_csv(os.path.join(path, csv))
-
+                print(preds[data[0]])
+    
+    print(preds[data[0]])
+    
     preds[data[0] + subdata[0]] = pd.concat([preds[data[0] + subdata[0]], preds[data[0] + subdata[1]], preds[data[0] + subdata[2]]])
     preds[data[0] + subdata[0]].drop_duplicates(subset=["id"], inplace=True)
     preds[data[0] + subdata[0]] = preds[data[0]].merge(preds[data[0] + subdata[0]], on="id")
+    
+    print(preds[data[0]])
 
 
     def smooth(x):
@@ -465,11 +471,10 @@ def smooth_distance(path):
 
     # Cleanup & output
     for csv in sorted(os.listdir(path)):
-        if any(d in csv for d in data):
-            if any(s in csv for s in subdata[:3]):
-                os.remove(os.path.join(path, csv))
-            elif "csv" in csv:
-                preds[data[0]].to_csv(os.path.join(path, csv), index=False)
+        if any(s in csv for s in subdata):
+            os.remove(os.path.join(path, csv))
+        elif (".csv" in csv) and (exp in csv) and any(d in csv for d in data):
+            preds[data[0]].to_csv(os.path.join(path, csv), index=False)
 
 
 def sa_wrapper(data_path="./data"):
@@ -678,7 +683,7 @@ def main(path, gt_path="./data/"):
         if loop == 2:
             break
     
-    print("Finished with {} after {} loops.".format(last_score, loop))
+    print("Currently at {} after {} loops.".format(last_score, loop))
 
     # Get accuracy thresholds & optimize (This does not add value to the roc auc, but just to also have an acc score)
     fpr, tpr, thresholds = metrics.roc_curve(dev_df.label, dev_SX.proba)
@@ -698,10 +703,9 @@ def main(path, gt_path="./data/"):
     create_hashdata(jsonl="test_unseen")
 
     combine_subdata(path, exp=args.exp, subtrain=False)
-    
-    smooth_distance(path)
+    smooth_distance(path, exp=args.exp)
 
-    # Cleanup all i/t/o's .jsonl
+    print("Finished.")
   
 if __name__ == "__main__":
 
