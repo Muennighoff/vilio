@@ -694,13 +694,12 @@ def main(path, gt_path="./data/"):
 
     # Smooth distances & submerge
     create_hashdata(jsonl="dev_seen")
-    #create_hashdata(jsonl="test_seen")
-    #create_hashdata(jsonl="test_unseen")
+    create_hashdata(jsonl="test_seen")
+    create_hashdata(jsonl="test_unseen")
 
-    #create_subdata("./data")
     combine_subdata(path, exp=args.exp, subtrain=False)
     
-    #smooth_distance()
+    smooth_distance()
 
     # Cleanup all i/t/o's .jsonl
   
