@@ -699,7 +699,7 @@ def main(path, gt_path="./data/"):
 
     combine_subdata(path, exp=args.exp, subtrain=False)
     
-    smooth_distance()
+    smooth_distance(path)
 
     # Cleanup all i/t/o's .jsonl
   
