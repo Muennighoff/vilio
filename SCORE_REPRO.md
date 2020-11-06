@@ -129,9 +129,7 @@ Regenerate subdata! > Add it to the hm_finetuning file
 
 ## Ensembling
 
-1. Ensembling
-> Place all files in data (Should be 3 csv's per model (dev, test, test_unseen) for a total of 21 csvs) - > Run ens.sh 
-
+Take the csvs from all models (In their respective experiment folders) and create a folder named `vilio/data/ensemble` where you place the 3 csvs (dev_seen, test_seen, test_unseen) for each model. If you ran all 7 models, then you should have 21 csv files in that folder. (D, O, U, V, X, ES, EL). Now run `cd vilio; bash /bash/ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `/vilio` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
 
 ## Inference-only
@@ -139,9 +137,7 @@ Regenerate subdata! > Add it to the hm_finetuning file
 Following features:
 - Reextract?
 
-
 Following weights:
 - Re-train all using vilio? 
-
 
 # > Create a notebook with everything in one

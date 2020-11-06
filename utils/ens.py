@@ -688,9 +688,9 @@ def main(path, gt_path="./data/"):
 
     # Set path instd of /k/w ; Remove all csv data / load the exact same 3 files again as put out
     # As Simplex at some point simply weighs the highest of all - lets take sx as the final prediction after x loops
-    dev_SX.to_csv("/kaggle/working/ens_dev_" + args.exp + "_" + str(loop) + ".csv", index=False)
-    test_SX.to_csv("/kaggle/working/ens_test_" + args.exp + "_" + str(loop) + ".csv", index=False)
-    test_unseen_SX.to_csv("/kaggle/working/ens_test_unseen" + args.exp + "_" + str(loop) + ".csv", index=False)
+    dev_SX.to_csv("./FIN_dev_seen_" + args.exp + "_" + str(loop) + ".csv", index=False)
+    test_SX.to_csv("./FIN_test_seen_" + args.exp + "_" + str(loop) + ".csv", index=False)
+    test_unseen_SX.to_csv("./FIN_test_unseen_" + args.exp + "_" + str(loop) + ".csv", index=False)
 
     # Smooth distances & submerge
     #create_hashdata("dev_seen.jsonl")
@@ -704,7 +704,7 @@ def main(path, gt_path="./data/"):
   
 if __name__ == "__main__":
 
-    from pandas_scripts import create_hashdata
+    from pandas_scripts import create_hashdata, clean_data, combine_subdata
 
     args = parse_args()
     
