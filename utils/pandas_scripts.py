@@ -22,9 +22,9 @@ def dhash(img_path):
     dhash = imagehash.dhash(Image.open(img_path))
     return dhash
 
-def wdbhash(img_path):
-    wdbhhash = imagehash.whash(Image.open(img_path), mode='db4')
-    return wdbhash
+def wcoifhash(img_path):
+    wcoifhash = imagehash.whash(Image.open(img_path), mode='coif4')
+    return wcoifhash
 
 def wsymhash(img_path):
     wsymhash = imagehash.whash(Image.open(img_path), mode='sym4')
@@ -250,7 +250,7 @@ def create_hashdata(data_path="./data", jsonl="test_unseen"):
     df = pd.read_json(os.path.join(data_path, jsonl + ".jsonl"), lines=True, orient="records")
     df['full_path'] = df['img'].apply(lambda x: os.path.join(data_path, str(x)))
 
-    funcs = [phash, whash, dhash, wdbhash, wsymhash, wbiorhash, wrbiohash, wdmeyhash]
+    funcs = [phash, whash, dhash, wcoifhash, wsymhash, wbiorhash, wrbiohash, wdmeyhash]
 
     # Apply all hash funcs
     for f in funcs:
