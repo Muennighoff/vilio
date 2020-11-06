@@ -1,6 +1,8 @@
 
 # Outline to reproduce the ROC-AUC score on Hateful Memes
 
+Below follows an overview of the repo and the full outline to reproduce the results on the Hateful Memes Challenge hosted Facebook & DrivenData. If you run into any issue (no matter how small) do send me an email at n.muennighoff@gmail.com. Also contact me / open a PR if you have improvements for the structure or code of this repository. 
+
 For the purpose of having everything in one repo, I combined three separate repo's here, which should be treated as separate (in terms of package requirements, as they conflict):
 - py-bottom-up (Only for the purpose of feature extraction)
 - ernie-vil (For running E-Models)
@@ -75,7 +77,7 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 - Download the updated train.jsonl, dev_seen.jsonl, dev_unseen.jsonl, test_seen.jsonl, test_unseen.jsonl from the HM Challenge and place them in BOTH the data folder under `vilio/data` and the data folder under `vilio/ernie-vil/data/hm`
 
 
-## Individual Model Pretraining & Training
+## Individual Model Pretraining & Training & Inference
 
 1. PyTorch / D O U V X :
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
@@ -123,7 +125,23 @@ Download the pre-trained model SMALL PRETRAINED here and here.
 Take the csvs from all models (In their respective experiment folders) and create a folder named `vilio/data/ensemble` where you place the 3 csvs (dev_seen, test_seen, test_unseen) for each model. If you ran all 7 models, then you should have 21 csv files in that folder. (D, O, U, V, X, ES, EL). Now run `cd vilio; bash /bash/ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `/vilio` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
 
-## Inference-only
+## Inference-Only
+
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have set up a Notebook with the exact inference pipeline on kaggle accessible here. All you need to do is download the hatefulmemes data and make it accessible. I have uploaded the following to kaggle datasets:
+
+Features:
+- hm_vgattr3636.tsv
+- hm_vgattr5050.tsv
+- hm_vgattr7272.tsv
+- hm_vgattr10100.tsv
+- hm_vg5050.tsv
+- hm_vg10100.tsv
+
+Weights:
+- D36
+
+
+
 
 Following features:
 - Reextract?

@@ -14,34 +14,6 @@ def phash(img_path):
     phash = imagehash.phash(Image.open(img_path))
     return phash
 
-def whash(img_path):
-    whash = imagehash.whash(Image.open(img_path))
-    return whash
-
-def dhash(img_path):
-    dhash = imagehash.dhash(Image.open(img_path))
-    return dhash
-
-def wdbhash(img_path):
-    wdbhhash = imagehash.whash(Image.open(img_path), mode='db4')
-    return wdbhash
-
-def wsymhash(img_path):
-    wsymhash = imagehash.whash(Image.open(img_path), mode='sym4')
-    return wsymhash
-
-def wbiorhash(img_path):
-    wcoifhash = imagehash.whash(Image.open(img_path), mode='bior4.4')
-    return wcoifhash
-
-def wrbiohash(img_path):
-    wcoifhash = imagehash.whash(Image.open(img_path), mode='rbio4.4')
-    return wcoifhash
-
-def wdmeyhash(img_path):
-    wdmeyhash = imagehash.whash(Image.open(img_path), mode='dmey')
-    return wdmeyhash
-
 def crude_hash(img_path):
     """
     The function generates a hash based on simple comparisons such as dimensions of an image
@@ -79,7 +51,6 @@ def crude_hash(img_path):
             
     hash_v = str(img.shape[0]) + str(img.shape[1]) + str(img[row_val, col_val, 0]) + str(img[row_val, col_val, 1]) + str(img[row_val, col_val, 2])    
     return hash_v
-
 
 ### Data Cleaning
 
@@ -183,7 +154,7 @@ def create_subdata(data_path="./data"):
     data_path: Path to data folder containing all jsonl's & images under /img
     """
     # Check if the statement was already run and the necessary data exists:
-    if os.path.exists(os.path.join(data_path, "train_ic.jsonl")):
+    if os.path.exists(os.path.join(data_path, "train_s1.jsonl")):
         return
     else:
         print("Preparing...")
@@ -215,15 +186,15 @@ def create_subdata(data_path="./data"):
 
     dists = {}
     # Create ic dist to focus on data with similar text
-    dists["ic"] = full_dist[full_dist["text_dups"].map(len) > 1].copy()
+    dists["s1"] = full_dist[full_dist["text_dups"].map(len) > 1].copy()
 
     # Create tc dist to focus on data with similar images
-    dists["tc"] = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
+    dists["s2"] = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
 
     # Create oc dist to focus on all the rest; i.e. on the diverse part
-    dists["oc"] = full_dist[~((full_dist['id'].isin(dists["ic"].id.values)) | (full_dist['id'].isin(dists["tc"].id.values)))]
+    dists["s3"] = full_dist[~((full_dist['id'].isin(dists["s1"].id.values)) | (full_dist['id'].isin(dists["s2"].id.values)))]
 
-    for i in ["ic", "tc", "oc"]:
+    for i in ["s1", "s2", "s3"]:
     
         train = dists[i].loc[dists[i].identity == "train"][["id", "img", "label", "text"]]
         train.to_json(data_path + '/train_' + i + '.jsonl', lines=True, orient="records")
