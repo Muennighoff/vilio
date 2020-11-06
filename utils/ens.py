@@ -323,7 +323,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     """ 
 
     data = ["dev_seen", "test_seen", "test_unseen"]
-    subdata = ["ic", "tc", "oc", ""]
+    subdata = ["s1", "s2", "s3", ""]
     if subtrain:
         types = ["", "gt"]
     else:
@@ -340,34 +340,31 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
                 print("Loading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
-    print("PREDS:", preds)
-
     # Normalize probabilities
     for d in data:
         for x in types:
-            for i in ["ic", "tc", "oc"]:
-                print(d + i + x)
+            for i in ["s1", "s2", "s3"]:
                 if x == "gt":
                     preds[d+i+x] = preds[d+i+x].merge(preds[d], on="id")
                 preds[d+i+x]["proba"+i+x] = preds[d+i+x]["proba"]
                 preds[d+i+x]["proba"+i+x] = (preds[d+i+x]["proba"+i+x] - preds[d+i+x]["proba"+i+x].min())/(preds[d+i+x]["proba"+i+x].max()-preds[d+i+x]["proba"+i+x].min())
                 preds[d+i+x] = preds[d+i+x][["id", "proba"+i+x]]    
-            preds[d+"itc"+x] = preds[d+"ic"+x].merge(preds[d+"tc"+x], on="id", how="inner")
-            preds[d+"itc"+x]["proba"+"itc"+x] = (preds[d+"itc"+x]["proba"+"ic"+x] + preds[d+"itc"+x]["proba"+"tc"+x])/2
-            preds[d+"itc"+x] = preds[d+"itc"+x][["id", "proba"+"itc"+x]]
-            for i in ["ic", "tc"]:
-                preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"itc"+x].id.values)]
+            preds[d+"s4"+x] = preds[d+"s1"+x].merge(preds[d+"s2"+x], on="id", how="inner")
+            preds[d+"s4"+x]["proba"+"s4"+x] = (preds[d+"s4"+x]["proba"+"s1"+x] + preds[d+"s4"+x]["proba"+"s2"+x])/2
+            preds[d+"s4"+x] = preds[d+"s4"+x][["id", "proba"+"s4"+x]]
+            for i in ["s1", "s2"]:
+                preds[d+i+x] = preds[d+i+x].loc[~preds[d+i+x].id.isin(preds[d+"s4"+x].id.values)]
         
     # Combine
     for d in data:
-        for i in ["ic", "tc", "oc", "itc"]:
+        for i in ["s1", "s2", "s3", "s4"]:
             for x in types:
                 preds[d] = preds[d].merge(preds[d+i+x], on="id", how="left")
         preds[d].fillna(0, inplace=True)
         
     # Decide on probas
     fin_probas = ["proba"]
-    for i in ["ic", "tc", "oc", "itc"]:
+    for i in ["s1", "s2", "s3", "s4"]:
         scores = {}
         for x in types:
             df = preds["dev_seen"+i+x].merge(preds["dev_seengt"], on="id")
@@ -416,7 +413,7 @@ def smooth_distance(path):
     """
     # Load data
     data = ["test_unseen"]
-    subdata = ["ic", "tc", "oc"]
+    subdata = ["s1", "s2", "s3"]
 
     preds = {}
     for csv in sorted(os.listdir(path)):

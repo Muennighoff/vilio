@@ -403,7 +403,7 @@ if __name__ == "__main__":
         args.midsave = -1
         args.loadpre = None
 
-        for i in ["_ic", "_tc", "_oc"]:
+        for i in ["_s1", "_s2", "_s3"]:
             args.train = arg_tr + i
             args.valid = arg_va + i
             new_test = ''

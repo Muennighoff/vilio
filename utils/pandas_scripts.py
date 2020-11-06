@@ -183,7 +183,7 @@ def create_subdata(data_path="./data"):
     data_path: Path to data folder containing all jsonl's & images under /img
     """
     # Check if the statement was already run and the necessary data exists:
-    if os.path.exists(os.path.join(data_path, "train_ic.jsonl")):
+    if os.path.exists(os.path.join(data_path, "train_s1.jsonl")):
         return
     else:
         print("Preparing...")
@@ -214,16 +214,16 @@ def create_subdata(data_path="./data"):
     full_dist["crhash_dups"] = full_dist["crhash"].apply(lambda x: full_dist.loc[full_dist['crhash'] == x].id.values)
 
     dists = {}
-    # Create ic dist to focus on data with similar text
-    dists["ic"] = full_dist[full_dist["text_dups"].map(len) > 1].copy()
+    # Create s1 dist to focus on data with similar text
+    dists["s1"] = full_dist[full_dist["text_dups"].map(len) > 1].copy()
 
-    # Create tc dist to focus on data with similar images
-    dists["tc"] = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
+    # Create s2 dist to focus on data with similar images
+    dists["s2"] = full_dist[(full_dist["phash_dups"].map(len) + full_dist["crhash_dups"].map(len)) > 2].copy()
 
-    # Create oc dist to focus on all the rest; i.e. on the diverse part
-    dists["oc"] = full_dist[~((full_dist['id'].isin(dists["ic"].id.values)) | (full_dist['id'].isin(dists["tc"].id.values)))]
+    # Create s3 dist to focus on all the rest; i.e. on the diverse part
+    dists["s3"] = full_dist[~((full_dist['id'].isin(dists["s1"].id.values)) | (full_dist['id'].isin(dists["s2"].id.values)))]
 
-    for i in ["ic", "tc", "oc"]:
+    for i in ["s1", "s2", "s3"]:
     
         train = dists[i].loc[dists[i].identity == "train"][["id", "img", "label", "text"]]
         train.to_json(data_path + '/train_' + i + '.jsonl', lines=True, orient="records")
@@ -261,8 +261,8 @@ def create_hashdata(data_path="./data", jsonl="test_unseen"):
     df["text_clean"] = df["text"].str.replace('"', '')
     df["text_dups"] = df["text_clean"].apply(lambda x: df.loc[df['text_clean'] == x].id.values)
 
-    df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "_ic.jsonl", lines=True, orient="records")
+    df[sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)].to_json(os.path.join(data_path, jsonl) + "_s1.jsonl", lines=True, orient="records")
 
-    df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "_tc.jsonl", lines=True, orient="records")
+    df[df["text_dups"].map(len) > 1].to_json(os.path.join(data_path, jsonl) + "_s2.jsonl", lines=True, orient="records")
 
-    df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "_oc.jsonl", lines=True, orient="records")
+    df[~((sum(df[f.__name__ + "_dups"].map(len) for f in funcs) > len(funcs)) | (df["text_dups"].map(len) > 1))].to_json(os.path.join(data_path, jsonl) + "_s3.jsonl", lines=True, orient="records")
