@@ -546,8 +546,8 @@ def main(path, gt_path="./data/"):
                 test_unseen.append(pd.read_csv(os.path.join(path, csv)))
                 test_unseen_probas[csv[:-14]] = pd.read_csv(os.path.join(path, csv)).proba.values
             elif "test" in csv:
-                test.append(pd.read_csv(os.path.join(path + csv)))
-                test_probas[csv[:-7]] = pd.read_csv(os.path.join(path + csv)).proba.values
+                test.append(pd.read_csv(os.path.join(path, csv)))
+                test_probas[csv[:-7]] = pd.read_csv(os.path.join(path, csv)).proba.values
 
 
     dev_probas = pd.DataFrame(dev_probas)
