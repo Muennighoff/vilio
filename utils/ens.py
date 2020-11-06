@@ -690,7 +690,7 @@ def main(path, gt_path="./data/"):
     # As Simplex at some point simply weighs the highest of all - lets take sx as the final prediction after x loops
     dev_SX.to_csv(os.path.join(path, "/FIN_dev_seen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
     test_SX.to_csv(os.path.join(path, "/FIN_test_seen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
-    test_unseen_SX.to_csv(os.path.join("/FIN_test_unseen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
+    test_unseen_SX.to_csv(os.path.join(path, "/FIN_test_unseen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
 
     # Smooth distances & submerge
     create_hashdata(jsonl="dev_seen")
