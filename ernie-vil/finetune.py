@@ -31,7 +31,7 @@ from model.ernie_vil import ErnieVilModel, ErnieVilConfig
 from optim.optimization import optimization
 from utils.args import print_arguments
 from utils.init import init_checkpoint, init_pretraining_params
-from utils.pandas_scripts import clean_data, create_subdata, double_data
+from utils.pandas_scripts import clean_data, create_subdata, double_data, combine_subdata
 from args.finetune_args import parser
 
 import paddle.fluid as fluid
@@ -547,6 +547,8 @@ if __name__ == '__main__':
 
     main(args)
 
+    print("aRe we alive?")
+    
     # Combine & output
-    #if args.combine:
-    #    combine_subdata("./data")
+    if args.combine:
+        combine_subdata("./data/hm", gt_path="./data/hm", exp=args.exp)
