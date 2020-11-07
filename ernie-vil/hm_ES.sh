@@ -17,7 +17,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_2500 \
 ./data/log \
-val ES36 False
+dev_seen ES36 False
 
 # Midsave
 
@@ -37,7 +37,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-vals1 ES36 False
+dev_seens1 ES36 False
 
 # SUB2
 
@@ -53,7 +53,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-vals2 ES36 False
+dev_seens2 ES36 False
 
 # SUB3
 
@@ -69,7 +69,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-vals3 ES36 False
+dev_seens3 ES36 False
 
 ##################### TRAINDEV
 
@@ -86,7 +86,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_2500 \
 ./data/log \
-test ES36 False
+test_seen ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
@@ -113,7 +113,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-tests1 ES36 False
+test_seens1 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
@@ -136,7 +136,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-tests2 ES36 False
+test_seens2 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
@@ -159,7 +159,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/ernie_vil_config.base.json \
 ./output_hm/step_1250 \
 ./data/log \
-tests3 ES36 False
+test_seens3 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
