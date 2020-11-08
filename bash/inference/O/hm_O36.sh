@@ -13,4 +13,4 @@ python hm.py --seed 42 --model O \
 
 python hm.py --seed 42 --model O \
 --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 36 --loadfin $loadfin --exp O36 --subtest --combine
+--num_features 36 --loadfin $loadfin2 --exp O36 --subtest --combine

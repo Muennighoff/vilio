@@ -12,5 +12,5 @@ python hm.py --seed 98 --model D \
 --num_features 72 --loadfin $loadfin --exp D72 --subtest
 
 python hm.py --seed 98 --model D \
---test dev_seen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 72 --loadfin $loadfin --exp D72 --subtest --combine
+--test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
+--num_features 72 --loadfin $loadfin2 --exp D72 --subtest --combine
