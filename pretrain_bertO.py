@@ -429,6 +429,7 @@ class LXMERT:
 
 if __name__ == "__main__":
 
+    print("HELLO?!")
     # Create pretrain.jsonl & traindev data
     clean_data("./data")
 
