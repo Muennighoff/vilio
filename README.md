@@ -28,37 +28,49 @@
 Vilio aims to replicate the organization of huggingface's transformer repo at:
 https://github.com/huggingface/transformers
 
-- src/models
-All implemented models (also see below for a quick overview of models)
+- /bash
+Shell files to reproduce hateful memes results
 
-- /postprocessing
-Scripts applied for postprocessing & ensembling in the hateful memes challenge
+- /data
+By default, directory for loading in data & saving checkpoints
+
+- /ernie-vil
+Ernie-vil sub-repository written in PaddlePaddle
+
+- /fts_lmdb
+Scripts for handling .lmdb extracted features
+
+- /fts_tsv
+Scripts for handling .tsv extracted features
 
 - /notebooks
-Jupyter Notebooks to fully reproduce results
+Jupyter Notebooks for demonstration & reproducibility
 
-- /tools
-Tools that did not add value, but may in the future and hence have been archived for the purpose of structure (e.g. adding textb to OSCAR...)
+- /py-bottm-up-attention
+Sub-repository for tsv feature extraction forked & adapted from [here](https://github.com/airsplay/py-bottom-up-attention)
+
+- src/vilio
+All implemented models (also see below for a quick overview of models)
+
+- /utils
+Pandas & ensembling scripts for data handling
 
 - entry.py files
 Scripts used to access the models and apply model-specific data preparation
 
 - pretrain.py files
-Same purpose as entry files, but for pre-training
+Same purpose as entry files, but for pre-training; Point of entry for pre-training
 
 - hm.py
-Training code for the hateful memes challenge
+Training code for the hateful memes challenge; Main point of entry
 
 - param.py
 Args for running hm.py
 
-- data files
-Data loading files specific for the hateful memes challenge (They can be easily adapted to fit other datasets)
-
 
 ## Usage
 
-Follow SCORE_REPROD.md
+Follow SCORE_REPRO.md
 
 
 ## Architectures

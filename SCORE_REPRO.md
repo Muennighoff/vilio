@@ -117,7 +117,7 @@ Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirem
 Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. Next run `cd vilio/ernie-vil; bash /bash/EL/hm_EL.sh`On my setup this would run for **~19h**, as it runs 5 different features. If that's too long, you can run `cd vilio/ernie-vil; bash /bash/EL/hm_EL36.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELV50.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_EL72.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELVCR36.sh`, `cd vilio/ernie-vil; bash /bash/EL/hm_ELVCR72.sh`, followed by `cd vilio/ernie-vil; bash /bash/EL/hm_ELSA.sh`. I am not yet very advanced in PaddlePaddle, but definitely let me know if there are any issues. (When the output ends with _2950 Aborted (core dumped)_, that is normal).
 
 - E - Small:
-Download the pre-trained model SMALL PRETRAINED here and here.
+Download the pre-trained model SMALL PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-base-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`.
 
 
 ## Ensembling
@@ -127,7 +127,7 @@ Take the csvs from all models (In their respective experiment folders) and creat
 
 ## Inference-Only
 
-The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have set up a Notebook with the exact inference pipeline on kaggle accessible here. All you need to do is download the hatefulmemes data and make it accessible. I have uploaded the following to kaggle datasets:
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have set up a Notebook with the exact inference pipeline on kaggle accessible here. All you need to do is download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`. You can also choose to just download the following datasets:
 
 Features:
 - hm_vgattr3636.tsv
@@ -137,8 +137,10 @@ Features:
 - hm_vg5050.tsv
 - hm_vg10100.tsv
 
-Weights:
+Weights (6 ckpts per Model):
 - D36
+- D50
+- D72
 
 
 
