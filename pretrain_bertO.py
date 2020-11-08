@@ -47,6 +47,9 @@ def get_tuple(splits: str, bs: int, shuffle=False, drop_last=False, topk=-1) -> 
 
     return DataTuple(dataset=dset, torchdset=tset, loader=data_loader, evaluator=evaluator)
 
+# Create pretrain.jsonl & traindev data
+clean_data("./data")
+
 train_tuple = get_tuple(args.train, args.batch_size, shuffle=True, drop_last=True)
 valid_tuple = None
 
@@ -428,10 +431,6 @@ class LXMERT:
         self.model.load_state_dict(state_dict, strict=False)
 
 if __name__ == "__main__":
-
-    print("HELLO?!")
-    # Create pretrain.jsonl & traindev data
-    clean_data("./data")
 
     lxmert = LXMERT(max_seq_length=128)
 
