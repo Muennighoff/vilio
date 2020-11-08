@@ -388,15 +388,25 @@ if __name__ == "__main__":
 
     # Create pretrain.jsonl & traindev data
     clean_data("./data")
-    if args.subtest:
-        create_subdata("./data")
 
     main()
+
+    if args.subtest:
+        create_subdata("./data")
+        arg_te = args.test
+        arg_fin = args.loadfin 
+        for i in ["_s1", "_s2", "_s3"]:
+            new_test = ''
+            for split in arg_te.split(","):
+                new_test += split + i + ","
+            args.test = new_test[:-1] # Remove the last comma
+            args.loadfin = arg_fin[:-4] + i + ".pth" 
+            main()
+
 
     # Subtrain/Finetune on parts of the data in addition
     if args.subtrain:
         create_subdata("./data")
-        
         arg_tr = args.train
         arg_va = args.valid
         arg_te = args.test
@@ -414,7 +424,7 @@ if __name__ == "__main__":
             args.loadfin = os.path.join(args.output, "MID.pth")
             main()
 
-        # Combine & output
-        if args.combine:
-            combine_subdata("./data", exp=args.exp)
+    # Combine & output
+    if args.combine:
+        combine_subdata("./data", exp=args.exp)
 
