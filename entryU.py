@@ -176,15 +176,12 @@ class ModelU(nn.Module):
         input_ids = pad_sequence(iids, batch_first=True, padding_value=0)
         attn_masks = pad_sequence(attn_masks, batch_first=True, padding_value=0)
 
-        if args.pad:
-            img_feats, img_pos_feats, num_bbs = visual_feats
-        else:
-            img_feats, img_pos_feats = visual_feats
-            # image batches
-            num_bbs = [f.size(0) for f in img_feats]
+        img_feats, img_pos_feats = visual_feats
+        # image batches
+        num_bbs = [f.size(0) for f in img_feats]
 
-            img_feats = self.pad_tensors(img_feats, num_bbs)
-            img_pos_feats = self.pad_tensors(img_pos_feats, num_bbs)
+        img_feats = self.pad_tensors(img_feats, num_bbs)
+        img_pos_feats = self.pad_tensors(img_pos_feats, num_bbs)
 
         bs, max_tl = input_ids.size()
         out_size = attn_masks.size(1)
