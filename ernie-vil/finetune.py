@@ -548,8 +548,6 @@ if __name__ == '__main__':
 
     main(args)
 
-    print("aRe we alive?")
-
     # Combine & output
     if args.combine:
         combine_subdata("./data/hm", gt_path="./data/hm", exp=args.exp)
