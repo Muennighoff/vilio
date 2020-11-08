@@ -122,8 +122,6 @@ class LXMERTTorchDataset(Dataset):
         np.testing.assert_array_less(boxes, 1+1e-5)
         np.testing.assert_array_less(-boxes, 0+1e-5)
 
-        print("BXS", boxes.shape)
-
         # If calculating the matched loss, replace the sentence with an sentence
         # corresponding to other image.
         is_matched = 1

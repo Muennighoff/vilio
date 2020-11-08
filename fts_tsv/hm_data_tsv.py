@@ -198,7 +198,6 @@ def load_obj_tsv(fname, ids, topk=args.topk):
                 item[key] = int(item[key])
             
             boxes = item['num_boxes']
-            print("BXESOR:", boxes)
             decode_config = [
                 ('objects_id', (boxes, ), np.int64),
                 ('objects_conf', (boxes, ), np.float32),

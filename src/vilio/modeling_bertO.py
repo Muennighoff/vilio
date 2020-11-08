@@ -495,8 +495,6 @@ class BertOPretraining(BertPreTrainedModel):
             for key in VISUAL_CONFIG.visual_losses:
                 label, mask_conf = obj_labels[key]
 
-                #print(key)
-                #print("LB:", label.shape)
             
                 # Add 0's to label at beginning for lang output - EXP #, label.size(2)
                 if key == "feat":
@@ -504,9 +502,7 @@ class BertOPretraining(BertPreTrainedModel):
                     lang_label = torch.zeros((label.size(0), 128, label.size(2)), dtype=torch.float32).cuda()
                 else:
                     lang_label = torch.zeros((label.size(0), 128), dtype=torch.long).cuda()
-                
-                #print(lang_label.shape)
-                #print(lang_label.dtype, label.dtype)
+
 
                 label = torch.cat((lang_label, label), dim=1)
 
