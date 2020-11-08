@@ -13,4 +13,4 @@ python hm.py --seed 86 --model U \
 
 python hm.py --seed 86 --model U \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-cased --epochs 5 --tsv \
---num_features 72 --loadpre ./data/uniter-large.pt --num_pos 6 --contrib --midsave $midsave --exp U72 --subtrain --topk $topk
+--num_features 72 --loadpre ./data/uniter-large.pt --num_pos 6 --contrib --midsave $midsave --exp U72 --subtrain --combine --topk $topk

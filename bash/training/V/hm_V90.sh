@@ -13,4 +13,4 @@ python hm.py --seed 90 --model V \
 
 python hm.py --seed 90 --model V \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --reg \
---loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V90 --subtrain --topk $topk
+--loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V90 --subtrain --combine --topk $topk
