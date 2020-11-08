@@ -298,6 +298,13 @@ class LXMERT:
                 visual_feats=None, pos=None, obj_labels=None, matched_label=None, ans=None):
         """
 
+        # SHAPES:
+        print("IS", input_ids.shape)
+        print("IS", input_mask.shape)
+        print("IS", segment_ids.shape)
+        print("IS", lm_labels.shape)
+        print("IS", feats.shape)
+
         loss, losses, ans_logit = self.model(
             input_ids, segment_ids, attention_mask=input_mask, img_feats=feats, masked_lm_labels=lm_labels, 
             matched_label=matched_labels, obj_labels=obj_labels
