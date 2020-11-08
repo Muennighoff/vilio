@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Allows for not having to copy the models to vilio/data
-loadfin=${1:-./data/LASTtrain.bin}
-loadfin2=${2:-./data/LASTtraindev.bin}
+loadfin=${1:-./data/LASTtrain.pth}
+loadfin2=${2:-./data/LASTtraindev.pth}
 
 # 36 Feats, Seed 147
 cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
