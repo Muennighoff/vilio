@@ -99,7 +99,6 @@ class LXMERTTorchDataset(Dataset):
     def __getitem__(self, item: int):
         datum = self.data[item]
 
-        #uid = datum['uid']
         img_id = datum['id']
 
         # Get image info
@@ -122,6 +121,8 @@ class LXMERTTorchDataset(Dataset):
         boxes[:, (1, 3)] /= img_h
         np.testing.assert_array_less(boxes, 1+1e-5)
         np.testing.assert_array_less(-boxes, 0+1e-5)
+
+        print("BXS", boxes.shape)
 
         # If calculating the matched loss, replace the sentence with an sentence
         # corresponding to other image.
