@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from param import args
 from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
 from fts_lmdb.hm_data import HMEvaluator
-
+from utils.pandas_scripts import clean_data
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from src.vilio.modeling_robertaV import RobertaVPretraining
@@ -532,6 +532,9 @@ class LXMERT:
 
 if __name__ == "__main__":
 
+    # Create pretrain.jsonl & traindev data
+    clean_data("./data")
+    
     lxmert = LXMERT(max_seq_length=128)
 
     lxmert.train(train_tuple, valid_tuple)

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Del this file?
+
 # Allows for not having to copy the models to vilio/data
 loadfin=${1:-./data/LASTtrain.pth}
 loadfin2=${2:-./data/LASTtraindev.pth}

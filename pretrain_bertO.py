@@ -14,7 +14,7 @@ if args.tsv:
     from fts_tsv.hm_pretrain_data_tsv import InputExample, LXMERTDataset, LXMERTTorchDataset
 else:
     from fts_lmdb.hm_pretrain_data import InputExample, LXMERTDataset, LXMERTTorchDataset 
-
+from utils.pandas_scripts import clean_data
 from src.vilio.transformers.tokenization_auto import AutoTokenizer
 from src.vilio.transformers.optimization import AdamW, get_linear_schedule_with_warmup, get_cosine_schedule_with_warmup
 from src.vilio.modeling_bertO import BertOPretraining
@@ -428,6 +428,9 @@ class LXMERT:
         self.model.load_state_dict(state_dict, strict=False)
 
 if __name__ == "__main__":
+
+    # Create pretrain.jsonl & traindev data
+    clean_data("./data")
 
     lxmert = LXMERT(max_seq_length=128)
 
