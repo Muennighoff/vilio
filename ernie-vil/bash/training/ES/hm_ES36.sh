@@ -44,14 +44,14 @@ dev_seens1 ES36 False
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250train \
 trains2 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250trains2 \
 ./data/log \
 dev_seens2 ES36 False
 
@@ -60,14 +60,14 @@ dev_seens2 ES36 False
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250train \
 trains3 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250trains3 \
 ./data/log \
 dev_seens3 ES36 False
 
@@ -84,41 +84,41 @@ traindev \
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_2500 \
+./output_hm/step_2500traindev \
 ./data/log \
 test_seen ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_2500 \
+./output_hm/step_2500traindev \
 ./data/log \
 test_unseen ES36 False
 
 # Midsave
 
-cp -r ./output_hm/step_1250 ./data/
+#cp -r ./output_hm/step_1250 ./data/
 
 # SUB 1
 
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250traindev \
 traindevs1 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs1 \
 ./data/log \
 test_seens1 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs1 \
 ./data/log \
 test_unseens1 ES36 False
 
@@ -127,21 +127,21 @@ test_unseens1 ES36 False
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250traindev \
 traindevs2 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs2 \
 ./data/log \
 test_seens2 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs2 \
 ./data/log \
 test_unseens2 ES36 False
 
@@ -150,20 +150,20 @@ test_unseens2 ES36 False
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250traindev \
 traindevs3 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs3 \
 ./data/log \
 test_seens3 ES36 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250traindevs3 \
 ./data/log \
 test_unseens3 ES36 True
