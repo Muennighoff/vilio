@@ -521,7 +521,7 @@ def main(args):
                     print("%s current learning_rate:%.8f" % (date_str, np_lr))
 
                     if steps % args.save_steps == 0:
-                        save_path = os.path.join(args.checkpoints, "step_" + str(steps))
+                        save_path = os.path.join(args.checkpoints, "step_" + str(steps) + str(args.split))
                         print("save_path:", save_path)
                         fluid.io.save_persistables(exe, save_path, train_program)
                     time_end = time.time()
