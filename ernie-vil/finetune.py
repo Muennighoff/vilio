@@ -266,7 +266,7 @@ def predict_wrapper(args,
 
 
         # Dump preds to csv for submission
-        dump_csv(quesid2ans, quesid2prob, "./data/" + args.split + args.exp + ".csv")
+        dump_csv(quesid2ans, quesid2prob, "./data/hm/" + args.split + args.exp + ".csv")
 
         print("average_acc:", sum_acc / steps)
         print("rocauc:", roc_auc_score(label_list, pred_list))
