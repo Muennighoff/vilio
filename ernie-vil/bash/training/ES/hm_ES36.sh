@@ -2,8 +2,8 @@
 
 ### ATT 36, Normal
 
-cp ./data/hm/hm_vgattr10100.tsv ./data/hm/HM_gt_img.tsv
-cp ./data/hm/hm_vgattr3636.tsv ./data/hm/HM_img.tsv
+mv ./data/hm/hm_vgattr10100.tsv ./data/hm/HM_gt_img.tsv
+mv ./data/hm/hm_vgattr3636.tsv ./data/hm/HM_img.tsv
 
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
