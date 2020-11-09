@@ -15,27 +15,27 @@ train \
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_2500 \
+./output_hm/step_2500train \
 ./data/log \
 dev_seen ES36 False
 
 # Midsave
 
-cp -r ./output_hm/step_1250 ./data/
+#cp -r ./output_hm/step_1250 ./data/
 
 # SUB 1
 
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./data/step_1250 \
+./output_hm/step_1250train \
 trains1 \
 1250
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
 ./data/erniesmall/ernie_vil_config.base.json \
-./output_hm/step_1250 \
+./output_hm/step_1250trains1 \
 ./data/log \
 dev_seens1 ES36 False
 
