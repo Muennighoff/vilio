@@ -573,6 +573,9 @@ def main(path, gt_path="./data/"):
 
     loop, last_score, delta = 0, 0, 0.1
 
+    print("DEVDF:", dev_df.info())
+    print("DEVS:", dev_probas.info())
+
     while (delta > 0.0001):
 
         # Individual Roc Aucs
