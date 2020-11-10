@@ -478,7 +478,7 @@ class HMDataReader(object):
             if 'gt_feature_lmdb_path' in task_conf and task_conf.get('use_gt_fea', False):
                 if task_conf['gt_feature_lmdb_path'] not in feature_reader_dict:
                     feature_reader_dict[task_conf['gt_feature_lmdb_path']] =    \
-                        ImageFeaturesH5Reader(task_conf['gt_feature_lmdb_path'], jsonl_path=annotations_jsonpath))
+                        ImageFeaturesH5Reader(task_conf['gt_feature_lmdb_path'], jsonl_path=annotations_jsonpath)
                         
             task_batch_size = task_conf.get('batch_size', 64)
             self.task_dup_cnt.append(max(int(task_batch_size / batch_size), 1))
