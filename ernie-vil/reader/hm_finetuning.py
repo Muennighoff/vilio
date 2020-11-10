@@ -120,8 +120,6 @@ def _load_annotationsHM(annotations_jsonlpath, split):
     entries = []
     splits = split.split(",")
 
-    #for split in splits:
-    #path = os.path.join(annotations_jsonlpath, f"{split}.jsonl") ################# HOW DO WE VALIDATE WITH DEV OR NOT AT ALL?
     entries.extend(
         [json.loads(jline) for jline in open(annotations_jsonlpath, "r").read().split('\n')]
         )

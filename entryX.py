@@ -121,9 +121,9 @@ class ModelX(nn.Module):
                                                                xlayers=args.xlayers, rlayers=args.rlayers)
 
 
-        print("UNEXPECTED: ", loading_info["unexpected_keys"])
-        print("MISSING: ", loading_info["missing_keys"])
-        print("ERRORS: ", loading_info["error_msgs"])
+        #print("UNEXPECTED: ", loading_info["unexpected_keys"])
+        #print("MISSING: ", loading_info["missing_keys"])
+        #print("ERRORS: ", loading_info["error_msgs"])
 
 
         ### CLASSIFICATION HEADS ###
