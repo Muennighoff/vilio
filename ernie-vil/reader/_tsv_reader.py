@@ -9,7 +9,7 @@ import os
 ## NOTE: We can use 10100 TSV here, as feats are later padded
 
 class ImageFeaturesH5Reader(object):
-    def __init__(self, features_path, splits="train,dev,test"):
+    def __init__(self, features_path, jsonl_path="train,dev,test"):
         """
         features_path: Path with tsv & jsonl's
         """
@@ -23,7 +23,17 @@ class ImageFeaturesH5Reader(object):
         #    self.raw_data.extend(
         #            [json.loads(jline) for jline in open(path, "r").read().split('\n')]
         #    )
+
+        entries = []
+        entries.extend(
+            [json.loads(jline) for jline in open(annotations_jsonlpath, "r").read().split('\n')]
+            )
+
+        id2datum = {datum["id"]: datum for datum in entries}
+
         #print("Load %d data from split(s) %s." % (len(self.raw_data)))
+
+        # Loading datasets to data
 
         # List to dict (for evaluation and others)
         #self.id2datum = {datum["id"]: datum for datum in self.raw_data}
@@ -31,7 +41,7 @@ class ImageFeaturesH5Reader(object):
         # Loading detection features to img_data
         img_data = []
         #if num_features:
-        img_data.extend(load_obj_tsv(features_path))#, num_features=num_features))#os.path.join(features_path, "HM_img.tsv"))) #self.id2datum.keys()))
+        img_data.extend(load_obj_tsv(features_path, id2datum.keys()))#, num_features=num_features))#os.path.join(features_path, "HM_img.tsv"))) #self.id2datum.keys()))
 
 
         # Convert img list to dict
@@ -110,7 +120,7 @@ csv.field_size_limit(sys.maxsize)
 FIELDNAMES = ["img_id", "img_h", "img_w", "objects_id", "objects_conf",
               "attrs_id", "attrs_conf", "num_boxes", "boxes", "features"]
 
-def load_obj_tsv(fname, topk=None):
+def load_obj_tsv(fname, ids, topk=None):
     """Load object features from tsv file.
     :param fname: The path to the tsv file.
     :param topk: Only load features for top K images (lines) in the tsv file.
@@ -124,6 +134,10 @@ def load_obj_tsv(fname, topk=None):
     with open(fname) as f:
         reader = csv.DictReader(f, FIELDNAMES, delimiter="\t")
         for i, item in enumerate(reader):
+
+            # Check if id in list of ids to save memory
+            if int(item["img_id"]) not in ids:
+                continue
 
             for key in ['img_h', 'img_w', 'num_boxes']:
                 item[key] = int(item[key])

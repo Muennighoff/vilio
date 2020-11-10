@@ -118,7 +118,6 @@ def _load_annotationsQA_R(annotations_jsonpath, split):
 def _load_annotationsHM(annotations_jsonlpath, split):
 
     entries = []
-    splits = split.split(",")
 
     entries.extend(
         [json.loads(jline) for jline in open(annotations_jsonlpath, "r").read().split('\n')]
@@ -188,11 +187,7 @@ class HMReader(object):
     
         self._split = split
         self._names = []
-        #with open(self.task_conf['unisex_names_table']) as csv_file:
-        #    csv_reader = csv.reader(csv_file, delimiter=',')
-        #    for row in csv_reader:
-        #        if row[1] != 'name':
-        #            self._names.append(row[1])
+
         self._feature_reader = feature_reader_dict[self.task_conf['feature_lmdb_path']]
         self.use_gt_fea = task_conf.get('use_gt_fea', False)
         if self.use_gt_fea:
@@ -468,18 +463,23 @@ class HMDataReader(object):
                  is_test=False,
                  num_features=50):
 
+        print("SPLIT:", split)
         self.task_readers = []
         feature_reader_dict = {}
         self.task_dup_cnt = []
         for task_conf in task_conf_group:
+            # Quicker FT Loading:
+            annotations_jsonpath=task_conf['annotations_jsonpath_' + split]
+
             if 'feature_lmdb_path' in task_conf:
                 if task_conf['feature_lmdb_path'] not in feature_reader_dict:
                     feature_reader_dict[task_conf['feature_lmdb_path']] =    \
-                        ImageFeaturesH5Reader(task_conf['feature_lmdb_path'])
+                        ImageFeaturesH5Reader(task_conf['feature_lmdb_path'], jsonl_path=annotations_jsonpath)
             if 'gt_feature_lmdb_path' in task_conf and task_conf.get('use_gt_fea', False):
                 if task_conf['gt_feature_lmdb_path'] not in feature_reader_dict:
                     feature_reader_dict[task_conf['gt_feature_lmdb_path']] =    \
-                        ImageFeaturesH5Reader(task_conf['gt_feature_lmdb_path'])
+                        ImageFeaturesH5Reader(task_conf['gt_feature_lmdb_path'], , jsonl_path=annotations_jsonpath))
+                        
             task_batch_size = task_conf.get('batch_size', 64)
             self.task_dup_cnt.append(max(int(task_batch_size / batch_size), 1))
         random_seed=np.random.randint(1000)
