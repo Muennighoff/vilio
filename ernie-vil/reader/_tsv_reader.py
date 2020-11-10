@@ -26,7 +26,7 @@ class ImageFeaturesH5Reader(object):
 
         entries = []
         entries.extend(
-            [json.loads(jline) for jline in open(annotations_jsonlpath, "r").read().split('\n')]
+            [json.loads(jline) for jline in open(jsonl_path, "r").read().split('\n')]
             )
 
         id2datum = {datum["id"]: datum for datum in entries}
