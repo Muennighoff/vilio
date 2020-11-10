@@ -228,4 +228,4 @@ def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
             if "test" in csv:
                 df["label"] = 0
                 df.loc[0, "label"] = 1
-            pd.concat([df, df]).to_json(os.path.join(data_path, csv[:-6] + "long" + ".jsonl"), lines=True, orient="records")
+            pd.concat([df, df[:int(0.3*len(df))]]).to_json(os.path.join(data_path, csv[:-6] + "long" + ".jsonl"), lines=True, orient="records")

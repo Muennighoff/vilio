@@ -9,7 +9,7 @@ import os
 ## NOTE: We can use 10100 TSV here, as feats are later padded
 
 class ImageFeaturesH5Reader(object):
-    def __init__(self, features_path, jsonl_path="train,dev,test"):
+    def __init__(self, features_path, jsonl_path="./data/hm/pretrain.jsonl"):
         """
         features_path: Path with tsv & jsonl's
         """
@@ -40,8 +40,7 @@ class ImageFeaturesH5Reader(object):
 
         # Loading detection features to img_data
         img_data = []
-        #if num_features:
-        img_data.extend(load_obj_tsv(features_path, id2datum.keys()))#, num_features=num_features))#os.path.join(features_path, "HM_img.tsv"))) #self.id2datum.keys()))
+        img_data.extend(load_obj_tsv(features_path, id2datum.keys()))
 
 
         # Convert img list to dict
