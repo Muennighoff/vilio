@@ -36,8 +36,8 @@ This will take a couple of minutes, if you run into any problems, refer to the R
 
 c) Place the img folder of the HM-challenge in `vilio/py-bottom-up-attention/data`; Make sure to place the whole img folder in there, i.e. the images will be at vilio/`py-bottom-up-attention/data/img/`
 
-d) Extract features - We use 6 different features for diversity in our model. Run them all at once with:
-`cd vilio/py-bottom-up-attention; bash hm_feats.bash` - > TEST!
+d) Extract features - We use 6 different features for diversity in our model. Run them all at once with (~6h):
+`cd vilio/py-bottom-up-attention; bash hm_feats.bash`
 
 Alternatively run them individually with the commands in hm_feats.bash, e.g.:
 
