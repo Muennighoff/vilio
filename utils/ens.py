@@ -429,17 +429,11 @@ def smooth_distance(path, exp=""):
             if (".csv" in csv) and (exp in csv):
                 print(csv)
                 preds[data[0]] = pd.read_csv(os.path.join(path, csv))
-                print(preds[data[0]])
-    
-    print(preds[data[0]])
     
     preds[data[0] + subdata[0]] = pd.concat([preds[data[0] + subdata[0]], preds[data[0] + subdata[1]], preds[data[0] + subdata[2]]])
     preds[data[0] + subdata[0]].drop_duplicates(subset=["id"], inplace=True)
     preds[data[0] + subdata[0]] = preds[data[0]].merge(preds[data[0] + subdata[0]], on="id")
     
-    print(preds[data[0]])
-
-
     def smooth(x):
         """
         Outputs a new proba smoothed based on distance
