@@ -80,6 +80,7 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 ## Individual Model Pretraining, Training & Inference
 
 The below combines both training & inference. For inference-only scroll to the bottom. 
+Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. 
 
 1. **PyTorch / D O U V X :**
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
