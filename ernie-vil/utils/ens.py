@@ -293,7 +293,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     preds = {}
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
-            if ("jsonl" in csv) and ("long" not in csv):
+            if "jsonl" in csv:
                 print("JLoading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
             if ("csv" in csv) and (exp in csv):
@@ -360,8 +360,13 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
         if any(d in csv for d in data) and ("csv" in csv):
             if any(s in csv for s in subdata[:3]):
                 os.remove(os.path.join(path, csv))
-            else:
-                preds[d].to_csv(os.path.join(path, csv), index=False)
+            elif data[0] in csv:
+                preds[data[0]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
+            elif data[1] in csv:
+                preds[data[1]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
+            elif data[2] in csv:
+                preds[data[2]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
+
 
 def sa_wrapper(data_path="./data"):
     """
