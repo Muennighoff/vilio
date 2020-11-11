@@ -81,8 +81,8 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 
 The below combines both training & inference. For inference-only scroll to the bottom. 
 Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. 
-
-1. **PyTorch / D O U V X :**
+<br><br>
+### 1. PyTorch / D O U V X
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
 Install the necessary packages with: 
 `cd vilio; pip install -r requirements_full.txt` - > TEST; Generate with pipx; Take versions from Kaggle? e.g. check for pytoch version there?
@@ -112,7 +112,7 @@ Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_berti
 For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash bash/training/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash bash/training/X/hm_X36.sh`, `cd vilio; bash bash/training/X/hm_X50.sh`, `cd vilio; bash bash/training/X/hm_X72.sh` `cd vilio; bash bash/training/X/hm_XSA.sh`.  You can run a test with `cd vilio; bash bash/training/X/hm_X.sh 20 5`. P100 Runtime in total:  **~15h**.
 
 
-2. **PaddlePaddle / E:**
+### 2. **PaddlePaddle / E:**
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie-vil/hm/data`
 Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. In my experience, Ernie (L, then S) is the best performing model. 
 
@@ -123,7 +123,7 @@ Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.
 Download the pre-trained model SMALL PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-base-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`.
 
 
-## Ensembling
+## Combining
 
 Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in `vilio/data/` (D, O, U, V, X, ES, EL). Apart from that, you still want to the HM data (img folder & .jsonls) in `vilio/data/`.  run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
