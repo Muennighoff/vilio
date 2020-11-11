@@ -405,7 +405,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
             elif data[1] in csv:
                 preds[data[1]].to_csv(os.path.join(path, csv), index=False)
             elif data[2] in csv:
-                preds[data[2]]].to_csv(os.path.join(path, csv), index=False)
+                preds[data[2]].to_csv(os.path.join(path, csv), index=False)
 
 
 def smooth_distance(path, exp=""):
