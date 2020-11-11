@@ -21,7 +21,7 @@ dev_seen EL72 False
 
 # Midsave
 
-#cp -r ./output_hm/step_1250 ./data/
+rm -r ./data/hm/img
 
 # SUB 1
 
