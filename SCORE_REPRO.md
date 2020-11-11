@@ -128,21 +128,39 @@ Take the csvs from all models (In their respective experiment folders) and drop 
 ## Inference-Only
 
 The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have set up a Notebook with the exact inference pipeline on kaggle accessible here.
-All you need to do is download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data` (e.g. add it as a dataset) and then commit using GPU. The notebook runs in around **9h**, which admittedly is very long and not very useful for production. However, just by e.g. running only one instead of three (or five for E) seeds per model (They only add about 2-3% of value), you can cut that down by **80%**. There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure one can get inference down to **~30min** with performance dropping less than **5%**. (I'd love to help on such a project!) <br> 
+All you need to do is download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data` (e.g. add it as a dataset) and then commit using GPU. The notebook runs in around **9h**, which admittedly is very long and not very useful for production. Yet, just by e.g. running only one instead of three (or five for E) seeds per model (They only add about 2-3% of value), you can cut that down by **80%**. There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure one can get inference down to **~30min** with performance dropping less than **5%**. E.g. only running the V & X part in the inference notebook should already produce roc-auc score in the 85-90 range on all sets. (I'd love to help on any project trying to decomplexify things & making it production optimized) <br> 
 You can also choose to just download the following datasets:
 
 [Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats)
 [Provided LMDB Features](https://www.kaggle.com/muennighoff/hmfeatureszipfin)
 
-Weights (8 ckpts per Model):
-- D36
+Weights (8 ckpts per run):
+- D36 
 - D50
 - D72
+- O36
+- O50
+- OV50
+- U36
+- U50
+- U72
+- V45
+- V90
+- V135
+- [X36](https://www.kaggle.com/muennighoff/viliox36)
+- [X50](https://www.kaggle.com/muennighoff/viliox50)
+- [X72](https://www.kaggle.com/muennighoff/viliox72)
+- ES36
+- ESV50
+- ES72
+- ESVCR36
+- ESVCR72
+- EL36
+- ELV50
+- EL72
+- ELVCR36
+- ELVCR72
 
 
-> How?
-a) Provide devs + 4 weights > Need to run 4 cmds as 4x loading
-b) Provide 4 * 3 weights (seeds)
-c
+## Final words
 
-# > Create a notebook with everything in one
