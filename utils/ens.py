@@ -379,6 +379,8 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
             fin_probas.append("proba" + i + max(scores, key=scores.get))
     
     print("PICKING: ", fin_probas)
+
+    print(preds["dev_seen"].info())
     
     # Run optimization
     probas_only = preds["dev_seen"][fin_probas]
