@@ -122,7 +122,7 @@ Download the pre-trained model SMALL PRETRAINED [here](https://ernie-github.cdn.
 
 ## Ensembling
 
-Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in that folder. (D, O, U, V, X, ES, EL). Now run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with ENS_. Submit the test_seen / test_unseen version of those.
+Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in that folder. (D, O, U, V, X, ES, EL). Now run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
 
 ## Inference-Only

@@ -403,11 +403,11 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
             if any(s in csv for s in subdata[:3]):
                 os.remove(os.path.join(path, csv))
             elif data[0] in csv:
-                preds[data[0]].to_csv(os.path.join(path, csv), index=False)
+                preds[data[0]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
             elif data[1] in csv:
-                preds[data[1]].to_csv(os.path.join(path, csv), index=False)
+                preds[data[1]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
             elif data[2] in csv:
-                preds[data[2]].to_csv(os.path.join(path, csv), index=False)
+                preds[data[2]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
 
 
 def smooth_distance(path, exp=""):
@@ -480,7 +480,7 @@ def smooth_distance(path, exp=""):
         if any(s in csv for s in subdata):
             os.remove(os.path.join(path, csv))
         elif (".csv" in csv) and (exp in csv) and any(d in csv for d in data):
-            preds[data[0]].to_csv(os.path.join(path, csv), index=False)
+            preds[data[0]][["id", "proba", "label"]].to_csv(os.path.join(path, csv), index=False)
 
 
 def sa_wrapper(data_path="./data"):
