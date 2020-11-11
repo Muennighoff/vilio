@@ -14,7 +14,10 @@ The pipeline to reproduce the roc-auc score on the public & private leaderboard 
 
 I used one NVIDIA Tesla P100, Cuda 10.2 & Python 3 for all purposes.
 A better GPU/multiple-GPUs will significantly speed up things, but I made sure everything works with just those basics. 
-We will install specific packages for each subprocess as outlined below. 
+Each of the subrepos has its own requirements.txt which can be installed via:
+- `cd vilio/py-bottom-up-attention; pip install -r requirements.txt`
+- `cd vilio; pip install -r requirements.txt`
+- `cd vilio/ernie-vil; pip install -r requirements.txt`
 
 
 ## Data preparation
@@ -85,7 +88,7 @@ Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of runn
 ### 1. PyTorch / D O U V X
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
 Install the necessary packages with: 
-`cd vilio; pip install -r requirements_full.txt` - > TEST; Generate with pipx; Take versions from Kaggle? e.g. check for pytoch version there?
+`cd vilio; pip install -r requirements_full.txt`
 
 We now proceed to the training of our models. For all models we make use of pre-trained models provided by the creators of each model. I will put the original DL-Links for all models below, but I have reuploaded all model weights to datasets on kaggle, so contact me in case any of the original DL-Links does not work anymore (You can also find the datasets in the hm_pipeline notebook).
 
@@ -114,7 +117,7 @@ For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my set
 
 ### 2. **PaddlePaddle / E:**
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie-vil/hm/data`
-Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed. In my experience, Ernie (L, then S) is the best performing model. 
+Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed.
 
 - E - Large:
 Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. Next run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL.sh`On my setup this would run for **~19h**, as it runs 5 different features. If that's too long, you can run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELV50.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_EL72.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR72.sh`, followed by `cd vilio/ernie-vil; bash bash/training/EL/hm_ELSA.sh`. I am not yet very advanced in PaddlePaddle, but definitely let me know if there are any issues. (When the output ends with _2950 Aborted (core dumped)_, that is normal).
