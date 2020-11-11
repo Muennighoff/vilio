@@ -10,7 +10,7 @@ For the purpose of having everything in one repo, I combined three separate repo
 
 The pipeline to reproduce the roc-auc score on the public & private leaderboard from scratch on the Hateful Memes challenge follows. If you want to use the pre-trained models and perform inference only, scroll to the end.
 
-# Soft- & Hardware
+## Soft- & Hardware
 
 I used one NVIDIA Tesla P100, Cuda 10.2 & Python 3 for all purposes.
 A better GPU/multiple-GPUs will significantly speed up things, but I made sure everything works with just those basics. 
@@ -19,7 +19,7 @@ We will install specific packages for each subprocess as outlined below.
 
 ## Data preparation
 
-1. **Images**
+1. #### **Images**
 - We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
 
 Refer to the feature_extraction notebook under notebooks if you run into any problems:
