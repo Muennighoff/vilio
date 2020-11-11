@@ -41,7 +41,8 @@ This will take a couple of minutes, if you run into any problems, refer to the R
 - Alternatively run them individually with the commands in hm_feats.bash, e.g.:
 `cd vilio/py-bottom-up-attention; python detectron2_mscoco_proposal_maxnms.py --batchsize 4 --split img --weight vgattr --minboxes 36 --maxboxes 36`
 On the hardware I used, each extraction takes about 90 minutes. 
-<br><br>
+<br>
+
 After completing extraction, we have the following files in vilio/py-bottom-up-attention/data:
 - hm_vgattr3636.tsv
 - hm_vgattr5050.tsv
