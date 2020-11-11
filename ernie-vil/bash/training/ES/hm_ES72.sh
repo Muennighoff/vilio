@@ -1,6 +1,6 @@
 #bash -x ./env.sh
 
-### ATT 36, Normal
+### ATT 72
 
 mv ./data/hm/hm_vgattr10100.tsv ./data/hm/HM_gt_img.tsv
 mv ./data/hm/hm_vgattr7272.tsv ./data/hm/HM_img.tsv
@@ -18,10 +18,6 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./output_hm/step_2500train \
 ./data/log \
 dev_seen ES72 False
-
-# Midsave
-
-#cp -r ./output_hm/step_1250 ./data/
 
 # SUB 1
 
@@ -71,8 +67,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/log \
 dev_seens3 ES72 False
 
-##################### TRAINDEV
-
+### TRAINDEV
 
 bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
@@ -94,10 +89,6 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./output_hm/step_2500traindev \
 ./data/log \
 test_unseen ES72 False
-
-# Midsave
-
-#cp -r ./output_hm/step_1250 ./data/
 
 # SUB 1
 

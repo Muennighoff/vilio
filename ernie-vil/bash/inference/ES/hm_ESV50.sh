@@ -50,7 +50,7 @@ $loadfin4 \
 ./data/log \
 dev_seens3 ESV50 False
 
-##################### TRAINDEV
+### TRAINDEV
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/erniesmall/vocab.txt \
