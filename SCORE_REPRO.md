@@ -4,9 +4,9 @@
 Below follows an overview of the repo and the full outline to reproduce the results on the Hateful Memes Challenge hosted Facebook & DrivenData. If you run into any issue (no matter how small) do send me an email at n.muennighoff@gmail.com. Also contact me / open a PR if you have improvements for the structure or code of this repository. 
 
 For the purpose of having everything in one repo, I combined three separate repo's here, which should be treated as separate (in terms of package requirements, as they conflict):
-- py-bottom-up (Only for the purpose of feature extraction)
-- ernie-vil (For running E-Models)
-- vilio (For X, D, V, U, O-Models & everything else)
+- py-bottom-up-attention (Only for the purpose of feature extraction)
+- ernie-vil (For E-Models)
+- vilio (For D, O, U, V, X-Models & everything else)
 
 The pipeline to reproduce the roc-auc score on the public & private leaderboard from scratch on the Hateful Memes challenge follows. If you want to use the pre-trained models and perform inference only, scroll to the end.
 
@@ -19,7 +19,7 @@ We will install specific packages for each subprocess as outlined below.
 
 ## Data preparation
 
-1. #### **Images**
+### Images
 - We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
 
 Refer to the feature_extraction notebook under notebooks if you run into any problems:
@@ -73,11 +73,13 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 - /img/ folder
 
 
-2. **Text** 
+### Text 
 - Download the updated train.jsonl, dev_seen.jsonl, dev_unseen.jsonl, test_seen.jsonl, test_unseen.jsonl from the HM Challenge and place them in BOTH the data folder under `vilio/data` and the data folder under `vilio/ernie-vil/data/hm`
 
 
-## Individual Model Pretraining & Training & Inference
+## Individual Model Pretraining, Training & Inference
+
+The below combines both training & inference. For inference-only scroll to the bottom. 
 
 1. **PyTorch / D O U V X :**
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
@@ -122,31 +124,32 @@ Download the pre-trained model SMALL PRETRAINED [here](https://ernie-github.cdn.
 
 ## Ensembling
 
-Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in that folder. (D, O, U, V, X, ES, EL). Now run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
+Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in `vilio/data/` (D, O, U, V, X, ES, EL). Apart from that, you still want to the HM data (img folder & .jsonls) in `vilio/data/`.  run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
 
 ## Inference-Only
 
-The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have set up a Notebook with the exact inference pipeline on kaggle accessible here.
-All you need to do is download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data` (e.g. add it as a dataset) and then commit using GPU. The notebook runs in around **9h**, which admittedly is very long and not very useful for production. Yet, just by e.g. running only one instead of three (or five for E) seeds per model (They only add about 2-3% of value), you can cut that down by **80%**. There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure one can get inference down to **~30min** with performance dropping less than **5%**. E.g. only running the V & X part in the inference notebook should already produce roc-auc score in the 85-90 range on all sets. (I'd love to help on any project trying to decomplexify things & making it production optimized) <br> 
-You can also choose to just download the following datasets:
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle, under Inference1, Inference2, Inference3, which already include the weight & feature data as inputs. To run them:
+1) Inference1: Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
+2) Inference2: Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
+3) Inference3: Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~8h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
 
 [Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats)
 [Provided LMDB Features](https://www.kaggle.com/muennighoff/hmfeatureszipfin)
 
 Weights (8 ckpts per run):
-- D36 
-- D50
-- D72
-- O36
-- O50
-- OV50
-- U36
-- U50
-- U72
-- V45
-- V90
-- V135
+- [D36](https://www.kaggle.com/muennighoff/viliod36) 
+- [D50](https://www.kaggle.com/muennighoff/viliod50)
+- [D72](https://www.kaggle.com/muennighoff/viliod72)
+- [O36](https://www.kaggle.com/muennighoff/vilioo36)
+- [O50](https://www.kaggle.com/muennighoff/vilioo50)
+- [OV50](https://www.kaggle.com/muennighoff/vilioov50)
+- [U36](https://www.kaggle.com/muennighoff/viliou36)
+- [U50](https://www.kaggle.com/muennighoff/viliou50)
+- [U72](https://www.kaggle.com/muennighoff/viliou72)
+- [V45](https://www.kaggle.com/muennighoff/viliov45)
+- [V90](https://www.kaggle.com/muennighoff/viliov90)
+- [V135](https://www.kaggle.com/muennighoff/viliov135)
 - [X36](https://www.kaggle.com/muennighoff/viliox36)
 - [X50](https://www.kaggle.com/muennighoff/viliox50)
 - [X72](https://www.kaggle.com/muennighoff/viliox72)
@@ -162,5 +165,7 @@ Weights (8 ckpts per run):
 - ELVCR72
 
 
-## Final words
+## Additional thoughts
 
+I think the pipeline is quite complicated and those long inference runs are not very useful for production. Yet, just by e.g. running only one instead of three (or five for E) seeds per model, you can cut the inference time down by **80%** and not loose more than **absolute 1-3%** on the roc-auc metric. There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure we can get inference down to **~30min** and performance dropping less than **absolute 3%** (and I'll be working on this!). E.g. only running the V & X part in the inference notebook should already produce roc-auc score in the 85-90 range on all sets. I'd love to help on any project trying to decomplexify things & making it production optimized! Also I'd love to hear any type of critic of the repo. <br> 
+Sending lots of love your way!🥶
