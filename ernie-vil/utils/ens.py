@@ -357,7 +357,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
             preds[d]["proba"] += preds[d][fin_probas[i]] * sx_weights[i]
         
     for csv in sorted(os.listdir(path)):
-        if any(d in csv for d in data) and ("csv" in csv):
+        if any(d in csv for d in data) and ("csv" in csv) and (exp in csv):
             if any(s in csv for s in subdata[:3]):
                 os.remove(os.path.join(path, csv))
             elif data[0] in csv:
