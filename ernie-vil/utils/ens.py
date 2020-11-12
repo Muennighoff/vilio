@@ -294,10 +294,8 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
             if ("jsonl" in csv) and ("long" not in csv):
-                print("JLoading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
             if ("csv" in csv) and (exp in csv):
-                print("Loading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0]] = pd.read_csv(os.path.join(path, csv))
 
     # Normalize probabilities
@@ -333,12 +331,8 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
                     scores[x] = roc_auc_score(df["label"], df["proba"+i+x])
                 except:
                     scores[x] = 0
-        print(i)
-        print(scores)
         if len(scores) > 0:
             fin_probas.append("proba" + i + max(scores, key=scores.get))
-    
-    print("PICKING: ", fin_probas)
     
     # Run optimization
     probas_only = preds["dev_seen"][fin_probas]
@@ -346,8 +340,6 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     
     if len(gt_only) < len(preds["dev_seengt"].label):
         print("Your predictions do not include the full dev!")
-
-    print("STARTED WITH: ", roc_auc_score(gt_only, preds["dev_seen"].proba))
      
     sx_weights = Simplex(probas_only, gt_only, df_list=False, exploration=1, scale=50)
     
@@ -379,8 +371,8 @@ def sa_wrapper(data_path="./data"):
     dev_probas, test_probas, test_unseen_probas = {}, {}, {} # Never dynamically add to a pd Dataframe
 
     for csv in sorted(os.listdir(data_path)):
-        print(csv)
         if ".csv" in csv:
+            print("Included in Simple Average: ")
             if ("dev" in csv) or ("val" in csv):
                 dev.append(pd.read_csv(data_path + csv))
                 dev_probas[csv[:-8]] = pd.read_csv(data_path + csv).proba.values
@@ -403,7 +395,6 @@ def sa_wrapper(data_path="./data"):
     os.makedirs(os.path.join(data_path, args.exp), exist_ok=True)
 
     for csv in sorted(os.listdir(data_path)):
-        print(csv)
         if ".csv" in csv:
             if ("dev" in csv) or ("val" in csv):
                 os.remove(os.path.join(data_path, csv))
