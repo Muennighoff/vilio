@@ -54,13 +54,13 @@ HM - Directions tried & scraped:
 	- https://github.com/RobertJGabriel/Google-profanity-words
 
 HM - Directions tried & added:
-- SWA/Stochastic Weight Averaging is great when you want to train models “blind”. There was not a lot of data accessible so I decided to train models on all the data possible without validation, but use SWA to obtain stable results at the end. I still use models trained with validation, however to get score estimates and weights for the ensemble.
-- Removing Duplicates & misclassified examples
+- SWA/Stochastic Weight Averaging: Great when you want to train models “blind”. There was not a lot of data accessible so I decided to train models on all the data possible without validation, but use SWA to obtain stable results at the end. I still use models trained with validation, however to get score estimates and weights for the ensemble.
+- Removing Duplicates & misclassified examples:
 	- Using the IDs provided on the forum helped, after the updated train was released, just removing duplicates and keeping the rest worked best
 	- Removed about 50 pure duplicates & added about 140 data from the new dev
 - Predict dev based on train only > Use those dev preds to determine ensemble weights for test predictions based on train+dev
-- The problem in my understanding: Due to conflicting labels (i.e. confounders with the same text) the model is much less confident about such predictions than single hate/non-hate predictions - Even though the model might correctly know which of those two is more hateful (i.e. it orders the two confounders when looked at in isolation correctly) it misplaces them on the “global roc auc scale”, i.e. when combined with all other predictions (e.g. too much to the right; to the left, due to e.g. the theme having stronger signals in one direction). I solved this problem by training one main model on the full data and three “children” on subsets of the data (which included e.g. more conflicting pairs). This allowed them to focus on that data in isolation and then make for a better score when recombining the predictions of the main model & the children. The idea of submodels was inspired by the Inception Network & I think it could be interesting to implement those submodels looking at different parts of the data into the main model. 
-- Model-specific changes
+- Conditioned Bagging: The problem in my understanding: Due to conflicting labels (i.e. confounders with the same text) the model is much less confident about such predictions than single hate/non-hate predictions - Even though the model might correctly know which of those two is more hateful (i.e. it orders the two confounders when looked at in isolation correctly) it misplaces them on the “global roc auc scale”, i.e. when combined with all other predictions (e.g. too much to the right; to the left, due to e.g. the theme having stronger signals in one direction). I solved this problem by training one main model on the full data and three “children” on subsets of the data (which included e.g. more conflicting pairs). This allowed them to focus on that data in isolation and then make for a better score when recombining the predictions of the main model & the children. The idea of submodels was inspired by the Inception Network & I think it could be interesting to implement those submodels looking at different parts of the data into the main model. 
+- Model-specific changes:
 	- D
 		- Update Bert Functions to be on par with huggingface as of 09/2020
 	- O
