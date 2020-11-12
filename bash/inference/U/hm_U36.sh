@@ -5,7 +5,7 @@ loadfin=${1:-./data/LASTtrain.pth}
 loadfin2=${2:-./data/LASTtraindev.pth}
 
 # 36 Feats, Seed 129
-cp ./data/hm_vgattr5050.tsv ./data/HM_img.tsv
+cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
 
 python hm.py --seed 129 --model U \
 --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-cased --epochs 5 --tsv \
