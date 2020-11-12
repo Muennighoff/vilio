@@ -135,10 +135,13 @@ Take the csvs from all models (In their respective experiment folders) and drop 
 
 ## Inference-Only
 
-The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle, under Inference1, Inference2, Inference3, which already include the weight & feature data as inputs. To run them:
-1) Inference1: Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
-2) Inference2: Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
-3) Inference3: Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~8h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle due to time constraints on kaggle. They already include the weight & feature data as inputs. To run them:
+1) [Inference1](https://www.kaggle.com/muennighoff/hm-inference1): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
+2) [Inference2](https://www.kaggle.com/muennighoff/hm-inference2): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~7h).
+3) [Inference3](https://www.kaggle.com/muennighoff/hm-inference3): Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~7h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
+The inference-only notebook(s) is/are much longer than the train+inference notebook, since we need to deal with loading in many weights. Inference-only on all seeds & models together takes around 20h, while full training takes around 70h. 
+
+Below are/is all the pre-trained/extracted data mentioned in the notebooks:
 
 [Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats) <br>
 [Provided LMDB Features](https://www.kaggle.com/muennighoff/hmfeatureszipfin)
@@ -164,9 +167,9 @@ Weights (8 ckpts per run):
 - [ES72](https://www.kaggle.com/muennighoff/vilioes72)
 - [ESVCR36](https://www.kaggle.com/muennighoff/vilioesvcr36)
 - [ESVCR72](https://www.kaggle.com/muennighoff/vilioesvcr72)
-- EL36
-- ELV50
-- EL72
+- EL36: [Train](https://www.kaggle.com/muennighoff/vilioel36) & [Traindev](https://www.kaggle.com/muennighoff/vilioel36b)
+- ELV50: To be added by 11/13
+- EL72: [Train](https://www.kaggle.com/muennighoff/vilioel72) & [Traindev](https://www.kaggle.com/muennighoff/vilioel72b)
 - ELVCR36
 - ELVCR72
 
