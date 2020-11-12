@@ -293,7 +293,7 @@ def combine_subdata(path, gt_path="./data/", exp="", subtrain=True):
     preds = {}
     for csv in sorted(os.listdir(path)):
         if any(d in csv for d in data):
-            if "jsonl" in csv:
+            if ("jsonl" in csv) and ("long" not in csv):
                 print("JLoading: ", csv)
                 preds[[d for d in data if d in csv][0] + [s for s in subdata if s in csv][0] + "gt"] = pd.read_json(os.path.join(path, csv), lines=True, orient="records")
             if ("csv" in csv) and (exp in csv):
