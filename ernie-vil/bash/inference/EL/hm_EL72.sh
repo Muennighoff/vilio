@@ -10,106 +10,106 @@ loadfin6=${6:-./data/LASTtraindev.pth}
 loadfin7=${7:-./data/LASTtrain.pth}
 loadfin8=${8:-./data/LASTtraindev.pth}
 
-### ATT 36, Normal
+### ATT 72
 
 mv ./data/hm/hm_vgattr10100.tsv ./data/hm/HM_gt_img.tsv
-mv ./data/hm/hm_vgattr3636.tsv ./data/hm/HM_img.tsv
+mv ./data/hm/hm_vgattr7272.tsv ./data/hm/HM_img.tsv
 
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin \
 ./data/log \
-dev_seen ES36 False
+dev_seen EL72 False
 
 # SUB 1
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin2 \
 ./data/log \
-dev_seens1 ES36 False
+dev_seens1 EL72 False
 
 # SUB2
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin3 \
 ./data/log \
-dev_seens2 ES36 False
+dev_seens2 EL72 False
 
 # SUB3
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin4 \
 ./data/log \
-dev_seens3 ES36 False
+dev_seens3 EL72 False
 
 ##################### TRAINDEV
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin5 \
 ./data/log \
-test_seen ES36 False
+test_seen EL72 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin5 \
 ./data/log \
-test_unseen ES36 False
+test_unseen EL72 False
 
 # SUB 1
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin6 \
 ./data/log \
-test_seens1 ES36 False
+test_seens1 EL72 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin6  \
 ./data/log \
-test_unseens1 ES36 False
+test_unseens1 EL72 False
 
 # SUB2
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin7 \
 ./data/log \
-test_seens2 ES36 False
+test_seens2 EL72 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin7 \
 ./data/log \
-test_unseens2 ES36 False
+test_unseens2 EL72 False
 
 # SUB3
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin8 \
 ./data/log \
-test_seens3 ES36 False
+test_seens3 EL72 False
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
-./data/erniesmall/vocab.txt \
-./data/erniesmall/ernie_vil_config.base.json \
+./data/ernielarge/vocab.txt \
+./data/ernielarge/ernie_vil.large.json \
 $loadfin8 \
 ./data/log \
-test_unseens3 ES36 True
+test_unseens3 EL72 True
