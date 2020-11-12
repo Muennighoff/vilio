@@ -157,11 +157,11 @@ Weights (8 ckpts per run):
 - [X36](https://www.kaggle.com/muennighoff/viliox36)
 - [X50](https://www.kaggle.com/muennighoff/viliox50)
 - [X72](https://www.kaggle.com/muennighoff/viliox72)
-- ES36
-- ESV50
-- ES72
-- ESVCR36
-- ESVCR72
+- [ES36](https://www.kaggle.com/muennighoff/vilioes36)
+- [ESV50](https://www.kaggle.com/muennighoff/vilioesv50)
+- [ES72](https://www.kaggle.com/muennighoff/vilioes72)
+- [ESVCR36](https://www.kaggle.com/muennighoff/vilioesvcr36)
+- [ESVCR72](https://www.kaggle.com/muennighoff/vilioesvcr72)
 - EL36
 - ELV50
 - EL72
