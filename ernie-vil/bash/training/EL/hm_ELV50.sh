@@ -1,6 +1,6 @@
 #bash -x ./env.sh
 
-### ATT 36, Normal
+### VGATTR 50
 
 mv ./data/hm/hm_vg10100.tsv ./data/hm/HM_gt_img.tsv
 mv ./data/hm/hm_vg5050.tsv ./data/hm/HM_img.tsv
@@ -19,9 +19,9 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/log \
 dev_seen ELV50 False
 
-# Midsave
+# Save Space
 
-#cp -r ./output_hm/step_1250 ./data/
+rm -r ./data/hm/img
 
 # SUB 1
 

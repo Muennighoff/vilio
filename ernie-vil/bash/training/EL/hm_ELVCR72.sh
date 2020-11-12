@@ -19,9 +19,9 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/log \
 dev_seen ELVCR72 False
 
-# Midsave
+# Save Space
 
-#cp -r ./output_hm/step_1250 ./data/
+rm -r ./data/hm/img
 
 # SUB 1
 
