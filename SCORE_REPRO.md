@@ -12,7 +12,7 @@ The pipeline to reproduce the roc-auc score on the public & private leaderboard 
 
 ## Soft- & Hardware
 
-I used one NVIDIA Tesla P100, Cuda 10.2 & Python 3 for all purposes.
+I used one NVIDIA Tesla P100, Cuda 10.2, a Linux environment & Python 3 for all purposes.
 A better GPU/multiple-GPUs will significantly speed up things, but I made sure everything works with just those basics. 
 Each of the subrepos has its own requirements.txt which can be installed via:
 - `cd vilio/py-bottom-up-attention; pip install -r requirements.txt`
@@ -25,7 +25,7 @@ Each of the subrepos has its own requirements.txt which can be installed via:
 ### Images
 - We perform feature extraction before starting to train to speed up training (I also have the code for feature extraction on the go if ever needed (will double training time though)).
 
-Refer to the feature_extraction notebook under notebooks if you run into any problems:
+Refer to the feature_extraction notebook under `vilio/notebooks` if you run into any problems:
 
 - Clone the repo;
 `git clone https://github.com/Muennighoff/vilio.git`
@@ -83,7 +83,7 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 ## Individual Model Pretraining, Training & Inference
 
 The below combines both training & inference. For inference-only scroll to the bottom. 
-Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. 
+Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. I also uploaded the notebook to kaggle [here](https://www.kaggle.com/muennighoff/hm-pipeline) where I already downloaded all the pretrained models. In order to run it though the models need to be split up.
 <br><br>
 ### 1. PyTorch / D O U V X
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
@@ -120,10 +120,12 @@ Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie
 Install the necessary packages with `cd vilio/ernie-vil; pip install -r requirements.txt`. Some of them will install different versions of packages previously installed.
 
 - E - Large:
-Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. Next run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL.sh`On my setup this would run for **~19h**, as it runs 5 different features. If that's too long, you can run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELV50.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_EL72.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR72.sh`, followed by `cd vilio/ernie-vil; bash bash/training/EL/hm_ELSA.sh`. I am not yet very advanced in PaddlePaddle, but definitely let me know if there are any issues. (When the output ends with _2950 Aborted (core dumped)_, that is normal).
+Download the pre-trained model LARGE PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`. Now dowload LARGE VCR FINETUNED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-VCR-task-pre-en.1.tar.gz) and do the same to create a folder `vilio/ernie-vil/data/ernielargevcr`. We will be using both the original pre-trained model & the VCR finetuned model, as it increases diversity. Next run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL.sh`On my setup this would run for **~19h**, as it runs 5 different features. If that's too long, you can run `cd vilio/ernie-vil; bash bash/training/EL/hm_EL36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELV50.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_EL72.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR36.sh`, `cd vilio/ernie-vil; bash bash/training/EL/hm_ELVCR72.sh`, followed by `cd vilio/ernie-vil; bash bash/training/EL/hm_ELSA.sh`.
 
 - E - Small:
 Download the pre-trained model SMALL PRETRAINED [here](https://ernie-github.cdn.bcebos.com/model-ernie-vil-base-en.1.tar.gz). Place the files "vocab.txt", ernie_vil.large.json and the params folder in a new folder called "ernielarge" and place the folder under `vilio/ernie-vil/data/ernielarge`.
+
+I am not yet very advanced in PaddlePaddle, but definitely let me know if there are any issues. When the output ends with _2950 Aborted (core dumped)_, it says numpy.multicore array not found that is normal. I am using "mv" statements in the shell scripts to move around the features, instead of "cp" to save space, hence I in the hm_ES & hm_EL shell files we run the features in order (36, 36, 50, 72, 72), so we can afford to move them and keep them for the next run. (For the 2nd 36 & 72 it will show a .tsv not found error, but thats fine as the tsv is already in place) In general as long as it runs, it is fine. 
 
 
 ## Combining
@@ -138,7 +140,7 @@ The above is the full pipeline to train, infer & ensemble. If you want to perfor
 2) Inference2: Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
 3) Inference3: Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~8h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
 
-[Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats)
+[Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats) <br>
 [Provided LMDB Features](https://www.kaggle.com/muennighoff/hmfeatureszipfin)
 
 Weights (8 ckpts per run):
