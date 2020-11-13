@@ -55,7 +55,7 @@ After completing extraction, we have the following files in `vilio/py-bottom-up-
 - hm_vg5050.tsv
 - hm_vg10100.tsv
 
-We also make use of the lmdb feats provided by mmf for one of our models, download them [here](https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features/features.tar.gz)
+We also make use of the lmdb feats provided by mmf for one of our models, download them [here](https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features/features.tar.gz).
 <br>
 With the downloaded detectron.lmdb, we now have 7 different feature files.
 
@@ -83,7 +83,7 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 ## Individual Model Pretraining, Training & Inference
 
 The below combines both training & inference. For inference-only scroll to the bottom. 
-Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. If you have unlimited resources you can just run `vilio/notebooks/hm_pipeline.ipynb` as is and you will have the final csvs to submit to the leaderboard. I also uploaded the notebook to kaggle [here](https://www.kaggle.com/muennighoff/hm-pipeline) where I already downloaded all the pretrained models. In order to run it with limited hard- & software though the models need to be split up.
+Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. If you have unlimited resources you can just run `vilio/notebooks/hm_pipeline.ipynb` as is and you will have the final csvs to submit to the leaderboard. I also uploaded the notebook to kaggle [here](https://www.kaggle.com/muennighoff/hm-pipeline), where I already downloaded all the pretrained models. In order to run it with limited hard- & software though the models need to be split up.
 <br><br>
 ### 1. PyTorch / D O U V X
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
