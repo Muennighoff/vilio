@@ -372,7 +372,7 @@ def sa_wrapper(data_path="./data"):
 
     for csv in sorted(os.listdir(data_path)):
         if ".csv" in csv:
-            print("Included in Simple Average: ")
+            print("Included in Simple Average: ", csv)
             if ("dev" in csv) or ("val" in csv):
                 dev.append(pd.read_csv(data_path + csv))
                 dev_probas[csv[:-8]] = pd.read_csv(data_path + csv).proba.values
