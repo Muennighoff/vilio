@@ -1,6 +1,5 @@
 HM Conclusion
 
-
 HM - Interesting directions not pursued:
 - Grid features instead of boxes
 	- https://drive.google.com/file/d/1j9QE6xBq7Al_92ylmQEO4Ufq4f5n3Awa/view
@@ -80,3 +79,13 @@ HM - Directions tried & added:
 	- E
 		- Use extracted feats with 10 - 100 boxes as ground truth boxes (The original models were Pre-trained on hand labelled GT Boxes + the extracted feats)
 		- Lots of small changes & upgrades from the original repo
+
+Other:
+- Leaderboards
+	- https://visualcommonsense.com/leaderboard/
+	- https://evalai.cloudcv.org/web/challenges/challenge-page/163/leaderboard/498#leaderboardrank-3
+	- https://visualqa.org/roe.html
+- NLP Kaggle competitions
+	- Tweet Sentiment
+	- TensorFlow 2.0 QA
+	- Google Quest Q&A
