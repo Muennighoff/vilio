@@ -11,6 +11,8 @@ HM - Interesting directions not pursued:
 	- E.g. a sub CNN which only detects whether there is a person with down-syndrome in the image and then feeds this to the master model
 - Re-pretraining from scratch (COCO, CC) with superior Bert models
 	- Using Roberta, Albert & replicate pre-training e.g. for uniter should give a boost as HM is heavily text-dependent
+- Add SWA for Ernie-Vil
+	- This should save us from running 5 seeds for E-Vil, but I havn't yet figured out how
 - Negative Sampling (not really helpful for HM, as ROC AUC metric, not e.g. accuracy)
 	- https://www.kaggle.com/c/jigsaw-multilingual-toxic-comment-classification/discussion/160986
 	  
