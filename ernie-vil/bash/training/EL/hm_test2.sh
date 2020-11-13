@@ -6,9 +6,6 @@ mv ./data/hm/hm_vgattr10100.tsv ./data/hm/HM_gt_img.tsv
 mv ./data/hm/hm_vgattr7272.tsv ./data/hm/HM_img.tsv
 
 
-# Save Space
-rm -r ./data/hm/img
-
 ##################### TRAINDEV
 
 
@@ -59,6 +56,10 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./output_hm/step_1250traindevs1 \
 ./data/log \
 test_unseens1 ELVCR72 False
+
+
+# Save Space
+rm -r ./data/hm/img
 
 # SUB2
 
