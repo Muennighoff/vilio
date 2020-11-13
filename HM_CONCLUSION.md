@@ -3,7 +3,9 @@ HM Conclusion
 HM - Interesting directions not pursued:
 - Grid features instead of boxes
 	- https://drive.google.com/file/d/1j9QE6xBq7Al_92ylmQEO4Ufq4f5n3Awa/view
-- Side-branches within the network itself looking at different parts of the data similar to the Inception Network
+- Transformers/Graphs for images from scratch instead of extracted feats that rely on local convolution
+	- Hardware-wise infeasible, but this is the future
+- Side-branches within the network itself looking at different parts of the data similar to the Inception Network (i.e. not separated like right now)
 	- https://towardsdatascience.com/a-simple-guide-to-the-versions-of-the-inception-network-7fc52b863202
 - Sub-models which support a bigger model
 	- E.g. a sub CNN which only detects whether there is a person with down-syndrome in the image and then feeds this to the master model
