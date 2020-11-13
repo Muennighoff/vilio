@@ -168,7 +168,7 @@ Weights (8 ckpts per run):
 - [ESVCR36](https://www.kaggle.com/muennighoff/vilioesvcr36)
 - [ESVCR72](https://www.kaggle.com/muennighoff/vilioesvcr72)
 - EL36: [Train](https://www.kaggle.com/muennighoff/vilioel36) & [Traindev](https://www.kaggle.com/muennighoff/vilioel36b)
-- ELV50: To be added by 11/13
+- ELV50: [Train](https://www.kaggle.com/muennighoff/vilioelv50) & [Traindev](https://www.kaggle.com/muennighoff/vilioelv50b/settings)
 - EL72: [Train](https://www.kaggle.com/muennighoff/vilioel72) & [Traindev](https://www.kaggle.com/muennighoff/vilioel72b)
 - ELVCR36: [Train](https://www.kaggle.com/muennighoff/vilioelvcr36) & [Traindev](https://www.kaggle.com/muennighoff/vilioelvcr36b/settings)
 - ELVCR72: To be added by 11/13
