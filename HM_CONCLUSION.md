@@ -50,6 +50,8 @@ HM - Directions tried & scraped:
 	- Did help initially, but not when pretraining - Could be used for the models we are not pretraining
 - Conditioned bagging based on context
 	- Tried to build models which would train on data e.g. relating to the them of world war II, and then combine those; worsened results - probably because topics are difficult to separate and have quite some overlap so it misses crucial data
+- Siamese Models
+	- I tried a siamese model for U which looks at similar datapoints at the same time. Did not converge at all.
 - Adding new words
 	- Against Jacob's recomm. I tried & learned. (My intuition was that BERT will never have seen words such as handjob in the given context, but probably finetuning is solving such issues already even though embeddings do not change during finetuning - Worsened rcac by 3% on a Bert-only)
 	- https://github.com/google-research/bert/issues/9
