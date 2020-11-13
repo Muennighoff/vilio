@@ -81,6 +81,10 @@ bash run_finetuning.sh hm conf/hm/model_conf_hm \
 traindev \
 2500
 
+# Save Space
+
+rm -r ./data/ernielargevcr
+
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/ernielargevcr/vocab.txt \
 ./data/ernielargevcr/ernie_vil.large.json \

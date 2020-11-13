@@ -21,7 +21,7 @@ dev_seen EL72 False
 
 # Save Space
 
-rm -r ./data/hm/img
+#rm -r ./data/hm/img
 
 # SUB 1
 
