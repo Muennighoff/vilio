@@ -20,8 +20,7 @@ bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 dev_seen ELVCR72 False
 
 # Save Space
-
-rm -r ./data/hm/img
+#rm -r ./data/hm/img
 
 # SUB 1
 
@@ -80,10 +79,6 @@ bash run_finetuning.sh hm conf/hm/model_conf_hm \
 ./data/ernielargevcr/params \
 traindev \
 2500
-
-# Save Space
-
-rm -r ./data/ernielargevcr
 
 bash run_inference.sh hm "" val conf/hm/model_conf_hm \
 ./data/ernielargevcr/vocab.txt \
