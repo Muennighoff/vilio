@@ -10,8 +10,8 @@ python pretrain_bertV.py --seed 135 --taskMaskLM --wordMaskRate 0.15 --train pre
 
 python hm.py --seed 135 --model V \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --reg \
---num_features 100 --loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V135 --subtrain --topk $topk
+--num_features 100 --loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V135 --topk $topk
 
 python hm.py --seed 135 --model V \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --reg \
---num_features 100 --loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V135 --subtrain --combine --topk $topk
+--num_features 100 --loadpre ./data/LAST_BV.pth --swa --midsave $midsave --exp V135 --topk $topk

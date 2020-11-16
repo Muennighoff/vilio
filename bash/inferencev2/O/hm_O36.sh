@@ -9,8 +9,8 @@ cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
 
 python hm.py --seed 42 --model O \
 --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 36 --loadfin $loadfin --exp O36 --subtest
+--num_features 36 --loadfin $loadfin --exp O36
 
 python hm.py --seed 42 --model O \
 --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 36 --loadfin $loadfin2 --exp O36 --subtest --combine
+--num_features 36 --loadfin $loadfin2 --exp O36
