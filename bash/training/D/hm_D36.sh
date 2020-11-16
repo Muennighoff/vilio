@@ -9,8 +9,8 @@ cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
 
 python hm.py --seed 147 --model D \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --subtrain --topk $topk
+--num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --topk $topk
 
 python hm.py --seed 147 --model D \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --subtrain --combine --topk $topk
+--num_features 36 --loadpre ./data/pytorch_model_11.bin --contrib --midsave $midsave --exp D36 --topk $topk

@@ -11,8 +11,8 @@ python pretrain_bertX.py --seed 60 --taskMaskLM --wordMaskRate 0.15 --train pret
 
 python hm.py --seed 60 --model X \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv --llayers 12 --rlayers 2 --xlayers 5 \
---num_features 50 --loadpre ./data/LAST_BX.pth --swa --midsave $midsave --exp X60 --subtrain --topk $topk
+--num_features 50 --loadpre ./data/LAST_BX.pth --swa --midsave $midsave --exp X60 --topk $topk
 
 python hm.py --seed 60 --model X \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv --llayers 12 --rlayers 2 --xlayers 5 \
---num_features 50 --loadpre ./data/LAST_BX.pth --swa --midsave $midsave --exp X60 --subtrain --combine --topk $topk
+--num_features 50 --loadpre ./data/LAST_BX.pth --swa --midsave $midsave --exp X60 --topk $topk
