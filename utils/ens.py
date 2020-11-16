@@ -18,6 +18,7 @@ def parse_args():
     parser.add_argument("--enspath", type=str, default="./data", help="Path to folder with all csvs")
     parser.add_argument("--enstype", type=str, default="loop", help="Type of ensembling to be performed - Current options: loop / sa")
     parser.add_argument("--exp", type=str, default="experiment", help="Name of experiment for csv's")
+    parser.add_argument('--subdata', action='store_const', default=False, const=True)
     
     # Parse the arguments.
     args = parser.parse_args()
@@ -683,13 +684,14 @@ def main(path, gt_path="./data/"):
     test_SX.to_csv(os.path.join(path, "FIN_test_seen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
     test_unseen_SX.to_csv(os.path.join(path, "FIN_test_unseen_" + args.exp + "_" + str(loop) + ".csv"), index=False)
 
-    # Smooth distances & submerge
-    create_hashdata(jsonl="dev_seen")
-    create_hashdata(jsonl="test_seen")
-    create_hashdata(jsonl="test_unseen")
+    if args.subdata == True:
+        # Smooth distances & submerge
+        create_hashdata(jsonl="dev_seen")
+        create_hashdata(jsonl="test_seen")
+        create_hashdata(jsonl="test_unseen")
 
-    combine_subdata(path, exp=args.exp, subtrain=False)
-    smooth_distance(path, exp=args.exp)
+        combine_subdata(path, exp=args.exp, subtrain=False)
+        smooth_distance(path, exp=args.exp)
 
     print("Finished.")
   
