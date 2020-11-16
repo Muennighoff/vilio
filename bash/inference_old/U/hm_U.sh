@@ -19,7 +19,7 @@ python hm.py --seed 43 --model U \
 --num_features 50 --num_pos 6 --loadfin $loadfin2 --exp U43 --subtest --combine
 
 # 72 Feats, Seed 86
-cp ./data/hm_vgattr5050.tsv ./data/HM_img.tsv
+cp ./data/hm_vgattr7272.tsv ./data/HM_img.tsv
 
 python hm.py --seed 86 --model U \
 --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-cased --epochs 5 --tsv \
@@ -30,7 +30,7 @@ python hm.py --seed 86 --model U \
 --num_features 72 --num_pos 6 --loadfin $loadfin2 --exp U72 --subtest --combine
 
 # 36 Feats, Seed 129
-cp ./data/hm_vgattr5050.tsv ./data/HM_img.tsv
+cp ./data/hm_vgattr3636.tsv ./data/HM_img.tsv
 
 python hm.py --seed 129 --model U \
 --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-cased --epochs 5 --tsv \
