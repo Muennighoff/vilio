@@ -13,4 +13,4 @@ python hm.py --seed 147 --model D \
 
 python hm.py --seed 147 --model D \
 --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-base-uncased --epochs 5 --tsv \
---num_features 36 --loadfin $loadfin2 --exp D36 --subtest
+--num_features 36 --loadfin $loadfin2 --exp D36
