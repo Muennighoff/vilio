@@ -543,11 +543,7 @@ if __name__ == '__main__':
     if args.task_name == "hm":
         # Create pretrain.jsonl & traindev data
         clean_data("./data/hm")
-        create_subdata("./data/hm")
+        # As PaddlePaddle sometimes does not read in all the data we just double it
         double_data("./data/hm")
 
     main(args)
-
-    # Combine & output
-    if args.combine:
-        combine_subdata("./data/hm", gt_path="./data/hm", exp=args.exp)
