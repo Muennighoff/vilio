@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Allows for quick test runs - Set topk to e.g. 20 & midsave to 5
+# Allows for quick test runs - Set topk to e.g. 20
 topk=${1:--1}
-midsave=${2:-2000}
 
 
 # 50 Feats, Seed 126
@@ -13,8 +12,8 @@ python pretrain_bertO.py --seed 126 --taskMaskLM --taskMatched --wordMaskRate 0.
 
 python hm.py --seed 126 --model O \
 --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp O50 --topk $topk
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --exp O50 --topk $topk
 
 python hm.py --seed 126 --model O \
 --train traindev --valid dev_seen --test test_seen,test_unseen --lr 1e-5 --batchSize 8 --tr bert-large-uncased --epochs 5 --tsv \
---num_features 50 --loadpre ./data/LAST_BO.pth --contrib --midsave $midsave --exp O50 --topk $topk
+--num_features 50 --loadpre ./data/LAST_BO.pth --contrib --exp O50 --topk $topk

@@ -215,11 +215,11 @@ def create_subdata(data_path="./data"):
 
 def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
     """
-    Takes the data and pastes it on to the end. This ensure the model uses the whole
+    Takes the data and pastes it on to the end. This ensure the model uses the whole data.
 
     jsonl: json lines file with img entry
     """
-    data = ["train", "dev_seen", "traindev", "test_seen", "test_unseen"]
+    data = ["dev_seen", "test_seen", "test_unseen"] #"train","traindev",
 
     preds = {}
     for csv in sorted(os.listdir(data_path)):
