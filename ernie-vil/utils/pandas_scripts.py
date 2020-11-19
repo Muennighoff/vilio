@@ -145,7 +145,7 @@ def clean_data(data_path="./data"):
     trainclean.to_json(path_or_buf=os.path.join(data_path, "train.jsonl"), orient='records', lines=True)
 
     # c) Cleaned Train + unused data from dev_unseen + dev_seen
-    traincleandev = pd.concat([train, dev_unseen, dev_seen]) ########################
+    traincleandev = pd.concat([dev_seen, train, dev_unseen, dev_seen]) ########################
     traincleandev.to_json(path_or_buf=os.path.join(data_path, "traindev.jsonl"), orient='records', lines=True)
 
 
