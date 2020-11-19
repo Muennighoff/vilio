@@ -48,8 +48,6 @@ HM - Directions tried & scraped:
 	- Tried also smoothed pseudo-labels, i.e. taking the proba only; Did not work for me at all & since they were also not allowed in the competition thats good haha!
 - Reiniting final layers & pooler
 	- Did help initially, but not when pretraining - Could be used for the models we are not pretraining
-- Conditioned bagging based on context
-	- Tried to build models which would train on data e.g. relating to the them of world war II, and then combine those; worsened results - probably because topics are difficult to separate and have quite some overlap so it misses crucial data
 - Siamese Models
 	- I tried a siamese model for U which looks at similar datapoints at the same time. Did not converge at all.
 - Adding new words
@@ -64,7 +62,6 @@ HM - Directions tried & added:
 	- Using the IDs provided on the forum helped, after the updated train was released, just removing duplicates and keeping the rest worked best
 	- Removed about 50 pure duplicates & added about 140 data from the new dev
 - Predict dev based on train only > Use those dev preds to determine ensemble weights for test predictions based on train+dev
-- Conditioned Bagging: The problem in my understanding: Due to conflicting labels (i.e. confounders with the same text) the model is much less confident about such predictions than single hate/non-hate predictions - Even though the model might correctly know which of those two is more hateful (i.e. it orders the two confounders when looked at in isolation correctly) it misplaces them on the “global roc auc scale”, i.e. when combined with all other predictions (e.g. too much to the right; to the left, due to e.g. the theme having stronger signals in one direction). I solved this problem by training one main model on the full data and three “children” on subsets of the data (which included e.g. more conflicting pairs). This allowed them to focus on that data in isolation and then make for a better score when recombining the predictions of the main model & the children. The idea of submodels was inspired by the Inception Network & I think it could be interesting to implement those submodels looking at different parts of the data into the main model. 
 - Model-specific changes:
 	- D
 		- Update Bert Functions to be on par with huggingface as of 09/2020

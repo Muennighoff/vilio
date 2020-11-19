@@ -24,7 +24,6 @@ jieba==0.42.1
 botocore==1.19.8
 spacy==2.3.2
 boto3==1.16.8
-apex==0.9.10dev
 comet_ml==3.2.5
 dataclasses==0.6
 fairseq==0.9.0
