@@ -2,7 +2,7 @@
     {
     "task": "HM",
     "num_choice": 1,
-    "annotations_jsonpath_train": "./data/hm/trainlong.jsonl",
+    "annotations_jsonpath_train": "./data/hm/train.jsonl",
     "annotations_jsonpath_trains1": "./data/hm/train_s1long.jsonl",
     "annotations_jsonpath_trains2": "./data/hm/train_s2long.jsonl",
     "annotations_jsonpath_trains3": "./data/hm/train_s3long.jsonl",
@@ -10,7 +10,7 @@
     "annotations_jsonpath_dev_seens1": "./data/hm/dev_seen_s1long.jsonl",
     "annotations_jsonpath_dev_seens2": "./data/hm/dev_seen_s2long.jsonl",
     "annotations_jsonpath_dev_seens3": "./data/hm/dev_seen_s3long.jsonl",
-    "annotations_jsonpath_traindev": "./data/hm/traindevlong.jsonl",
+    "annotations_jsonpath_traindev": "./data/hm/traindev.jsonl",
     "annotations_jsonpath_traindevs1": "./data/hm/traindev_s1long.jsonl",
     "annotations_jsonpath_traindevs2": "./data/hm/traindev_s2long.jsonl",
     "annotations_jsonpath_traindevs3": "./data/hm/traindev_s3long.jsonl",

@@ -221,6 +221,8 @@ def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
     """
     data = ["dev_seen", "test_seen", "test_unseen"] #"train","traindev",
 
+    #df = pd.read_json(os.path.join(data_path, "train.csv"), lines=True, orient="records") > Long in conf!
+
     preds = {}
     for csv in sorted(os.listdir(data_path)):
         if any(d in csv for d in data) and ("jsonl" in csv) and ("long" not in csv):
