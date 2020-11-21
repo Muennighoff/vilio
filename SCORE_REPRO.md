@@ -163,11 +163,12 @@ Weights (2 ckpts per run - ignore the sub ckpts):
 
 ## Additional thoughts
 
-I think the pipeline is quite complicated and those long inference runs are not very useful for production. Yet, just by e.g. running only one instead of three (or five for E) seeds per model, you can cut the inference time down by **80%** and not loose more than **absolute 1-3%** on the roc-auc metric. Similarly using less models significantly speeds up things.  E.g. only running the V & X part in the inference notebook should already produce roc-auc scores in the 85-90 range on all sets. In case you want to try that, here is a rough ranking of the best models: **1.EL  2.ES  3.U/O/V  4.D  5.X** There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure we can get inference down to **~30min** and performance dropping less than **absolute 3%** (and I'll be working on this!). I'd love to help on any project trying to decomplexify things & making it production optimized! Also I'd love to hear any critic of the repo. <br> 
+Just by e.g. running only one instead of three (or five for E) seeds per model, you can cut the inference time down by **80%** and not loose more than **absolute 1-3%** on the roc-auc metric. Similarly using less models significantly speeds up things. In case you want to try that, here is a rough ranking of the best models: **1.EL  2.ES  3.U/O/V** There is also room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure we can get inference down to **~10min** and performance dropping less than **absolute 3%** (and I'll be working on this!). I'd love to help on any project trying to decomplexify things & making it production optimized! Also I'd love to hear any critic of the repo. <br> 
 Sending lots of love your way!🥶
 
 
 ## Additional Models not used
+These models are not used in my original submission, but since I have implemented them here's how to use them :) 
 
 - **D-Model:**
 Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data/pytorch_model_11.bin`
