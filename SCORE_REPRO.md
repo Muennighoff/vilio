@@ -6,7 +6,7 @@ Below follows an overview of the repo and the full outline to reproduce the resu
 For the purpose of having everything in one repo, I combined three separate repo's here, which should be treated as separate (in terms of package requirements, as they conflict):
 - py-bottom-up-attention (Only for the purpose of feature extraction)
 - ernie-vil (For E-Models)
-- vilio (For D, O, U, V, X-Models & everything else)
+- vilio (For O, U, V-Models & everything else)
 
 The pipeline to reproduce the roc-auc score on the public & private leaderboard from scratch on the Hateful Memes challenge follows. If you want to use the pre-trained models and perform inference only, scroll to the end.
 
@@ -92,7 +92,7 @@ Install the necessary packages with: <br>
 
 We now proceed to the training of our models. For all models we make use of pre-trained models provided by the creators of each model. I will put the original DL-Links for all models below, but I have reuploaded all model weights to datasets on kaggle, so contact me in case any of the original DL-Links does not work anymore (You can also find the datasets in the hm_pipeline notebook).
 
-O, V & X are first task-specific pretrained with combinations of MaskedLM and ITM (Image-Text-Matching) on the previously extracted features. We then construct a clean train-file by dropping some duplicates and adding the data from dev_unseen.jsonl that is not in dev_seen.jsonl (When it prints "Preparing..."). D, O, U, V, X are then trained on the clean train-file and validated using dev_seen.jsonl. The same is repeated without validation on the clean train-file + dev_seen to produce test_seen and test_unseen estimates on as much data as possible. We use the dev_seen estimates to optimize & combine all 3 seeds per model and end up with 3 csv files for each model: dev_seen, test_seen, test_unseen
+O & V are first task-specific pretrained with combinations of MaskedLM and ITM (Image-Text-Matching) on the previously extracted features. We then construct a clean train-file by dropping some duplicates and adding the data from dev_unseen.jsonl that is not in dev_seen.jsonl (When it prints "Preparing..."). O, U & V are then trained on the clean train-file and validated using dev_seen.jsonl. The same is repeated without validation on the clean train-file + dev_seen to produce test_seen and test_unseen estimates on as much data as possible. We use the dev_seen estimates to optimize & combine all 3 seeds per model and end up with 3 csv files for each model: dev_seen, test_seen, test_unseen
 
 
 - **O-Model:**
