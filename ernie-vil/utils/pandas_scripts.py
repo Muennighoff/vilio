@@ -155,9 +155,7 @@ def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
 
     jsonl: json lines file with img entry
     """
-    data = ["dev_seen", "test_seen", "test_unseen"] #"train","traindev",
-
-    #df = pd.read_json(os.path.join(data_path, "train.csv"), lines=True, orient="records") > Long in conf!
+    data = ["train", "traindev", "dev_seen", "test_seen", "test_unseen"]
 
     preds = {}
     for csv in sorted(os.listdir(data_path)):
