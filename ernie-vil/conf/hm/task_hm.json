@@ -2,9 +2,9 @@
     {
     "task": "HM",
     "num_choice": 1,
-    "annotations_jsonpath_train": "./data/hm/trainlong.jsonl",
+    "annotations_jsonpath_train": "./data/hm/train.jsonl",
     "annotations_jsonpath_dev_seen": "./data/hm/dev_seenlong.jsonl",
-    "annotations_jsonpath_traindev": "./data/hm/traindevlong.jsonl",
+    "annotations_jsonpath_traindev": "./data/hm/traindev.jsonl",
     "annotations_jsonpath_test_unseen": "./data/hm/test_unseenlong.jsonl",
     "annotations_jsonpath_test_seen": "./data/hm/test_seenlong.jsonl",
     "feature_lmdb_path": "./data/hm/HM_img.tsv",
