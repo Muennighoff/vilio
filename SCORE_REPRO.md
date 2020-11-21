@@ -6,7 +6,7 @@ Below follows an overview of the repo and the full outline to reproduce the resu
 For the purpose of having everything in one repo, I combined three separate repo's here, which should be treated as separate (in terms of package requirements, as they conflict):
 - py-bottom-up-attention (Only for the purpose of feature extraction)
 - ernie-vil (For E-Models)
-- vilio (For D, O, U, V, X-Models & everything else)
+- vilio (For O, U, V-Models & everything else)
 
 The pipeline to reproduce the roc-auc score on the public & private leaderboard from scratch on the Hateful Memes challenge follows. If you want to use the pre-trained models and perform inference only, scroll to the end.
 
@@ -85,35 +85,28 @@ For our ERNIE-model make copies of the files where necessary and place the follo
 The below combines both training & inference. For inference-only scroll to the bottom. 
 Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of running training & inference for all models. If you have unlimited resources you can just run `vilio/notebooks/hm_pipeline.ipynb` as is and you will have the final csvs to submit to the leaderboard. I also uploaded the notebook to kaggle [here](https://www.kaggle.com/muennighoff/hm-pipeline), where I already downloaded all the pretrained models. In order to run it with limited hard- & software though the models need to be split up.
 <br><br>
-### 1. PyTorch / D O U V X
+### 1. PyTorch / O U V
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`
 Install the necessary packages with: <br>
 `cd vilio; pip install -r requirements_full.txt`
 
 We now proceed to the training of our models. For all models we make use of pre-trained models provided by the creators of each model. I will put the original DL-Links for all models below, but I have reuploaded all model weights to datasets on kaggle, so contact me in case any of the original DL-Links does not work anymore (You can also find the datasets in the hm_pipeline notebook).
 
-O, V & X are first task-specific pretrained with combinations of MaskedLM and ITM (Image-Text-Matching) on the previously extracted features. We then construct a clean train-file by dropping some duplicates and adding the data from dev_unseen.jsonl that is not in dev_seen.jsonl (When it prints "Preparing..."). D, O, U, V, X are then trained on the clean train-file and validated using dev_seen.jsonl. The same is repeated without validation on the clean train-file + dev_seen to produce test_seen and test_unseen estimates on as much data as possible. We use the dev_seen estimates to optimize & combine all 3 seeds per model and end up with 3 csv files for each model: dev_seen, test_seen, test_unseen
+O & V are first task-specific pretrained with combinations of MaskedLM and ITM (Image-Text-Matching) on the previously extracted features. We then construct a clean train-file by dropping some duplicates and adding the data from dev_unseen.jsonl that is not in dev_seen.jsonl (When it prints "Preparing..."). O, U & V are then trained on the clean train-file and validated using dev_seen.jsonl. The same is repeated without validation on the clean train-file + dev_seen to produce test_seen and test_unseen estimates on as much data as possible. We use the dev_seen estimates to optimize & combine all 3 seeds per model and end up with 3 csv files for each model: dev_seen, test_seen, test_unseen
 
-- **D-Model:**
-Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data/pytorch_model_11.bin`
-The file `vilio/bash/training/D/hm_D.sh` will run the model on three different features & seeds and then simple average them. First to make sure everything works correctly, run the file once with only a tiny part of data by changing the topk argument, for example as follows: `cd vilio; bash bash/training/D/hm_D.sh 20`. This will run the file with only 20 images. If there are any file errors make sure the the necessary files are under `vilio/data` as outlined above. Else raise an issue/send me an email and I will look into it asap. If there are no apparent errors, run `cd vilio; bash bash/training/D/hm_D.sh`. On a P100, each model takes around 4 hours, hence it will run for **~4h**. If that's too long, we also have .sh files separating the steps. For separating the steps run `cd vilio; bash bash/training/D/hm_D36.sh`, `cd vilio; bash bash/training/D/hm_D50.sh`, `cd vilio; bash bash/training/D/hm_D72.sh` and then run `cd vilio; bash bash/training/D/hm_DSA.sh` to simple average the the 9 csvs that have been created. This will create a new dir within `vilio/data/` named after the experiment (D365072), where it will store the final **3 csvs (dev_seen, test_seen, test_unseen)** for the D-Model, which will go into the final ensemble. If you plan to reset your environment, make sure to save those 3 csvs, everything else can be discarded.
 
 - **O-Model:**
-Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take `/large-vg-labels/ep_20_590000/pytorch_model.bin`, and place the file pytorch_model.bin under `vilio/data/pytorch_model.bin`. Everything is the same as for the D-Model, except that we also perform task-specific pretraining using pretrain_bertO.py, which increases running time. Run `cd vilio; bash bash/training/O/hm_O.sh` to run all three feats + simple averaging **(~9h)**. Alternatively, run `cd vilio; bash bash/training/O/hm_OV50.sh`, `cd vilio; bash bash/training/O/hm_O50.sh` and `cd vilio; bash bash/training/O/hm_O36.sh` (I didn't have the memory to run 72 feats for O, hence we run O50, once with vgattr extraction, once with vg extraction). Then run `cd vilio; bash bash/training/O/hm_OSA.sh` and make sure you do not discard those final 3 csvs in the folder `./data/O365050`. You can run a quick test via e.g. `cd vilio; bash bash/training/O/hm_O.sh 20`.
+Download the pre-trained model [here](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip), unzip it and take `/large-vg-labels/ep_20_590000/pytorch_model.bin`, and place the file pytorch_model.bin under `vilio/data/pytorch_model.bin`. The file `vilio/bash/training/O/hm_O.sh` will pretrain the model, run it on three different features & seeds and then simple average them. First to make sure everything works correctly, run the file once with only a tiny part of data by changing the topk argument, for example as follows: `cd vilio; bash bash/training/O/hm_O.sh 20`.This will run the file with only 20 images. If there are any file errors make sure the the necessary files are under `vilio/data` as outlined above. Else raise an issue/send me an email and I will look into it asap. If there are no apparent errors, run `cd vilio; bash bash/training/O/hm_O.sh`. On a P100, each model takes around 3 hours, hence it will run for **~9h**. If that's too long, we also have .sh files separating the steps.
+For separating the steps, run `cd vilio; bash bash/training/O/hm_OV50.sh`, `cd vilio; bash bash/training/O/hm_O50.sh` and `cd vilio; bash bash/training/O/hm_O36.sh` (I didn't have the memory to run 72 feats for O, hence we run O50, once with vgattr extraction, once with vg extraction). Then run `cd vilio; bash bash/training/O/hm_OSA.sh` to simple average the 9 csvs that have been created. This will create a new dir within `vilio/data/` named after the experiment (O365050), where it will store the final **3 csvs (dev_seen, test_seen, test_unseen)** for the O-Model, which will go into the final ensemble. If you plan to reset your environment, make sure to save those 3 csvs, everything else can be discarded. 
 
 - **U-Model:**
 Download the pre-trained model [here](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) and place the file uniter-large.pt under `vilio/data`.
-We follow the same procedure as for D-Model, i.e. run `cd vilio; bash bash/training/U/hm_U.sh`. Alternatively `cd vilio; bash bash/training/U/hm_U36.sh`, `cd vilio; bash bash/training/U/hm_U50.sh`, `cd vilio; bash bash/training/U/hm_U72.sh` `cd vilio; bash bash/training/U/hm_USA.sh`. You can run a test with `cd vilio; bash bash/training/U/hm_U.sh 20`. P100 Runtime in total: **~5h**.
+We follow the same procedure as for O-Model, except that there will be no pre-training. Run `cd vilio; bash bash/training/U/hm_U.sh` to do all at once. Alternatively `cd vilio; bash bash/training/U/hm_U36.sh`, `cd vilio; bash bash/training/U/hm_U50.sh`, `cd vilio; bash bash/training/U/hm_U72.sh` `cd vilio; bash bash/training/U/hm_USA.sh`. You can run a test with `cd vilio; bash bash/training/U/hm_U.sh 20`. P100 Runtime in total: **~5h**.
 
 - **V-Model:**
 Download the pre-trained model [here](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) untar it and place the file model.pth under `vilio/data`.
 For V we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). 
 We use the lmdb features for V as well as pretraining, so make sure you have installed lmdb as in `vilio/requirements.txt`. After installing PyTorch 1.6, run `cd vilio; bash bash/training/V/hm_V.sh`to extract lmdb feats, run three different seeds and averaging. Alternatively run `cd vilio; bash bash/training/V/hm_VLMDB.sh` to extract lmdb feats and then `cd vilio; bash bash/training/V/hm_V45.sh`, `cd vilio; bash bash/training/V/hm_V90.sh`, `cd vilio; bash bash/training/V/hm_V135.sh`, followed by `cd vilio; bash bash/training/V/hm_VSA.sh`. If you want to test, I recommend just running one of the single bash files with extraction before, which should run in around 4 hours (Modify the epochs parameter to test even quicker). P100 Runtime in total:  **~3h**.
-
-- **X-Model:**
-Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
-For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash bash/training/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash bash/training/X/hm_X36.sh`, `cd vilio; bash bash/training/X/hm_X50.sh`, `cd vilio; bash bash/training/X/hm_X72.sh` `cd vilio; bash bash/training/X/hm_XSA.sh`.  You can run a test with `cd vilio; bash bash/training/X/hm_X.sh 20`. P100 Runtime in total:  **~5h**.
-
 
 ### 2. **PaddlePaddle / E:**
 Make sure we have 5 jsonl files, 5 tsv files and 1 img folder under `vilio/ernie-vil/hm/data`
@@ -130,26 +123,23 @@ I am not yet very advanced in PaddlePaddle, but definitely let me know if there 
 
 ## Combining
 
-Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 7 models, then you should have 21 csv files in `vilio/data/` (D, O, U, V, X, ES, EL). Apart from that, you still want to have the HM data (img folder & .jsonls) in `vilio/data/`.  run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
+Take the csvs from all models (In their respective experiment folders) and drop them into `vilio/data/`. Make sure you place 3 csvs (dev_seen, test_seen, test_unseen) for each model there. If you ran all 5 models, then you should have 15 csv files in `vilio/data/` (O, U, V, ES, EL). Apart from that, you still want to have the HM data (img folder & .jsonls) in `vilio/data/`.  run `cd vilio; bash bash/hm_ens.sh`. This will loop through multiple ensembling methods (simple averaging, power averaging, rank averaging, optimization) and output three final csvs in `./vilio/data` starting with FIN_. Submit the test_seen / test_unseen version of those.
 
 
 ## Inference-Only
 
-The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle due to time constraints on kaggle. They already include the weight & feature data as inputs. To run them:
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle. They already include the weight & feature data as inputs. To run them:
 1) [Inference1](https://www.kaggle.com/muennighoff/hm-inference1): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
 2) [Inference2](https://www.kaggle.com/muennighoff/hm-inference2): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~7h).
 3) [Inference3](https://www.kaggle.com/muennighoff/hm-inference3): Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~7h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
-The inference-only notebook(s) is/are much longer than the train+inference notebook, since we need to deal with loading in many weights. Sometimes cuda throws an initialization error when running many models consecutively. In that case it is best to split them and run them one by one making sure to save the three csvs per model. Inference-only on all seeds & models together takes around 20h, while full training takes around 70h. 
+Sometimes cuda throws an initialization error when running many models consecutively. In that case it is best to split them and run them one by one making sure to save the three csvs per model. Inference-only on all seeds & models together takes around 4h, while full training takes around 25h. 
 
 Below are/is all the pre-trained/extracted data mentioned in the notebooks:
 
 [Extracted TSV Features](https://www.kaggle.com/muennighoff/hmtsvfeats) <br>
 [Provided LMDB Features](https://www.kaggle.com/muennighoff/hmfeatureszipfin)
 
-Weights (8 ckpts per run):
-- [D36](https://www.kaggle.com/muennighoff/viliod36) 
-- [D50](https://www.kaggle.com/muennighoff/viliod50)
-- [D72](https://www.kaggle.com/muennighoff/viliod72)
+Weights (2 ckpts per run - ignore the sub ckpts):
 - [O36](https://www.kaggle.com/muennighoff/vilioo36)
 - [O50](https://www.kaggle.com/muennighoff/vilioo50)
 - [OV50](https://www.kaggle.com/muennighoff/vilioov50)
@@ -159,22 +149,31 @@ Weights (8 ckpts per run):
 - [V45](https://www.kaggle.com/muennighoff/viliov45)
 - [V90](https://www.kaggle.com/muennighoff/viliov90)
 - [V135](https://www.kaggle.com/muennighoff/viliov135)
-- [X36](https://www.kaggle.com/muennighoff/viliox36)
-- [X50](https://www.kaggle.com/muennighoff/viliox50)
-- [X72](https://www.kaggle.com/muennighoff/viliox72)
 - [ES36](https://www.kaggle.com/muennighoff/vilioes36)
 - [ESV50](https://www.kaggle.com/muennighoff/vilioesv50)
 - [ES72](https://www.kaggle.com/muennighoff/vilioes72)
 - [ESVCR36](https://www.kaggle.com/muennighoff/vilioesvcr36)
 - [ESVCR72](https://www.kaggle.com/muennighoff/vilioesvcr72)
-- EL36: [Train](https://www.kaggle.com/muennighoff/vilioel36) & [Traindev](https://www.kaggle.com/muennighoff/vilioel36b)
-- ELV50: [Train](https://www.kaggle.com/muennighoff/vilioelv50) & [Traindev](https://www.kaggle.com/muennighoff/vilioelv50b/settings)
-- EL72: [Train](https://www.kaggle.com/muennighoff/vilioel72) & [Traindev](https://www.kaggle.com/muennighoff/vilioel72b)
-- ELVCR36: [Train](https://www.kaggle.com/muennighoff/vilioelvcr36) & [Traindev](https://www.kaggle.com/muennighoff/vilioelvcr36b/settings)
-- ELVCR72: [Train](https://www.kaggle.com/muennighoff/vilioelvcr72x) & [Traindev](https://www.kaggle.com/muennighoff/vilioelvcr72xb)
+- [EL36](https://www.kaggle.com/muennighoff/el36viliodev)
+- [ELV50](https://www.kaggle.com/muennighoff/elv50viliodev)
+- [EL72](https://www.kaggle.com/muennighoff/el72viliodev)
+- [ELVCR36](https://www.kaggle.com/muennighoff/elvcr36viliodev)
+- [ELVCR72](https://www.kaggle.com/muennighoff/elvcr72viliodev)
 
 
 ## Additional thoughts
 
-I think the pipeline is quite complicated and those long inference runs are not very useful for production. Yet, just by e.g. running only one instead of three (or five for E) seeds per model, you can cut the inference time down by **80%** and not loose more than **absolute 1-3%** on the roc-auc metric. Similarly using less models significantly speeds up things.  E.g. only running the V & X part in the inference notebook should already produce roc-auc scores in the 85-90 range on all sets. In case you want to try that, here is a rough ranking of the best models: **1.EL  2.ES  3.U/O/V  4.D  5.X** There is also much room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure we can get inference down to **~30min** and performance dropping less than **absolute 3%** (and I'll be working on this!). I'd love to help on any project trying to decomplexify things & making it production optimized! Also I'd love to hear any critic of the repo. <br> 
+Just by e.g. running only one instead of three (or five for E) seeds per model, you can cut the inference time down by **80%** and not loose more than **absolute 1-3%** on the roc-auc metric. Similarly using less models significantly speeds up things. In case you want to try that, here is a rough ranking of the best models: **1.EL  2.ES  3.U/O/V** There is also room for optimization in the code (e.g. cp statements; reloading tsv feats every time; pre-sorting tsv files by train, dev, test), with which I am sure we can get inference down to **~10min** and performance dropping less than **absolute 3%** (and I'll be working on this!). I'd love to help on any project trying to decomplexify things & making it production optimized! Also I'd love to hear any critic of the repo. <br> 
 Sending lots of love your way!🥶
+
+
+## Additional Models not used
+These models are not used in my original submission, but since I have implemented them here's how to use them :) 
+
+- **D-Model:**
+Download the pre-trained model [here](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) and place the file pytorch_model_11.bin under `vilio/data/pytorch_model_11.bin`
+The file `vilio/bash/training/D/hm_D.sh` will run the model on three different features & seeds and then simple average them. First to make sure everything works correctly, run the file once with only a tiny part of data by changing the topk argument, for example as follows: `cd vilio; bash bash/training/D/hm_D.sh 20`. This will run the file with only 20 images. If there are any file errors make sure the the necessary files are under `vilio/data` as outlined above. Else raise an issue/send me an email and I will look into it asap. If there are no apparent errors, run `cd vilio; bash bash/training/D/hm_D.sh`. On a P100, each model takes around 4 hours, hence it will run for **~4h**. If that's too long, we also have .sh files separating the steps. For separating the steps run `cd vilio; bash bash/training/D/hm_D36.sh`, `cd vilio; bash bash/training/D/hm_D50.sh`, `cd vilio; bash bash/training/D/hm_D72.sh` and then run `cd vilio; bash bash/training/D/hm_DSA.sh` to simple average the the 9 csvs that have been created. This will create a new dir within `vilio/data/` named after the experiment (D365072), where it will store the final **3 csvs (dev_seen, test_seen, test_unseen)** for the D-Model, which will go into the final ensemble. If you plan to reset your environment, make sure to save those 3 csvs, everything else can be discarded.
+
+- **X-Model:**
+Download the pre-trained model [here](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) and place the file Epoch18_LXRT.pth under `vilio/data`.
+For X we will be using PyTorch 1.6 to make use of SWA which is >=1.6. For my setup this means running: `pip install torch==1.6.0+cu101 torchvision==0.7.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html`. Check out how to install PyTorch 1.6 [here](https://pytorch.org/get-started/previous-versions/). We also perform pretraining and use different tsv features. After installing PyTorch 1.6, run `cd vilio; bash bash/training/X/hm_X.sh`to run three different seeds and averaging. Alternatively `cd vilio; bash bash/training/X/hm_X36.sh`, `cd vilio; bash bash/training/X/hm_X50.sh`, `cd vilio; bash bash/training/X/hm_X72.sh` `cd vilio; bash bash/training/X/hm_XSA.sh`.  You can run a test with `cd vilio; bash bash/training/X/hm_X.sh 20`. P100 Runtime in total:  **~5h**.
