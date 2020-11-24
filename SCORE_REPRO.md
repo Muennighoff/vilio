@@ -128,10 +128,10 @@ Take the csvs from all models (In their respective experiment folders) and drop 
 
 ## Inference-Only
 
-The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example Notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle. They already include the weight & feature data as inputs. To run them:
-1) [Inference1](https://www.kaggle.com/muennighoff/hm-inference1): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~6h).
-2) [Inference2](https://www.kaggle.com/muennighoff/hm-inference2): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~7h).
-3) [Inference3](https://www.kaggle.com/muennighoff/hm-inference3): Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/ECSVS` as outlined in the notebook. Commit it (~7h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
+The above is the full pipeline to train, infer & ensemble. If you want to perform inference only without training, I have uploaded weights & set up an example notebook with the exact inference pipeline that you can find under `vilio/notebooks`. I also uploaded the notebook split into three to kaggle. They already include the weight & feature data as inputs. To run them:
+1) [Inference1](https://www.kaggle.com/muennighoff/hm-inference1): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~1h).
+2) [Inference2](https://www.kaggle.com/muennighoff/hm-inference2): Upload/download the hatefulmemes data and copy paste the img folder and the jsonls into `/vilio/data`, as outlined in the notebook. Then commit it (~1h).
+3) [Inference3](https://www.kaggle.com/muennighoff/hm-inference3): Grab the csv files that were output from Inference1 & Inference2 (Click on the committed notebook and scroll to the output part). Upload those 6 csvs as input data to Inference3. Make sure they get copied to `/vilio/data/` in the end, as outlined in the notebook. Commit it (~3h). Take the output test_seen / test_unseen starting with FIN_ and submit them. 
 Sometimes cuda throws an initialization error when running many models consecutively. In that case it is best to split them and run them one by one making sure to save the three csvs per model. Inference-only on all seeds & models together takes around 4h, while full training takes around 25h. 
 
 Below are/is all the pre-trained/extracted data mentioned in the notebooks:
