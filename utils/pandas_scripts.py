@@ -77,7 +77,6 @@ def clean_data(data_path="./data"):
     # We validate with dev_seen throughout all experiments, so we only take the new data from dev_unseen add it to train and then discard dev_unseen
     dev_unseen = pd.read_json(os.path.join(data_path,"dev_unseen.jsonl"), lines=True, orient="records")
     dev_unseen = dev_unseen[~dev_unseen['id'].isin(dev_seen.id.values)].copy()
-    test_seen = pd.read_json(os.path.join(data_path, "test_seen.jsonl"), lines=True, orient="records")
 
     ## Clean training data
     df_dict = {'train': train, 'dev_seen': dev_seen, 'dev_unseen': dev_unseen}
@@ -127,7 +126,7 @@ def clean_data(data_path="./data"):
     
     # a) Pretrain file for ITM & LM pre-training
 
-    pretrain = pd.concat([train, dev_seen, test_seen, dev_unseen])
+    pretrain = pd.concat([train, dev_seen, dev_unseen])
 
     # The following ids throw some dimension error when pre-training; we can afford to skip them
     dim_error = [63805, 73026, 16845, 27058]
