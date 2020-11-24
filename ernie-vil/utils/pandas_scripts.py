@@ -78,9 +78,7 @@ def clean_data(data_path="./data"):
     # We validate with dev_seen throughout all experiments, so we only take the new data from dev_unseen add it to train and then discard dev_unseen
     dev_unseen = pd.read_json(os.path.join(data_path,"dev_unseen.jsonl"), lines=True, orient="records")
     dev_unseen = dev_unseen[~dev_unseen['id'].isin(dev_seen.id.values)].copy()
-
     test_seen = pd.read_json(os.path.join(data_path, "test_seen.jsonl"), lines=True, orient="records")
-    test_unseen = pd.read_json(os.path.join(data_path, "test_unseen.jsonl"), lines=True, orient="records")
 
     ## Clean training data
     df_dict = {'train': train, 'dev_seen': dev_seen, 'dev_unseen': dev_unseen}
@@ -129,8 +127,7 @@ def clean_data(data_path="./data"):
     ## Output all files we need
     
     # a) Pretrain file for ITM & LM pre-training
-
-    pretrain = pd.concat([train, dev_seen, test_seen, dev_unseen, test_unseen])
+    pretrain = pd.concat([train, dev_seen, test_seen, dev_unseen])
 
     # The following ids throw some dimension error when pre-training; we can afford to skip them
     dim_error = [63805, 73026, 16845, 27058]
@@ -149,11 +146,11 @@ def clean_data(data_path="./data"):
     traincleandev.to_json(path_or_buf=os.path.join(data_path, "traindev.jsonl"), orient='records', lines=True)
 
 
-def double_data(data_path="./data", jsonl="test_unseen.jsonl"):
+def double_data(data_path="./data"):
     """
-    Takes the data and pastes it on to the end. This ensure the model uses the whole data.
-
-    jsonl: json lines file with img entry
+    Takes the data and pastes it on to the end. This ensures the data is formatted correctly for E-Models.
+    It also creates a dummy column "label" which is just set to 0. 
+    The test data is only used at inference.
     """
     data = ["train", "traindev", "dev_seen", "test_seen", "test_unseen"]
 

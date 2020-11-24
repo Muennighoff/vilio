@@ -542,7 +542,7 @@ if __name__ == '__main__':
     if args.task_name == "hm":
         # Create pretrain.jsonl & traindev data
         clean_data("./data/hm")
-        # As PaddlePaddle sometimes does not read in all the data we just double it
+        # This handles formatting for the E-Models. There needs to be a label column & some data needs to be copied to the end for length requirements.
         double_data("./data/hm")
 
     main(args)
