@@ -3,7 +3,7 @@
 
 This outline aims to explain how you can use the repo for your own Vision & Language problem. Be it Visual Question Answering, Visual Reasoning, Classification etc. 
 For applying it to the Hateful Memes Dataset, refer to SCORE_REPRO.md. 
-<br>
+<br> <br>
 If anything pops up, do feel free to: Drop an issue / send a PR / send me an email at n.muennighoff@gmail.com
 
 ## Data
@@ -33,29 +33,38 @@ Depending on your feature format and text format, you probably want to go throug
 
 ## Modeling
 
+### PyTorch
 Once your data is ready, I'd recommend making a copy of `vilio/hm.py` and depending on your project consider the following adjustments:
 - The score metric (currently roc-auc & accuracy)
 - Remove/adjust the `clean_data` call, which is specific to the hm dataset
 - Adjust the result dumping (currently dump_csv for a csv file output with id, predicted label, predicted probability)
+### PaddlePaddle
+If you choose to run one of the ERNIE models implemented in PaddlePaddle, I'd recommend making a copy of `vilio/ernie-vil/reader/hm_finetuning.py` and making necessary adjustments on the go, while going through the file, such as
+- Add function in `vilio/ernie-vil/baching/finetune_batching.py`
+- Data handling in `vilio/ernie-vil/reader/_tsv_reader.py`
+- Copy the hm conf folder & adjust under `vilio/ernie-vil/conf/`
+- Add a data folder for your project at `vilio/ernie-vil/data`
 
-Finally it is time to choose the model you want to run. Refer to the below table for a rough performance & implementation guide. 
+Finally it is time to choose the model you want to run. Refer to the below table for a rough performance & implementation guide. When pre-trained models are available, you can download them by clicking on the respective language transformer. <br>
 Note that the performance rank might be very different for other datasets than Hateful Memes.
 <br>
 
-| Model | Language Transformer | Performance Rank for HM | Task-specific pre-training enabled |
-|-|-|
-| [E - ERNIE-VIL](https://arxiv.org/abs/2006.16934) | Full API documentation and tutorials |
-| [D - DeVLBERT](https://arxiv.org/abs/2008.06884) | Tasks supported by 🤗 Transformers |
-| [O - OSCAR](https://arxiv.org/abs/2004.06165) | Using the `Tokenizer` class to prepare data for the models |
-| [U - UNITER](https://arxiv.org/abs/1909.11740) | Using the models provided by 🤗 Transformers in a PyTorch/TensorFlow training loop and the `Trainer` API |
-| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | Example scripts for fine-tuning models on a wide range of tasks |
-| [X - LXMERT](https://arxiv.org/abs/1908.07490) | Upload and share your fine-tuned models with the community |
-| [Migration](https://huggingface.co/transformers/migration.html) | Migrate to 🤗 Transformers from `pytorch-transformers` or `pytorch-pretrained-bert` |
+| Model | Language Transformers (--tr in params.py) | Performance Rank for HM | Pre-trained model available | Task-specific pre-training enabled |
+|-|-|-|-|-|
+| [E - ERNIE-VIL LARGE/SMALL](https://arxiv.org/abs/2006.16934) | ERNIE | **1**, **2**  | [LARGE](https://ernie-github.cdn.bcebos.com/model-ernie-vil-large-en.1.tar.gz) / [BASE](https://ernie-github.cdn.bcebos.com/model-ernie-vil-base-en.1.tar.gz) | No (TODO) |
+| [D - DeVLBERT](https://arxiv.org/abs/2008.06884) | bert-base-uncased | **8** | [BASE](https://drive.google.com/file/d/151vQVATAlFM6rs5qjONMnIJBGfL8ea-B/view?usp=sharing) | No |
+| [O - OSCAR LARGE/SMALL](https://arxiv.org/abs/2004.06165) | bert-large-uncased / bert-base-uncased | **5**, **6** | [LARGE](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip) / [BASE](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/base-vg-labels.zip) | Yes |
+| [U - UNITER LARGE/SMALL](https://arxiv.org/abs/1909.11740) | bert-large-cased / bert-base-cased | **3**, **4** | [LARGE](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) / [BASE](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-base.pt)| Yes |
+| [U - UNITER LARGE/SMALL](https://arxiv.org/abs/1909.11740) | roberta-large / roberta-small | **14** | No | No |
+| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | bert-large-uncased | **7** | [Yes](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) | Yes |
+| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | roberta-large / roberta-small | **11** | No | Yes |
+| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | albert-base-v2 - albert-xxlarge-v2 | **10** (XXL V2) | No | Yes |
+| [X - LXMERT](https://arxiv.org/abs/1908.07490) | bert-large-uncased / bert-base-uncased | **9** | [LARGE](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) | Yes |
+| [X - LXMERT](https://arxiv.org/abs/1908.07490) | roberta-large / roberta-small | **13** | No | Yes |
+| [X - LXMERT](https://arxiv.org/abs/1908.07490) | albert-base-v2 - albert-xxlarge-v2 | **12** (XXL V2) | No | Yes |
 
-
-Now just run your adjusted version of `vilio/hm.py` with e.g. `python hm.py --model U --train train --valid dev_seen --test dev_seen --lr 1e-5 --batchSize 8 --tr bert-large-cased --epochs 5 --tsv --num_features 50 --loadpre ./data/uniter-large.pt --num_pos 6 --contrib --exp U50`. The parameters are explained at `vilio/params.py`.
-
-
-
-
-
+For most models other language transformers might work as well, but havn't been tested yet. Note that for VL tasks having a pre-trained model makes a major difference. If you choose to use a pretrained model, make sure to place the weights file in `vilio/data` or for E-Models the params folder in `vilio/ernie-vil/data/ernielarge/` / `vilio/ernie-vil/data/erniesmall/`.
+<br><br>
+Now just place your features & text data in the respective data folders & run the model. <br>
+Depending on which model & features you chose, refer to the bash files either under `vilio/bash/training` or `vilio/ernie-vil/bash/training` and adjust them to your needs. <br>
+The parameters are explained at `vilio/params.py`. <br>
