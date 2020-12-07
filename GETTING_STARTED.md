@@ -56,7 +56,7 @@ Note that the performance rank might be very different for other datasets than H
 | [O - OSCAR LARGE/SMALL](https://arxiv.org/abs/2004.06165) | bert-large-uncased / bert-base-uncased | **5**, **6** | [LARGE](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/large-vg-labels.zip) / [BASE](https://biglmdiag.blob.core.windows.net/oscar/pretrained_models/base-vg-labels.zip) | Yes |
 | [U - UNITER LARGE/SMALL](https://arxiv.org/abs/1909.11740) | bert-large-cased / bert-base-cased | **3**, **4** | [LARGE](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-large.pt) / [BASE](https://convaisharables.blob.core.windows.net/uniter/pretrained/uniter-base.pt)| Yes |
 | [U - UNITER LARGE/SMALL](https://arxiv.org/abs/1909.11740) | roberta-large / roberta-small | **14** | No | No |
-| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | bert-large-uncased | **7** | [Yes](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) | Yes |
+| [V - VisualBERT](https://arxiv.org/abs/1908.03557) | bert-large-uncased | **7** | [LARGE](https://dl.fbaipublicfiles.com/mmf/data/models/visual_bert/visual_bert.pretrained.coco.tar.gz) | Yes |
 | [V - VisualBERT](https://arxiv.org/abs/1908.03557) | roberta-large / roberta-small | **11** | No | Yes |
 | [V - VisualBERT](https://arxiv.org/abs/1908.03557) | albert-base-v2 - albert-xxlarge-v2 | **10** (XXL V2) | No | Yes |
 | [X - LXMERT](https://arxiv.org/abs/1908.07490) | bert-large-uncased / bert-base-uncased | **9** | [LARGE](http://nlp.cs.unc.edu/models/lxr1252_bertinit/Epoch18_LXRT.pth) | Yes |
