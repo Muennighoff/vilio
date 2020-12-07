@@ -70,8 +70,8 @@ Args for running hm.py
 
 ## Usage
 
-Follow SCORE_REPRO.md
-
+Follow SCORE_REPRO.md for reproducing performance on the Hateful Memes Task. <br>
+Follow GETTING_STARTED.md for using the framework for your own task.
 
 ## Architectures
 
@@ -106,7 +106,7 @@ Follow SCORE_REPRO.md
 
 ## Attributions
 
-The code heavily borrows from the following repositories:
+The code heavily borrows from the following repositories, thanks for their great work:
 - https://github.com/huggingface/transformers
 - https://github.com/facebookresearch/mmf
 - https://github.com/airsplay/lxmert
