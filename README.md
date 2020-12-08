@@ -19,7 +19,7 @@
 </p>
 
 <h3 align="center">
-<p> State-of-the-art Vision & Linguistics Order 🥶
+<p> State-of-the-art Visio-Linguistic Models 🥶
 </h3>
 
 
