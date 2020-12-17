@@ -71,7 +71,8 @@ Args for running hm.py
 ## Usage
 
 Follow SCORE_REPRO.md for reproducing performance on the Hateful Memes Task. <br>
-Follow GETTING_STARTED.md for using the framework for your own task.
+Follow GETTING_STARTED.md for using the framework for your own task. <br>
+See the paper at: https://arxiv.org/abs/2012.07788
 
 ## Architectures
 
