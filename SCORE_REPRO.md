@@ -150,7 +150,7 @@ Weights (2 ckpts per run - ignore the sub ckpts):
 - [V45](https://www.kaggle.com/muennighoff/viliov45)
 - [V90](https://www.kaggle.com/muennighoff/viliov90)
 - [V135](https://www.kaggle.com/muennighoff/viliov135)
-- [ES36](https://www.kaggle.com/muennighoff/vilioes36)
+- [ES36](https://www.kaggle.com/muennighoff/vilioe36)
 - [ESVCR36](https://www.kaggle.com/muennighoff/vilioesvcr36)
 - [ESV50](https://www.kaggle.com/muennighoff/vilioesv50)
 - [ES72](https://www.kaggle.com/muennighoff/vilioes72)
