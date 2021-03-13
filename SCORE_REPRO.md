@@ -56,7 +56,7 @@ After completing extraction, we have the following files in `vilio/py-bottom-up-
 - hm_vg10100.tsv
 
 We will still need the /img/ folder from HM for the models, as we initally remove some duplicates from the training data for a cleaner dataset. Place the /img/ folder under both `vilio/data` & `vilio/ernie-vil/data/hm`.
-We also make use of the lmdb feats provided by mmf for one of our models, download them [here](https://dl.fbaipublicfiles.com/mmf/data/datasets/hateful_memes/defaults/features/features.tar.gz).
+We also make use of the lmdb feats provided by mmf for one of our models, download them [here](https://www.kaggle.com/muennighoff/hmfeatureszipfin).
 <br>
 With the downloaded detectron.lmdb, we now have 7 different feature files.
 
