@@ -90,7 +90,7 @@ Refer to the hm_pipeline notebook under `vilio/notebooks` for an example of runn
 ### 1. PyTorch / O U V
 Make sure we have 5 jsonl files, 4 tsv files, 1 lmdb file and 1 img folder under `vilio/data`.
 Install the necessary packages with: <br>
-`cd vilio; pip install -r requirements_full.txt`
+`cd vilio; pip install -r requirements.txt`
 
 We now proceed to the training of our models. For all models we make use of pre-trained models provided by the creators of each model. I will put the original DL-Links for all models below, but I have reuploaded all model weights to datasets on kaggle, so contact me in case any of the original DL-Links does not work anymore (You can also find the datasets in the hm_pipeline notebook).
 
