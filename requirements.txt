@@ -19,6 +19,7 @@ requests==2.23.0
 pytorch_lightning==1.0.4
 ImageHash==4.1.0
 tokenizers==0.9.2
+transformers==3.5.1 # Required due to some imports in the files under src/vilio/transformers
 torchvision==0.7.0
 jieba==0.42.1
 botocore==1.19.8
