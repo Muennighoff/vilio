@@ -22,6 +22,15 @@
 <p> State-of-the-art Visio-Linguistic Models 🥶
 </h3>
 
+## Updates
+
+### 06/2021 - Inference on any meme
+
+- Thanks to the initiative by <a href="https://github.com/katrinc">katrinc</a>, here are two notebooks for using Vilio to perform pure inference on any meme you want :)
+- Just adapt the example input dataset / input model to use a different meme / pretrained model🥶
+- GPU: https://www.kaggle.com/muennighoff/vilioexample-nb
+- CPU: https://www.kaggle.com/muennighoff/vilioexample-nb-cpu
+
 
 ## Ordering
 
