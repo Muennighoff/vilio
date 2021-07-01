@@ -24,6 +24,10 @@
 
 ## Updates
 
+### 06/2021 - Hateful Memes CSV Files
+
+- The CSV files that were used for the scores in the <a href="https://arxiv.org/abs/2012.07788">vilio paper</a> are now available <a href="https://www.kaggle.com/muennighoff/vilioresults">here</a>
+
 ### 06/2021 - Inference on any meme
 
 - Thanks to the initiative by <a href="https://github.com/katrinc">katrinc</a>, here are two notebooks for using Vilio to perform pure inference on any meme you want :)
