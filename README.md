@@ -124,3 +124,14 @@ The code heavily borrows from the following repositories, thanks for their great
 - https://github.com/huggingface/transformers
 - https://github.com/facebookresearch/mmf
 - https://github.com/airsplay/lxmert
+
+## Citation
+
+```bibtex
+@article{muennighoff2020vilio,
+  title={Vilio: State-of-the-art visio-linguistic models applied to hateful memes},
+  author={Muennighoff, Niklas},
+  journal={arXiv preprint arXiv:2012.07788},
+  year={2020}
+}
+```
